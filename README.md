@@ -1,1 +1,51 @@
-This is a Visual Novel or Dating Sim game for Lession ENGSE204
+# เกมจีบสาว (Dating Simulation Game)
+
+เกม Dating Simulation แบบเทิร์นเบส สร้างด้วยภาษา Java
+
+## ภาพรวม
+
+เกมจีบสาวที่ผู้เล่นจะได้สร้างความสัมพันธ์กับตัวละครต่างๆ ผ่านการเลือกคำตอบในบทสนทนา เพื่อไปสู่ตอนจบที่แตกต่างกันตามคะแนนความสัมพันธ์
+
+## ระบบหลัก
+
+- **ระบบบทสนทนา** (Dialogue System) - แสดงบทสนทนาและรูปตัวละคร
+- **ระบบเลือกคำตอบ** (Choice System) - เลือกตอบโต้ที่ส่งผลต่อเนื้อเรื่อง
+- **ระบบคะแนนความสัมพันธ์** (Affection Points) - ติดตามความสัมพันธ์กับตัวละคร
+- **ระบบหลายตอนจบ** (Multiple Ending) - ตอนจบหลายแบบตามการเล่น
+- **ระบบ Save/Load** - บันทึกและโหลดความคืบหน้า
+
+## โครงสร้างโปรเจกต์
+
+ดูรายละเอียดใน [docs/STRUCTURE.md](docs/STRUCTURE.md)
+
+## การรันโปรเจกต์
+
+```bash
+# Compile
+javac -d bin src/main/java/com/game/**/*.java
+
+# Run
+java -cp bin com.game.Main
+```
+
+## สถานะปัจจุบัน
+
+✅ โครงสร้างพื้นฐานเสร็จสมบูรณ์  
+🔄 ยังไม่มี UI (Console-based ในตอนนี้)  
+📝 ต้องสร้างเนื้อหาบทสนทนาและตัวละคร
+
+## TODO
+
+- [ ] สร้าง UI (Swing/JavaFX)
+- [ ] เพิ่มเนื้อหาบทสนทนา
+- [ ] สร้าง character sprites
+- [ ] เพิ่ม BGM และ sound effects
+- [ ] เขียน unit tests
+
+## Requirements
+
+- Java 8 หรือสูงกว่า
+
+## License
+
+สำหรับการพัฒนาส่วนตัว
