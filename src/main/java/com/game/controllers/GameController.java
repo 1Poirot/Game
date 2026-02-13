@@ -1,11 +1,13 @@
 package com.game.controllers;
 
 import com.game.models.Player;
+import com.game.models.Character;
 import com.game.systems.dialogue.DialogueSystem;
 import com.game.systems.choice.ChoiceSystem;
 import com.game.systems.affection.AffectionSystem;
 import com.game.systems.ending.EndingSystem;
 import com.game.systems.save.SaveSystem;
+import com.game.ui.GamePanel;
 
 /**
  * Game Controller - ควบคุมการเล่นเกมหลัก
@@ -13,21 +15,28 @@ import com.game.systems.save.SaveSystem;
  */
 public class GameController {
     private Player player;
+    private Character character;
     private DialogueSystem dialogueSystem;
     private ChoiceSystem choiceSystem;
     private AffectionSystem affectionSystem;
     private EndingSystem endingSystem;
     private SaveSystem saveSystem;
+    private GamePanel gamePanel;
 
     private boolean gameRunning;
 
     public GameController() {
+        // Initialize systems
         this.dialogueSystem = new DialogueSystem();
         this.choiceSystem = new ChoiceSystem();
         this.affectionSystem = new AffectionSystem();
         this.endingSystem = new EndingSystem();
         this.saveSystem = new SaveSystem();
         this.gameRunning = false;
+
+        // Initialize character and game panel
+        this.character = new Character("อิอิ");
+        this.gamePanel = new GamePanel(character, dialogueSystem);
     }
 
     public void startNewGame(String playerName) {
@@ -74,5 +83,14 @@ public class GameController {
 
     public void saveCurrentGame(String saveSlot) {
         saveSystem.saveGame(player, saveSlot);
+    }
+
+    /**
+     * Get the game panel for UI display
+     * 
+     * @return GamePanel instance
+     */
+    public GamePanel getGamePanel() {
+        return gamePanel;
     }
 }
