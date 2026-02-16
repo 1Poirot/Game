@@ -1,9 +1,6 @@
 package com.game.ui;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.*;
 
 public class Changescene extends JFrame {
@@ -24,145 +21,131 @@ public class Changescene extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         mainPanel.add(new SceneRoom(), "room");
-        mainPanel.add(new SceneClass(), "class");
 
         add(mainPanel);
         setVisible(true);
     }
 
-    // ========================= SCENE ROOM =========================
+    // ========================== SCENE ==========================
     class SceneRoom extends JLayeredPane {
-
-        private JLabel dialogPanel;
-        private Map<String, SceneData> scenes = new HashMap<>();
-        private String current = "S1";
 
         public SceneRoom() {
 
             setLayout(null);
 
+            // Background
             JLabel bg = createBackground("src/main/resources/images/backgrounds/มุมตึก.png");
             add(bg, Integer.valueOf(0));
 
+            // Character
             JLabel character = createCharacter();
             add(character, Integer.valueOf(1));
 
-            dialogPanel = createDialogPanel();
-            add(dialogPanel, Integer.valueOf(100));
-            setComponentZOrder(dialogPanel, 0);
+            // Top UI
+            add(createTopLeftUI(), Integer.valueOf(5));
+            add(createTopRightUI(), Integer.valueOf(5));
 
-            dialogPanel.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    nextScene();
-                }
-            });
-
-            buildStory();
-            showScene("S1");
-        }
-
-        private void buildStory() {
-
-            scenes.put("S1", new SceneData(
-                    "คิม แจฮยอน",
-                    "Day 1",
-                    "“ระวังหน่อย… ตรงนี้คนเดินผ่านเยอะ”",
-                    "S2"
-            ));
-
-            scenes.put("S2", new SceneData(
-                    "คุณ",
-                    "Day 1",
-                    "“ขอโทษนะ เราเดินไม่ทันระวังเอง”",
-                    "END"
-            ));
-        }
-
-        private void showScene(String id) {
-
-            current = id;
-
-            SceneData s = scenes.get(id);
-            if (s == null) return;
-
-            dialogPanel.setText(
-                    "<html><b>" + s.name + "</b><br>" +
-                            s.day + "<br><br>" +
-                            s.text + "</html>"
-            );
-        }
-
-        private void nextScene() {
-
-            SceneData s = scenes.get(current);
-            if (s == null) return;
-
-            if (s.next.equals("END")) {
-                cardLayout.show(mainPanel, "class"); // เปลี่ยนฉาก
-                return;
-            }
-
-            showScene(s.next);
+            // Dialog
+            add(createDialogUI(), Integer.valueOf(10));
         }
     }
 
-    // ========================= SCENE CLASS =========================
-    class SceneClass extends JLayeredPane {
+    // ========================== TOP LEFT ==========================
+    private JPanel createTopLeftUI() {
 
-        public SceneClass() {
+        JPanel panel = new JPanel(null);
+        panel.setOpaque(false);
+        panel.setBounds(30, 20, 420, 70);
 
-            setLayout(null);
+        // Heart icon
+        JLabel heart = new JLabel(new ImageIcon("heart.png"));
+        heart.setBounds(0, 10, 50, 50);
+        panel.add(heart);
 
-            JLabel bg = createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
-            add(bg, Integer.valueOf(0));
+        // Progress background
+        RoundedPanel barBg = new RoundedPanel(30);
+        barBg.setBackground(new Color(255, 230, 235));
+        barBg.setBounds(50, 15, 350, 40);
+        barBg.setLayout(null);
 
-            JLabel character = createCharacter();
-            add(character, Integer.valueOf(1));
+        JProgressBar bar = new JProgressBar(0, 100);
+        bar.setValue(20);
+        bar.setString("20%");
+        bar.setStringPainted(true);
+        bar.setBounds(10, 5, 330, 30);
 
-            JLabel label = new JLabel("ห้องเรียน");
-            label.setForeground(Color.WHITE);
-            label.setFont(new Font("Tahoma", Font.BOLD, 40));
-            label.setBounds(100, 100, 400, 60);
-            add(label, Integer.valueOf(2));
-        }
+        barBg.add(bar);
+        panel.add(barBg);
+
+        return panel;
     }
 
-    // ========================= DATA =========================
-    class SceneData {
+    // ========================== TOP RIGHT ==========================
+    private JPanel createTopRightUI() {
 
-        String name;
-        String day;
-        String text;
-        String next;
+        JPanel panel = new RoundedPanel(30);
+        panel.setLayout(null);
+        panel.setBackground(new Color(230, 230, 230, 220));
 
-        SceneData(String name, String day, String text, String next) {
-            this.name = name;
-            this.day = day;
-            this.text = text;
-            this.next = next;
-        }
+        panel.setBounds(WIDTH - 230, 20, 180, 70);
+
+        JLabel bag = new JLabel(new ImageIcon("bag.png"));
+        bag.setBounds(25, 10, 50, 50);
+
+        JLabel gear = new JLabel(new ImageIcon("gear.png"));
+        gear.setBounds(100, 10, 50, 50);
+
+        panel.add(bag);
+        panel.add(gear);
+
+        return panel;
     }
 
-    // ========================= DIALOG =========================
-    private JLabel createDialogPanel() {
+    // ========================== DIALOG ==========================
+    private JPanel createDialogUI() {
 
-        JLabel dialog = new JLabel();
-        dialog.setOpaque(true);
-        dialog.setBackground(new Color(244, 169, 193, 230));
-        dialog.setFont(new Font("Tahoma", Font.PLAIN, 22));
+        JPanel container = new JPanel(null);
+        container.setOpaque(false);
+        container.setBounds(50, HEIGHT - 260, WIDTH - 100, 230);
 
-        int dialogW = WIDTH - 200;
-        int dialogH = 200;
+        // Name box
+        RoundedPanel nameBox = new RoundedPanel(25);
+        nameBox.setBackground(Color.WHITE);
+        nameBox.setBounds(20, 0, 200, 50);
 
-        dialog.setBounds(100, HEIGHT - dialogH - 40, dialogW, dialogH);
+        JLabel name = new JLabel("คิม แจฮยอน");
+        name.setFont(new Font("Tahoma", Font.BOLD, 18));
+        nameBox.add(name);
 
-        dialog.setVerticalAlignment(SwingConstants.TOP);
-        dialog.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Dialog box
+        RoundedPanel dialog = new RoundedPanel(40);
+        dialog.setBackground(new Color(244, 169, 193, 220));
+        dialog.setBounds(0, 30, WIDTH - 100, 200);
+        dialog.setLayout(null);
 
-        return dialog;
+        JLabel text = new JLabel("“ระวังหน่อย… ตรงนี้คนเดินผ่านเยอะ”");
+        text.setFont(new Font("Tahoma", Font.PLAIN, 22));
+        text.setBounds(40, 40, 900, 40);
+
+        JLabel day = new JLabel("Day 1");
+        day.setFont(new Font("Tahoma", Font.BOLD, 18));
+        day.setBounds(dialog.getWidth() - 100, 20, 80, 30);
+
+        JLabel sparkle = new JLabel("✨");
+        sparkle.setFont(new Font("Dialog", Font.PLAIN, 28));
+        sparkle.setBounds(dialog.getWidth() - 60, 150, 40, 40);
+
+        dialog.add(text);
+        dialog.add(day);
+        dialog.add(sparkle);
+
+        container.add(nameBox);
+        container.add(dialog);
+
+        return container;
     }
 
-    // ========================= BACKGROUND =========================
+    // ========================== BACKGROUND ==========================
     private JLabel createBackground(String path) {
 
         ImageIcon icon = new ImageIcon(path);
@@ -174,7 +157,7 @@ public class Changescene extends JFrame {
         return bg;
     }
 
-    // ========================= CHARACTER =========================
+    // ========================== CHARACTER ==========================
     private JLabel createCharacter() {
 
         int charW = WIDTH / 4;
@@ -191,6 +174,28 @@ public class Changescene extends JFrame {
         character.setBounds(x, y, charW, charH);
 
         return character;
+    }
+
+    // ========================== ROUNDED PANEL ==========================
+    class RoundedPanel extends JPanel {
+
+        private int radius;
+
+        public RoundedPanel(int radius) {
+            this.radius = radius;
+            setOpaque(false);
+        }
+
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
+            super.paintComponent(g);
+        }
     }
 
     public static void main(String[] args) {
