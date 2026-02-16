@@ -1,96 +1,65 @@
 package com.game.controllers;
 
 import com.game.models.Player;
-import com.game.models.Character;
-import com.game.systems.dialogue.DialogueSystem;
-import com.game.systems.choice.ChoiceSystem;
-import com.game.systems.affection.AffectionSystem;
-import com.game.systems.ending.EndingSystem;
-import com.game.systems.save.SaveSystem;
-import com.game.ui.GamePanel;
+import com.game.systems.shop.ShopSystem;
+import com.game.ui.SettingsScreen;
+import com.game.ui.ShopScreen;
+import com.game.ui.AudioSettingsScreen; // อย่าลืม Import คลาสหน้าตั้งค่าเสียงที่สร้างใหม่
+import javax.swing.JFrame;
 
-/**
- * Game Controller - ควบคุมการเล่นเกมหลัก
- * จัดการ Game Loop และเชื่อมต่อระบบต่างๆ
- */
 public class GameController {
     private Player player;
-    private Character character;
-    private DialogueSystem dialogueSystem;
-    private ChoiceSystem choiceSystem;
-    private AffectionSystem affectionSystem;
-    private EndingSystem endingSystem;
-    private SaveSystem saveSystem;
-    private GamePanel gamePanel;
-
-    private boolean gameRunning;
+    private ShopSystem shopSystem;
+    private JFrame mainFrame;
 
     public GameController() {
-        // Initialize systems
-        this.dialogueSystem = new DialogueSystem();
-        this.choiceSystem = new ChoiceSystem();
-        this.affectionSystem = new AffectionSystem();
-        this.endingSystem = new EndingSystem();
-        this.saveSystem = new SaveSystem();
-        this.gameRunning = false;
+        // เริ่มต้นผู้เล่นด้วยชื่อ "Hero" และเงิน 100
+        this.player = new Player("Hero", 100);
+        this.shopSystem = new ShopSystem();
 
-        // Initialize character and game panel
-        this.character = new Character("อิอิ");
-        this.gamePanel = new GamePanel(character, dialogueSystem);
+        mainFrame = new JFrame("Game Shop - Swing Version");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // --- ปรับขนาดหน้าจอเป็น 1920 x 1080 ---
+        mainFrame.setSize(1920, 1080);
+        mainFrame.setResizable(false); // ล็อกขนาดหน้าจอไม่ให้ลากขยายจนภาพเพี้ยน
+        mainFrame.setLocationRelativeTo(null); // ให้หน้าต่างเด้งขึ้นตรงกลางจอ
     }
 
-    public void startNewGame(String playerName) {
-        this.player = new Player(playerName);
-        this.gameRunning = true;
-        gameLoop();
+    public void start() {
+        showShop();
+        mainFrame.setVisible(true);
     }
 
-    public void loadGame(String saveSlot) {
-        this.player = saveSystem.loadGame(saveSlot);
-        if (player != null) {
-            this.gameRunning = true;
-            gameLoop();
-        }
+    // ฟังก์ชันแสดงหน้า ร้านค้า
+    public void showShop() {
+        mainFrame.getContentPane().removeAll();
+        mainFrame.setContentPane(new ShopScreen(this));
+        mainFrame.revalidate();
+        mainFrame.repaint();
     }
 
-    private void gameLoop() {
-        // TODO: Implement main game loop
-        // เริ่มจาก -> สนทนา -> เลือกคำตอบ -> คะแนนความสัมพันธ์เปลี่ยน ->
-        // ตำแหน่อต่อเนื่อง -> จบจาก
-
-        while (gameRunning) {
-            // 1. Display current situation/dialogue
-            // 2. Present choices
-            // 3. Process player choice
-            // 4. Update affection
-            // 5. Check for ending condition
-            // 6. Next turn
-
-            player.nextTurn();
-
-            // Placeholder: End game after certain turns
-            if (player.getCurrentTurn() >= 10) {
-                endGame();
-            }
-        }
+    // ฟังก์ชันแสดงหน้า เมนูตั้งค่ารวม (ที่มีปุ่ม เซฟ, โปรไฟล์, ออกจากเกม)
+    public void showSettings() {
+        mainFrame.getContentPane().removeAll();
+        mainFrame.add(new SettingsScreen(this));
+        mainFrame.revalidate();
+        mainFrame.repaint();
     }
 
-    private void endGame() {
-        EndingSystem.EndingType ending = endingSystem.determineEnding(player);
-        endingSystem.playEnding(ending);
-        this.gameRunning = false;
+    // --- เพิ่มฟังก์ชันแสดงหน้า ตั้งค่าเสียง (Audio Settings) ---
+    public void showAudioSettings() {
+        mainFrame.getContentPane().removeAll();
+        mainFrame.add(new AudioSettingsScreen(this)); // เรียกใช้คลาสหน้าตั้งค่าเสียง
+        mainFrame.revalidate();
+        mainFrame.repaint();
     }
 
-    public void saveCurrentGame(String saveSlot) {
-        saveSystem.saveGame(player, saveSlot);
+    public Player getPlayer() {
+        return player;
     }
 
-    /**
-     * Get the game panel for UI display
-     * 
-     * @return GamePanel instance
-     */
-    public GamePanel getGamePanel() {
-        return gamePanel;
+    public ShopSystem getShopSystem() {
+        return shopSystem;
     }
 }
