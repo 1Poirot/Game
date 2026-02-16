@@ -1,96 +1,50 @@
 package com.game.controllers;
 
 import com.game.models.Player;
-import com.game.models.Character;
-import com.game.systems.dialogue.DialogueSystem;
-import com.game.systems.choice.ChoiceSystem;
-import com.game.systems.affection.AffectionSystem;
-import com.game.systems.ending.EndingSystem;
-import com.game.systems.save.SaveSystem;
-import com.game.ui.GamePanel;
+import com.game.systems.shop.ShopSystem;
+import com.game.ui.SettingsScreen;
+import com.game.ui.ShopScreen;
+import javax.swing.JFrame;
 
-/**
- * Game Controller - ควบคุมการเล่นเกมหลัก
- * จัดการ Game Loop และเชื่อมต่อระบบต่างๆ
- */
 public class GameController {
     private Player player;
-    private Character character;
-    private DialogueSystem dialogueSystem;
-    private ChoiceSystem choiceSystem;
-    private AffectionSystem affectionSystem;
-    private EndingSystem endingSystem;
-    private SaveSystem saveSystem;
-    private GamePanel gamePanel;
-
-    private boolean gameRunning;
+    private ShopSystem shopSystem;
+    private JFrame mainFrame;
 
     public GameController() {
-        // Initialize systems
-        this.dialogueSystem = new DialogueSystem();
-        this.choiceSystem = new ChoiceSystem();
-        this.affectionSystem = new AffectionSystem();
-        this.endingSystem = new EndingSystem();
-        this.saveSystem = new SaveSystem();
-        this.gameRunning = false;
+        this.player = new Player("Hero", 100);
+        this.shopSystem = new ShopSystem();
 
-        // Initialize character and game panel
-        this.character = new Character("อิอิ");
-        this.gamePanel = new GamePanel(character, dialogueSystem);
+        mainFrame = new JFrame("Game Shop - Swing Version");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(900, 700);
+        mainFrame.setLocationRelativeTo(null);
     }
 
-    public void startNewGame(String playerName) {
-        this.player = new Player(playerName);
-        this.gameRunning = true;
-        gameLoop();
+    public void start() {
+        showShop();
     }
 
-    public void loadGame(String saveSlot) {
-        this.player = saveSystem.loadGame(saveSlot);
-        if (player != null) {
-            this.gameRunning = true;
-            gameLoop();
-        }
+    public void showShop() {
+        ShopScreen shopScreen = new ShopScreen(this);
+        mainFrame.setContentPane(shopScreen);
+        mainFrame.revalidate();
+        mainFrame.setVisible(true);
     }
 
-    private void gameLoop() {
-        // TODO: Implement main game loop
-        // เริ่มจาก -> สนทนา -> เลือกคำตอบ -> คะแนนความสัมพันธ์เปลี่ยน ->
-        // ตำแหน่อต่อเนื่อง -> จบจาก
-
-        while (gameRunning) {
-            // 1. Display current situation/dialogue
-            // 2. Present choices
-            // 3. Process player choice
-            // 4. Update affection
-            // 5. Check for ending condition
-            // 6. Next turn
-
-            player.nextTurn();
-
-            // Placeholder: End game after certain turns
-            if (player.getCurrentTurn() >= 10) {
-                endGame();
-            }
-        }
+    public void showSettings() {
+        // ล้างหน้าจอเก่าออกแล้วใส่ SettingsScreen เข้าไปแทน
+        mainFrame.getContentPane().removeAll();
+        mainFrame.add(new SettingsScreen(this));
+        mainFrame.revalidate();
+        mainFrame.repaint();
     }
 
-    private void endGame() {
-        EndingSystem.EndingType ending = endingSystem.determineEnding(player);
-        endingSystem.playEnding(ending);
-        this.gameRunning = false;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void saveCurrentGame(String saveSlot) {
-        saveSystem.saveGame(player, saveSlot);
-    }
-
-    /**
-     * Get the game panel for UI display
-     * 
-     * @return GamePanel instance
-     */
-    public GamePanel getGamePanel() {
-        return gamePanel;
+    public ShopSystem getShopSystem() {
+        return shopSystem;
     }
 }
