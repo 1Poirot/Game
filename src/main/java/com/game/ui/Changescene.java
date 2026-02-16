@@ -1,8 +1,9 @@
 package com.game.ui;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 
 public class Changescene extends JFrame {
@@ -17,7 +18,6 @@ public class Changescene extends JFrame {
     public Changescene() {
 
         setTitle("Love Game");
-
         setSize(WIDTH, HEIGHT);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -30,10 +30,12 @@ public class Changescene extends JFrame {
         setVisible(true);
     }
 
-    // ================= SCENE 1 =================
+    // ========================= SCENE ROOM =========================
     class SceneRoom extends JLayeredPane {
 
-        int relationship = 1;
+        private JLabel dialogPanel;
+        private Map<String, SceneData> scenes = new HashMap<>();
+        private String current = "S1";
 
         public SceneRoom() {
 
@@ -42,51 +44,70 @@ public class Changescene extends JFrame {
             JLabel bg = createBackground("src/main/resources/images/backgrounds/มุมตึก.png");
             add(bg, Integer.valueOf(0));
 
-            addTopUI();
-
             JLabel character = createCharacter();
             add(character, Integer.valueOf(1));
 
-            JPanel dialog = createDialog();
-            add(dialog, Integer.valueOf(2));
+            dialogPanel = createDialogPanel();
+            add(dialogPanel, Integer.valueOf(100));
+            setComponentZOrder(dialogPanel, 0);
 
-            dialog.addMouseListener(new MouseAdapter() {
+            dialogPanel.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    cardLayout.show(mainPanel, "class");
+                    nextScene();
                 }
             });
+
+            buildStory();
+            showScene("S1");
         }
 
-        private void addTopUI() {
+        private void buildStory() {
 
-            JLabel heart = new JLabel(new ImageIcon("heart.png"));
-            heart.setBounds(40, 30, 50, 50);
-            add(heart, Integer.valueOf(2));
+            scenes.put("S1", new SceneData(
+                    "คิม แจฮยอน",
+                    "Day 1",
+                    "“ระวังหน่อย… ตรงนี้คนเดินผ่านเยอะ”",
+                    "S2"
+            ));
 
-            JProgressBar bar = new JProgressBar(0, 5);
-            bar.setValue(relationship);
-            bar.setBounds(100, 40, 300, 30);
-            bar.setStringPainted(true);
+            scenes.put("S2", new SceneData(
+                    "คุณ",
+                    "Day 1",
+                    "“ขอโทษนะ เราเดินไม่ทันระวังเอง”",
+                    "END"
+            ));
+        }
 
-            int percent = (relationship * 100) / 5;
-            bar.setString(percent + "%");
+        private void showScene(String id) {
 
-            add(bar, Integer.valueOf(2));
+            current = id;
 
-            JLabel bag = new JLabel(new ImageIcon("bag.png"));
-            bag.setBounds(WIDTH - 170, 30, 50, 50);
-            add(bag, Integer.valueOf(2));
+            SceneData s = scenes.get(id);
+            if (s == null) return;
 
-            JLabel gear = new JLabel(new ImageIcon("gear.png"));
-            gear.setBounds(WIDTH - 100, 30, 50, 50);
-            add(gear, Integer.valueOf(2));
+            dialogPanel.setText(
+                    "<html><b>" + s.name + "</b><br>" +
+                            s.day + "<br><br>" +
+                            s.text + "</html>"
+            );
+        }
+
+        private void nextScene() {
+
+            SceneData s = scenes.get(current);
+            if (s == null) return;
+
+            if (s.next.equals("END")) {
+                cardLayout.show(mainPanel, "class"); // เปลี่ยนฉาก
+                return;
+            }
+
+            showScene(s.next);
         }
     }
 
-    // ================= SCENE 2 =================
+    // ========================= SCENE CLASS =========================
     class SceneClass extends JLayeredPane {
-
-        int relationship = 1;
 
         public SceneClass() {
 
@@ -95,42 +116,53 @@ public class Changescene extends JFrame {
             JLabel bg = createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
             add(bg, Integer.valueOf(0));
 
-            addTopUI();
-
             JLabel character = createCharacter();
             add(character, Integer.valueOf(1));
 
-            JPanel dialog = createDialog();
-            add(dialog, Integer.valueOf(2));
-        }
-
-        private void addTopUI() {
-
-            JLabel heart = new JLabel(new ImageIcon("heart.png"));
-            heart.setBounds(40, 30, 50, 50);
-            add(heart, Integer.valueOf(2));
-
-            JProgressBar bar = new JProgressBar(0, 5);
-            bar.setValue(relationship);
-            bar.setBounds(100, 40, 300, 30);
-            bar.setStringPainted(true);
-
-            int percent = (relationship * 100) / 5;
-            bar.setString(percent + "%");
-
-            add(bar, Integer.valueOf(2));
-
-            JLabel bag = new JLabel(new ImageIcon("bag.png"));
-            bag.setBounds(WIDTH - 170, 30, 50, 50);
-            add(bag, Integer.valueOf(2));
-
-            JLabel gear = new JLabel(new ImageIcon("gear.png"));
-            gear.setBounds(WIDTH - 100, 30, 50, 50);
-            add(gear, Integer.valueOf(2));
+            JLabel label = new JLabel("ห้องเรียน");
+            label.setForeground(Color.WHITE);
+            label.setFont(new Font("Tahoma", Font.BOLD, 40));
+            label.setBounds(100, 100, 400, 60);
+            add(label, Integer.valueOf(2));
         }
     }
 
-    // ================= Background =================
+    // ========================= DATA =========================
+    class SceneData {
+
+        String name;
+        String day;
+        String text;
+        String next;
+
+        SceneData(String name, String day, String text, String next) {
+            this.name = name;
+            this.day = day;
+            this.text = text;
+            this.next = next;
+        }
+    }
+
+    // ========================= DIALOG =========================
+    private JLabel createDialogPanel() {
+
+        JLabel dialog = new JLabel();
+        dialog.setOpaque(true);
+        dialog.setBackground(new Color(244, 169, 193, 230));
+        dialog.setFont(new Font("Tahoma", Font.PLAIN, 22));
+
+        int dialogW = WIDTH - 200;
+        int dialogH = 200;
+
+        dialog.setBounds(100, HEIGHT - dialogH - 40, dialogW, dialogH);
+
+        dialog.setVerticalAlignment(SwingConstants.TOP);
+        dialog.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        return dialog;
+    }
+
+    // ========================= BACKGROUND =========================
     private JLabel createBackground(String path) {
 
         ImageIcon icon = new ImageIcon(path);
@@ -142,7 +174,7 @@ public class Changescene extends JFrame {
         return bg;
     }
 
-    // ================= ตัวละคร =================
+    // ========================= CHARACTER =========================
     private JLabel createCharacter() {
 
         int charW = WIDTH / 4;
@@ -161,39 +193,7 @@ public class Changescene extends JFrame {
         return character;
     }
 
-    // ================= Dialog =================
-    private JPanel createDialog() {
-
-        JPanel dialog = new JPanel(null);
-        dialog.setBackground(new Color(244, 169, 193, 230));
-
-        int dialogW = WIDTH - 200;
-        int dialogH = 200;
-
-        dialog.setBounds(100, HEIGHT - dialogH - 40, dialogW, dialogH);
-
-        JLabel name = new JLabel("คิม แจฮยอน");
-        name.setBounds(30, 20, 300, 40);
-        name.setOpaque(true);
-        name.setBackground(Color.WHITE);
-        name.setFont(new Font("Tahoma", Font.BOLD, 20));
-
-        JLabel text = new JLabel("“ระวังหน่อย… ตรงนี้คนเดินผ่านเยอะ”");
-        text.setBounds(30, 100, 900, 40);
-        text.setFont(new Font("Tahoma", Font.PLAIN, 22));
-
-        JLabel day = new JLabel("Day 1");
-        day.setBounds(dialogW - 120, 20, 100, 40);
-        day.setFont(new Font("Tahoma", Font.BOLD, 20));
-
-        dialog.add(name);
-        dialog.add(text);
-        dialog.add(day);
-
-        return dialog;
-    }
-
     public static void main(String[] args) {
-        new Changescene();
+        SwingUtilities.invokeLater(() -> new Changescene());
     }
 }
