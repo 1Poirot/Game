@@ -9,7 +9,7 @@ public class SaveSystem {
 
     // บันทึกข้อมูลลงเครื่อง
     public static void saveToFile(int slot, String name, int money, String date) {
-        String fileName = "save_slot_" + slot + ".txt";
+        String fileName = "src/main/resources/saves/save_slot_" + slot + ".txt";
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(fileName), StandardCharsets.UTF_8))) {
             writer.write("Name:" + name);
@@ -24,8 +24,9 @@ public class SaveSystem {
 
     // อ่านข้อมูลจากเครื่อง (ใช้ทั้งในหน้า Save และ Load)
     public static Map<String, String> loadFromLocal(int slot) {
-        File file = new File("save_slot_" + slot + ".txt");
-        if (!file.exists()) return null;
+        File file = new File("src/main/resources/saves/save_slot_" + slot + ".txt");
+        if (!file.exists())
+            return null;
 
         Map<String, String> data = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(

@@ -28,7 +28,7 @@ public class Character {
         this.y = 60;
         this.width = 200;
         this.height = 300;
-        this.imagePath = "1.png";
+        this.imagePath = "src/main/resources/images/characters/1.png";
     }
 
     // Getters and Setters
