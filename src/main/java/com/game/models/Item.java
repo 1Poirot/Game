@@ -23,12 +23,29 @@ public class Item {
     }
 
     // Getters
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public int getPrice() { return price; }
-    public String getImagePath() { return imagePath; }
-    public int getAffectionBoost() { return affectionBoost; }
-    public String getDescription() { return description; }
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public int getAffectionBoost() {
+        return affectionBoost;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     // Setters (ถ้าจำเป็น, แต่โดยปกติ Item model จะเป็น Immutable)
 }

@@ -41,7 +41,7 @@ public class SaveScreen extends JPanel {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
                 g2.setColor(Color.BLACK);
                 g2.setStroke(new BasicStroke(4));
-                g2.drawRoundRect(2, 2, getWidth()-4, getHeight()-4, 50, 50);
+                g2.drawRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 50, 50);
                 g2.dispose();
             }
         };
@@ -63,20 +63,22 @@ public class SaveScreen extends JPanel {
             final int slot = i;
             Map<String, String> data = SaveSystem.loadFromLocal(slot); // ดึงข้อมูลจาก SaveSystem
             boolean hasData = (data != null);
-            
-            String info = !hasData ? "--- ช่องว่าง (Empty Slot) ---" 
-                         : "ผู้เล่น: " + data.get("Name") + " | เงิน: " + data.get("Money") + " (" + data.get("Date") + ")";
-            
+
+            String info = !hasData ? "--- ช่องว่าง (Empty Slot) ---"
+                    : "ผู้เล่น: " + data.get("Name") + " | เงิน: " + data.get("Money") + " (" + data.get("Date") + ")";
+
             // แผงปุ่มสำหรับแต่ละ Slot (รวมทั้งปุ่ม Save และ Load)
             JPanel slotRow = new JPanel(new BorderLayout(15, 0));
             slotRow.setOpaque(false);
 
             // 1. ปุ่มแสดงข้อมูลและกดเพื่อ LOAD
-            JButton loadBtn = createRoundedButton("LOAD " + slot + " | " + info, 1050, 90, 
-                                                hasData ? new Color(100, 149, 237) : Color.LIGHT_GRAY, Color.WHITE);
+            JButton loadBtn = createRoundedButton("LOAD " + slot + " | " + info, 1050, 90,
+                    hasData ? new Color(100, 149, 237) : Color.LIGHT_GRAY, Color.WHITE);
             loadBtn.addActionListener(e -> {
                 if (hasData) {
-                    int confirm = JOptionPane.showConfirmDialog(this, "ต้องการโหลดข้อมูลจาก Slot " + slot + " ใช่หรือไม่?", "ยืนยันการโหลด", JOptionPane.YES_NO_OPTION);
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                            "ต้องการโหลดข้อมูลจาก Slot " + slot + " ใช่หรือไม่?", "ยืนยันการโหลด",
+                            JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         controller.getPlayer().setName(data.get("Name"));
                         controller.getPlayer().setMoney(Integer.parseInt(data.get("Money")));
@@ -91,9 +93,11 @@ public class SaveScreen extends JPanel {
             // 2. ปุ่มสำหรับ SAVE ทับช่องนี้
             JButton saveBtn = createRoundedButton("บันทึกทับ", 200, 90, new Color(255, 105, 180), Color.WHITE);
             saveBtn.addActionListener(e -> {
-                int confirm = JOptionPane.showConfirmDialog(this, "ต้องการบันทึกข้อมูลปัจจุบันลงใน Slot " + slot + "?", "ยืนยันการเซฟ", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(this, "ต้องการบันทึกข้อมูลปัจจุบันลงใน Slot " + slot + "?",
+                        "ยืนยันการเซฟ", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    SaveSystem.saveToFile(slot, controller.getPlayer().getName(), controller.getPlayer().getMoney(), dateFormat.format(new Date()));
+                    SaveSystem.saveToFile(slot, controller.getPlayer().getName(), controller.getPlayer().getMoney(),
+                            dateFormat.format(new Date()));
                     JOptionPane.showMessageDialog(this, "บันทึกลงเครื่องเรียบร้อย!");
                     controller.showSaveScreen(); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
                 }
@@ -105,7 +109,7 @@ public class SaveScreen extends JPanel {
             gbc.gridy = i;
             saveBox.add(slotRow, gbc);
         }
-        
+
         centerWrapper.add(saveBox);
         add(centerWrapper, BorderLayout.CENTER);
     }
@@ -120,10 +124,11 @@ public class SaveScreen extends JPanel {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
                 g2.setColor(Color.BLACK);
                 g2.setStroke(new BasicStroke(3));
-                g2.drawRoundRect(1, 1, getWidth()-2, getHeight()-2, 40, 40);
+                g2.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 40, 40);
                 FontMetrics fm = g2.getFontMetrics();
                 g2.setColor(getForeground());
-                g2.drawString(getText(), (getWidth()-fm.stringWidth(getText()))/2, (getHeight()+fm.getAscent())/2 - 5);
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
+                        (getHeight() + fm.getAscent()) / 2 - 5);
                 g2.dispose();
             }
         };

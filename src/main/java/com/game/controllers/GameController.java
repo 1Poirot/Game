@@ -3,6 +3,8 @@ package com.game.controllers;
 import com.game.models.Player;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.AudioSettingsScreen;
+import com.game.ui.Changescene;
+import com.game.ui.MainMenuScreen;
 import com.game.ui.SaveScreen;
 import com.game.ui.SettingsScreen;
 import com.game.ui.ShopScreen;
@@ -28,7 +30,7 @@ public class GameController {
     }
 
     public void start() {
-        showShop();
+        showMainMenu();
         mainFrame.setVisible(true);
     }
 
@@ -41,6 +43,14 @@ public class GameController {
         // บังคับให้ระบบคำนวณ Layout และวาด Component ใหม่ทันที
         mainFrame.revalidate();
         mainFrame.repaint();
+    }
+
+    public void showMainMenu() {
+        changeScreen(new MainMenuScreen(this));
+    }
+
+    public void showGameScene() {
+        changeScreen(new Changescene(this));
     }
 
     public void showShop() {
@@ -59,10 +69,11 @@ public class GameController {
     }
 
     public void showSaveScreen() {
-        mainFrame.getContentPane().removeAll();
-        mainFrame.setContentPane(new SaveScreen(this));
-        mainFrame.revalidate();
-        mainFrame.repaint();
+        changeScreen(new SaveScreen(this));
+    }
+
+    public void exitGame() {
+        System.exit(0);
     }
 
     public Player getPlayer() {

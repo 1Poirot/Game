@@ -1,32 +1,31 @@
 package com.game.ui;
 
+import com.game.controllers.GameController;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
-public class Changescene extends JFrame {
+public class Changescene extends JPanel {
 
+    private GameController controller;
     CardLayout cardLayout = new CardLayout();
     JPanel mainPanel = new JPanel(cardLayout);
 
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    int WIDTH = screen.width;
-    int HEIGHT = screen.height;
+    int WIDTH = 1920;
+    int HEIGHT = 1080;
 
-    public Changescene() {
+    public Changescene(GameController controller) {
+        this.controller = controller;
 
-        setTitle("Love Game");
-        setSize(WIDTH, HEIGHT);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         mainPanel.add(new SceneRoom(), "room");
         mainPanel.add(new SceneNext(), "next");
 
-        add(mainPanel);
-        setVisible(true);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     // ========================== SCENE 1 ==========================
@@ -51,25 +50,24 @@ public class Changescene extends JFrame {
 
     // ========================== SCENE 2 ==========================
     // ========================== SCENE 2 ==========================
-class SceneNext extends JLayeredPane {
+    class SceneNext extends JLayeredPane {
 
-    public SceneNext() {
+        public SceneNext() {
 
-        setLayout(null);
+            setLayout(null);
 
-        JLabel bg = createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
-        add(bg, Integer.valueOf(0));
+            JLabel bg = createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
+            add(bg, Integer.valueOf(0));
 
-        JLabel character = createCharacter();
-        add(character, Integer.valueOf(1));
+            JLabel character = createCharacter();
+            add(character, Integer.valueOf(1));
 
-        add(createTopLeftUI(), Integer.valueOf(5));
-        add(createTopRightUI(), Integer.valueOf(5));
+            add(createTopLeftUI(), Integer.valueOf(5));
+            add(createTopRightUI(), Integer.valueOf(5));
 
-        add(createDialogUI2(), Integer.valueOf(10)); // 👈 ใช้อันนี้
+            add(createDialogUI2(), Integer.valueOf(10)); // 👈 ใช้อันนี้
+        }
     }
-}
-
 
     // ========================== TOP LEFT ==========================
     private JPanel createTopLeftUI() {
@@ -110,9 +108,27 @@ class SceneNext extends JLayeredPane {
 
         JLabel bag = new JLabel(new ImageIcon("bag.png"));
         bag.setBounds(25, 10, 50, 50);
+        bag.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        bag.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (controller != null) {
+                    controller.showShop();
+                }
+            }
+        });
 
         JLabel gear = new JLabel(new ImageIcon("gear.png"));
         gear.setBounds(100, 10, 50, 50);
+        gear.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        gear.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (controller != null) {
+                    controller.showSettings();
+                }
+            }
+        });
 
         panel.add(bag);
         panel.add(gear);
@@ -123,7 +139,7 @@ class SceneNext extends JLayeredPane {
     // ========================== DIALOG SCENE 1 ==========================
     private JPanel createDialogUI1() {
 
-        return createDialogBase(new String[]{
+        return createDialogBase(new String[] {
                 "เช้าวันเปิดเทอม ลมเช้าเย็นกว่าที่คาด",
                 "คุณยืนอยู่หน้าประตูโรงเรียนในชุดนักเรียนใหม่เอี่ยม",
                 "เสียงนักเรียนรอบตัวเต็มไปด้วยบทสนทนาและเสียงหัวเราะ",
@@ -145,28 +161,29 @@ class SceneNext extends JLayeredPane {
                 "จะเปลี่ยน 7 วันแรกของคุณไปตลอดกาล"
         }, true);
     }
-// ========================== DIALOG SCENE 2 ==========================
-private JPanel createDialogUI2() {
 
-    return createDialogBase(new String[]{
+    // ========================== DIALOG SCENE 2 ==========================
+    private JPanel createDialogUI2() {
 
-            "🏫 ห้องเรียน",
-            "หลังแนะนำตัวหน้าห้องเสร็จ",
-            "ครูให้คุณไปนั่งที่ว่างด้านหลัง",
+        return createDialogBase(new String[] {
 
-            "และเมื่อคุณเดินไปถึงโต๊ะเรียน",
-            "อีกฝ่ายก็นั่งอยู่โต๊ะข้าง ๆ",
+                "🏫 ห้องเรียน",
+                "หลังแนะนำตัวหน้าห้องเสร็จ",
+                "ครูให้คุณไปนั่งที่ว่างด้านหลัง",
 
-            "คุณหยุดชะงักเล็กน้อย",
-            "โลกมันกลมเกินไปหรือเปล่า…",
+                "และเมื่อคุณเดินไปถึงโต๊ะเรียน",
+                "อีกฝ่ายก็นั่งอยู่โต๊ะข้าง ๆ",
 
-            "อีกฝ่ายเหลือบมองคุณนิดเดียว",
-            "“บังเอิญอีกแล้ว”",
+                "คุณหยุดชะงักเล็กน้อย",
+                "โลกมันกลมเกินไปหรือเปล่า…",
 
-            "คุณหัวเราะ"
+                "อีกฝ่ายเหลือบมองคุณนิดเดียว",
+                "“บังเอิญอีกแล้ว”",
 
-    }, false); // false = ไม่ต้องเปลี่ยนฉากต่อ
-}
+                "คุณหัวเราะ"
+
+        }, false); // false = ไม่ต้องเปลี่ยนฉากต่อ
+    }
 
     // ========================== DIALOG BASE ==========================
     private JPanel createDialogBase(String[] dialogs, boolean changeScene) {
@@ -210,7 +227,7 @@ private JPanel createDialogUI2() {
         container.add(nameBox);
         container.add(dialog);
 
-        final int[] index = {0};
+        final int[] index = { 0 };
 
         dialog.addMouseListener(new MouseAdapter() {
             @Override
@@ -282,7 +299,4 @@ private JPanel createDialogUI2() {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Changescene());
-    }
 }
