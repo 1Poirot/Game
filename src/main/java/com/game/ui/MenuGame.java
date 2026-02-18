@@ -1,28 +1,28 @@
-package main;
+package com.game.ui;
 
-import javax.swing.*;
+import com.game.controllers.GameController; // นำเข้า Controller
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.*;
 
-public class MenuGame extends JFrame {
+public class MenuGame extends JPanel { // เปลี่ยนจาก JFrame เป็น JPanel
     private int screenW, screenH;
+    private GameController controller;
 
-    public MenuGame() {
-        // ตั้งค่าเบื้องต้น
-        setTitle("เกมจีบสาว");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setUndecorated(false); 
-        setLayout(null);
-
-        // คำนวณขนาดหน้าจอ
+    public MenuGame(GameController controller) {
+        this.controller = controller;
+        
+        // กำหนดขนาดตามหน้าจอจริง
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenW = screenSize.width;
         screenH = screenSize.height;
+
+        setLayout(null);
+        setPreferredSize(new Dimension(screenW, screenH));
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setBounds(0, 0, screenW, screenH);
@@ -34,34 +34,29 @@ public class MenuGame extends JFrame {
         layeredPane.add(background, Integer.valueOf(0));
 
         // ====== 2. Characters (Layer 1-2) ======
-        // ตั้งค่าขนาด: ผู้ชาย (80% ของจอ), ผู้หญิง (72% ของจอเพื่อให้เตี้ยกว่า)
         int maleW = (int) (screenW * 0.27);
         int maleH = (int) (screenH * 0.80);
         int femaleW = (int) (screenW * 0.23); 
         int femaleH = (int) (screenH * 0.72); 
 
-        // ตำแหน่ง: จัดวางที่มุมขวาล่าง
         int femaleX = (int) (screenW * 0.72);
         int femaleY = screenH - femaleH;
         int maleY = screenH - maleH;
-        int overlap = 145; // ระยะหลังชนกัน (ปรับตามความชอบ)
+        int overlap = 145;
 
-        // วางผู้หญิง (หันหลังชน - พลิกภาพ)
-        JLabel female = createFlippedImage( "src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png", femaleW, femaleH);
+        JLabel female = createFlippedImage("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png", femaleW, femaleH);
         female.setBounds(femaleX, femaleY, femaleW, femaleH);
-        layeredPane.add(female, Integer.valueOf(2)); // เลเยอร์หน้า
+        layeredPane.add(female, Integer.valueOf(2));
 
-        // วางผู้ชาย (หันหลังชน)
         JLabel male = createScaledImage("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png", maleW, maleH);
         male.setBounds(femaleX - maleW + overlap, maleY, maleW, maleH);
-        layeredPane.add(male, Integer.valueOf(1)); // เลเยอร์หลัง
+        layeredPane.add(male, Integer.valueOf(1));
 
         // ====== 3. Sakura Effect (Layer 3) ======
         SakuraPanel sakuraEffect = new SakuraPanel(screenW, screenH);
         layeredPane.add(sakuraEffect, Integer.valueOf(3));
 
         // ====== 4. UI Elements (Layer 4) ======
-        // Title Box
         JLabel title = new JLabel("เกมจีบสาว", SwingConstants.CENTER);
         title.setFont(new Font("Tahoma", Font.BOLD, screenW / 35));
         title.setOpaque(true);
@@ -70,7 +65,7 @@ public class MenuGame extends JFrame {
         title.setBounds((screenW - (screenW / 3)) / 2, screenH / 15, screenW / 3, screenH / 9);
         layeredPane.add(title, Integer.valueOf(4));
 
-        // ปุ่มเมนู
+        // ปุ่มเมนู พร้อมเชื่อมต่อ Action
         String[] menuText = {"เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม"};
         int btnW = 280;
         int btnH = 65;
@@ -80,32 +75,31 @@ public class MenuGame extends JFrame {
             RoundedButton btn = new RoundedButton(menuText[i]);
             btn.setFont(new Font("Tahoma", Font.BOLD, 26));
             btn.setBounds(screenW / 10, startY + (i * (btnH + 25)), btnW, btnH);
-            if (menuText[i].equals("ออกเกม")) btn.addActionListener(e -> System.exit(0));
+            
+            // เชื่อมโยงปุ่มเข้ากับ Controller
+            String text = menuText[i];
+            btn.addActionListener(e -> {
+                if (text.equals("เริ่มเกม")) controller.showGameScene();
+                else if (text.equals("โหลดเซฟ")) controller.showSaveScreen();
+                else if (text.equals("ตั้งค่า")) controller.showSettings();
+                else if (text.equals("ออกเกม")) controller.exitGame();
+            });
+            
             layeredPane.add(btn, Integer.valueOf(4));
         }
-
-        setVisible(true);
     }
 
-    // --- ฟังก์ชันโหลดภาพแบบ Ultra High Quality ---
+    // --- ฟังก์ชันเสริม (เหมือนเดิมที่คุณเขียนมา) ---
     private JLabel createScaledImage(String path, int w, int h) {
         try {
             ImageIcon icon = new ImageIcon(path);
             BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = img.createGraphics();
-            
-            // ตั้งค่าระดับสูงสุดเพื่อความคมชัด
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            
             g2.drawImage(icon.getImage(), 0, 0, w, h, null);
             g2.dispose();
             return new JLabel(new ImageIcon(img));
-        } catch (Exception e) {
-            return new JLabel("Missing: " + path);
-        }
+        } catch (Exception e) { return new JLabel("Missing Image"); }
     }
 
     private JLabel createFlippedImage(String path, int w, int h) {
@@ -113,21 +107,13 @@ public class MenuGame extends JFrame {
             ImageIcon icon = new ImageIcon(path);
             BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = img.createGraphics();
-            
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
-            // พลิกแกน X เพื่อให้หันหลังชนกัน
             g2.drawImage(icon.getImage(), w, 0, 0, h, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
             g2.dispose();
             return new JLabel(new ImageIcon(img));
-        } catch (Exception e) {
-            return new JLabel("Missing: " + path);
-        }
+        } catch (Exception e) { return new JLabel("Missing Image"); }
     }
 
-    // --- ปุ่มดีไซน์มน ---
+    // --- คลาสปุ่มดีไซน์มน ---
     class RoundedButton extends JButton {
         public RoundedButton(String label) {
             super(label);
@@ -182,11 +168,5 @@ public class MenuGame extends JFrame {
             if (y > h) { y = -20; x = new Random().nextInt(w); }
         }
         public Shape getShape() { return new Ellipse2D.Float(x, y, size, size / 1.6f); }
-    }
-
-    public static void main(String[] args) {
-        // แก้ปัญหาภาพเบลอบน Windows Scaling (High DPI)
-        System.setProperty("sun.java2d.uiScale", "1.0"); 
-        SwingUtilities.invokeLater(MenuGame::new);
     }
 }
