@@ -1,12 +1,11 @@
 package com.game.controllers;
 
 import com.game.models.Player;
-import com.game.systems.shop.ShopSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice; // เพิ่ม Import ระบบไดอะล็อก
+import com.game.systems.dialogue.DialogueSystemAndChoice;
+import com.game.systems.shop.ShopSystem; // เพิ่ม Import ระบบไดอะล็อก
 import com.game.ui.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import com.game.models.Character;
 
 public class GameController {
     private Player player;
@@ -52,7 +51,7 @@ public class GameController {
     }
 
     public void showGameScene() {
-        com.game.models.Character npc = new com.game.models.Character("Kim Jae-hyun", "assets/npc.png");
+        com.game.models.Character npc = new com.game.models.Character("Kim Jae-hyun", "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
         changeScreen(new GamePanel(npc, dialogueSystem)); // หายแดงแน่นอน
     }
 
