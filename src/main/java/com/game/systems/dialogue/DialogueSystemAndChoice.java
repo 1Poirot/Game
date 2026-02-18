@@ -1,9 +1,9 @@
 package com.game.systems.dialogue;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 public class DialogueSystemAndChoice {
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
@@ -180,7 +180,7 @@ public class DialogueSystemAndChoice {
         SCENES.put("S5B", new SCENE("Narrator", "Day1", "คุณปฏิเสธอย่างสุภาพ แต่เขามองตามเหมือนยังอยากพูดอะไรต่อ…", null, null, null, null, null));
     }
 
-    private void SHOW_SCENE(String ID) {
+    public void SHOW_SCENE(String ID) {
         CURRENT_ID = ID;
         SCENE S = SCENES.get(ID);
         if (S == null) return;

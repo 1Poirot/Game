@@ -1,3 +1,0 @@
-Name:Hero
-Money:50
-Date:16/02/2026 22:20

@@ -1,3 +1,0 @@
-Player: Hero
-Money: 0
-Save Date: Mon Feb 16 21:54:22 ICT 2026
