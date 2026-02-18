@@ -1,7 +1,7 @@
 package com.game.ui;
 
 import com.game.models.Character;
-import com.game.systems.dialogue.DialogueSystem;
+import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.utils.FontUtils;
 
 import javax.swing.*;
@@ -17,11 +17,11 @@ public class GamePanel extends JPanel {
     private Font thaiFont;
 
     private Character character;
-    private DialogueSystem dialogueSystem;
+    private DialogueSystemAndChoice dialogueSystem;
 
     private JButton btn1, btn2, btn3;
 
-    public GamePanel(Character character, DialogueSystem dialogueSystem) {
+    public GamePanel(Character character, DialogueSystemAndChoice dialogueSystem) { {
         this.character = character;
         this.dialogueSystem = dialogueSystem;
 
