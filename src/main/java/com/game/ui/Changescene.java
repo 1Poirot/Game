@@ -50,7 +50,6 @@ public class Changescene extends JFrame {
     }
 
     // ========================== SCENE 2 ==========================
-    // ========================== SCENE 2 ==========================
 class SceneNext extends JLayeredPane {
 
     public SceneNext() {
