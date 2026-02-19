@@ -2,77 +2,92 @@ package com.game.controllers;
 
 import com.game.models.Player;
 import com.game.systems.dialogue.DialogueSystemAndChoice;
-import com.game.systems.shop.ShopSystem; // เพิ่ม Import ระบบไดอะล็อก
+import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class GameController {
+
     private Player player;
     private ShopSystem shopSystem;
+    private DialogueSystemAndChoice dialogueSystem;
+
     private JFrame mainFrame;
-    private DialogueSystemAndChoice dialogueSystem; // ถืออ็อบเจกต์ระบบพูดคุยไว้
 
     public GameController() {
-        // สร้างข้อมูลผู้เล่นเริ่มต้น
+
+        // ===== สร้างข้อมูลเกม =====
         this.player = new Player("Hero", 100);
         this.shopSystem = new ShopSystem();
-
-        // สร้างระบบไดอะล็อกเตรียมไว้
         this.dialogueSystem = new DialogueSystemAndChoice();
 
+        // ===== สร้างหน้าต่างหลัก =====
         mainFrame = new JFrame("Game Shop - Fantasy RPG");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // --- ตั้งขนาดหน้าจอ 1920 x 1080 ---
-        mainFrame.setSize(1920, 1080);
-        mainFrame.setResizable(false);
+        // กำหนดขนาดเริ่มต้น (ไม่ล็อกตายตัว)
+        mainFrame.setSize(1280, 720);
+
+        // อนุญาตให้ย่อ-ขยายได้
+        mainFrame.setResizable(true);
+
+        // ป้องกันย่อเล็กเกินไป
+        mainFrame.setMinimumSize(new Dimension(960, 540));
+
+        // เปิดกลางจอ
         mainFrame.setLocationRelativeTo(null);
     }
 
+    // ================== เริ่มเกม ==================
     public void start() {
-        // เริ่มต้นด้วยหน้าเมนูหลัก
         showMainMenu();
         mainFrame.setVisible(true);
     }
 
-    /**
-     * เมธอดกลางสำหรับเปลี่ยนหน้าจอ
-     */
+    // ================== เปลี่ยนหน้าจอ ==================
     private void changeScreen(JPanel panel) {
+
+        // สำคัญ: ทำให้ panel ขยายเต็มพื้นที่อัตโนมัติ
+        panel.setPreferredSize(null);
+        panel.setMinimumSize(null);
+
         mainFrame.setContentPane(panel);
+
         mainFrame.revalidate();
         mainFrame.repaint();
     }
 
-    // --- หน้าแรกของเกม ---
+    // ================== หน้าต่างต่าง ๆ ==================
+
     public void showMainMenu() {
         changeScreen(new MenuGame(this));
     }
 
     public void showGameScene() {
-        com.game.models.Character npc = new com.game.models.Character("Kim Jae-hyun", "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-        changeScreen(new GamePanel(npc, dialogueSystem)); // หายแดงแน่นอน
+        com.game.models.Character npc =
+                new com.game.models.Character(
+                        "Kim Jae-hyun",
+                        "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png"
+                );
+
+        changeScreen(new GamePanel(npc, dialogueSystem));
     }
 
-    // --- หน้าร้านค้า ---
     public void showShop() {
         changeScreen(new ShopScreen(this));
     }
 
-    // --- หน้าตั้งค่า ---
     public void showSettings() {
         changeScreen(new SettingsScreen(this));
     }
 
-    // --- หน้าตั้งค่าเสียง ---
     public void showAudioSettings() {
         changeScreen(new AudioSettingsScreen(this));
     }
 
-    // --- หน้า Save & Load (5 Slots บันทึกลงเครื่อง) ---
     public void showSaveScreen() {
-        // หน้านี้จะดึงข้อมูลจากไฟล์ resources/data/save/ มาโชว์อัตโนมัติ
         changeScreen(new SaveScreen(this));
     }
 
@@ -80,7 +95,8 @@ public class GameController {
         System.exit(0);
     }
 
-    // --- Getters ---
+    // ================== Getters ==================
+
     public Player getPlayer() {
         return player;
     }
@@ -91,5 +107,9 @@ public class GameController {
 
     public DialogueSystemAndChoice getDialogueSystem() {
         return dialogueSystem;
+    }
+
+    public JFrame getMainFrame() {
+        return mainFrame;
     }
 }
