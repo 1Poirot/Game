@@ -1,8 +1,7 @@
 package com.game.controllers;
 
 import com.game.models.Player;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
-import com.game.systems.shop.ShopSystem; // เพิ่ม Import ระบบไดอะล็อก
+import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -11,15 +10,11 @@ public class GameController {
     private Player player;
     private ShopSystem shopSystem;
     private JFrame mainFrame;
-    private DialogueSystemAndChoice dialogueSystem; // ถืออ็อบเจกต์ระบบพูดคุยไว้
 
     public GameController() {
         // สร้างข้อมูลผู้เล่นเริ่มต้น
         this.player = new Player("Hero", 100);
         this.shopSystem = new ShopSystem();
-
-        // สร้างระบบไดอะล็อกเตรียมไว้
-        this.dialogueSystem = new DialogueSystemAndChoice();
 
         mainFrame = new JFrame("Game Shop - Fantasy RPG");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,8 +46,7 @@ public class GameController {
     }
 
     public void showGameScene() {
-        com.game.models.Character npc = new com.game.models.Character("Kim Jae-hyun", "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-        changeScreen(new GamePanel(npc, dialogueSystem)); // หายแดงแน่นอน
+        changeScreen(new Changescene(this));
     }
 
     // --- หน้าร้านค้า ---
@@ -89,7 +83,4 @@ public class GameController {
         return shopSystem;
     }
 
-    public DialogueSystemAndChoice getDialogueSystem() {
-        return dialogueSystem;
-    }
 }

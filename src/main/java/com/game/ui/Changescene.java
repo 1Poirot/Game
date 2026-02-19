@@ -49,12 +49,7 @@ public class Changescene extends JPanel {
     }
 
     // ========================== SCENE 2 ==========================
-<<<<<<< HEAD
-    // ========================== SCENE 2 ==========================
     class SceneNext extends JLayeredPane {
-=======
-class SceneNext extends JLayeredPane {
->>>>>>> origin/dev/min
 
         public SceneNext() {
 
