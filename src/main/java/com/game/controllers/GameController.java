@@ -1,10 +1,7 @@
 package com.game.controllers;
 
 import com.game.models.Player;
-<<<<<<< HEAD
-=======
 import com.game.systems.dialogue.DialogueSystemAndChoice;
->>>>>>> dev/non
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 
@@ -24,13 +21,9 @@ public class GameController {
         // ===== สร้างข้อมูลเกม =====
         this.player = new Player("Hero", 100);
         this.shopSystem = new ShopSystem();
-<<<<<<< HEAD
-
-=======
         this.dialogueSystem = new DialogueSystemAndChoice();
 
         // ===== สร้างหน้าต่างหลัก =====
->>>>>>> dev/non
         mainFrame = new JFrame("Game Shop - Fantasy RPG");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -73,17 +66,7 @@ public class GameController {
     }
 
     public void showGameScene() {
-<<<<<<< HEAD
         changeScreen(new Changescene(this));
-=======
-        com.game.models.Character npc =
-                new com.game.models.Character(
-                        "Kim Jae-hyun",
-                        "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png"
-                );
-
-        changeScreen(new GamePanel(npc, dialogueSystem));
->>>>>>> dev/non
     }
 
     public void showShop() {
@@ -116,9 +99,6 @@ public class GameController {
         return shopSystem;
     }
 
-<<<<<<< HEAD
-}
-=======
     public DialogueSystemAndChoice getDialogueSystem() {
         return dialogueSystem;
     }
@@ -127,4 +107,3 @@ public class GameController {
         return mainFrame;
     }
 }
->>>>>>> dev/non
