@@ -45,15 +45,23 @@ public class SaveScreen extends JPanel {
                 g2.dispose();
             }
         };
-        saveBox.setPreferredSize(new Dimension(1500, 850));
         saveBox.setOpaque(false);
+
+        // ให้ saveBox ขยายเต็มพื้นที่แทนขนาดคงที่
+        GridBagConstraints outerGbc = new GridBagConstraints();
+        outerGbc.fill = GridBagConstraints.BOTH;
+        outerGbc.weightx = 1.0;
+        outerGbc.weighty = 1.0;
+        outerGbc.insets = new Insets(20, 40, 30, 40);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 20, 15, 20);
         gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
         JLabel titleLabel = new JLabel("ระบบจัดการข้อมูลเกม (Save & Load)");
-        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 45));
+        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 32));
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 30, 0);
         saveBox.add(titleLabel, gbc);
@@ -110,7 +118,7 @@ public class SaveScreen extends JPanel {
             saveBox.add(slotRow, gbc);
         }
 
-        centerWrapper.add(saveBox);
+        centerWrapper.add(saveBox, outerGbc);
         add(centerWrapper, BorderLayout.CENTER);
     }
 
