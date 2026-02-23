@@ -82,7 +82,11 @@ public class GameController {
     }
 
     public void showSaveScreen() {
-        changeScreen(new SaveScreen(this));
+        showSaveScreen(() -> showSettings());
+    }
+
+    public void showSaveScreen(Runnable onBack) {
+        changeScreen(new SaveScreen(this, onBack));
     }
 
     public void exitGame() {

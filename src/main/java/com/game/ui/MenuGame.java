@@ -37,7 +37,8 @@ public class MenuGame extends JPanel {
         int screenW = layeredPane.getWidth();
         int screenH = layeredPane.getHeight();
 
-        if (screenW == 0 || screenH == 0) return;
+        if (screenW == 0 || screenH == 0)
+            return;
 
         layeredPane.removeAll();
 
@@ -57,7 +58,7 @@ public class MenuGame extends JPanel {
         int femaleX = (int) (screenW * 0.72);
         int femaleY = screenH - femaleH;
         int maleY = screenH - maleH;
-        int overlap = (int)(screenW * 0.05);
+        int overlap = (int) (screenW * 0.05);
 
         JLabel female = createFlippedImage(
                 "src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png",
@@ -89,7 +90,7 @@ public class MenuGame extends JPanel {
         layeredPane.add(title, Integer.valueOf(4));
 
         // ===== Buttons =====
-        String[] menuText = {"เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม"};
+        String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม" };
         int btnW = screenW / 8;
         int btnH = screenH / 14;
         int startY = (int) (screenH * 0.35);
@@ -103,10 +104,14 @@ public class MenuGame extends JPanel {
 
             String text = menuText[i];
             btn.addActionListener(e -> {
-                if (text.equals("เริ่มเกม")) controller.showGameScene();
-                else if (text.equals("โหลดเซฟ")) controller.showSaveScreen();
-                else if (text.equals("ตั้งค่า")) controller.showSettings();
-                else if (text.equals("ออกเกม")) controller.exitGame();
+                if (text.equals("เริ่มเกม"))
+                    controller.showGameScene();
+                else if (text.equals("โหลดเซฟ"))
+                    controller.showSaveScreen(() -> controller.showMainMenu());
+                else if (text.equals("ตั้งค่า"))
+                    controller.showSettings();
+                else if (text.equals("ออกเกม"))
+                    controller.exitGame();
             });
 
             layeredPane.add(btn, Integer.valueOf(4));

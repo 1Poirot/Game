@@ -11,10 +11,12 @@ import javax.swing.border.EmptyBorder;
 
 public class SaveScreen extends JPanel {
     private GameController controller;
+    private Runnable onBack;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-    public SaveScreen(GameController controller) {
+    public SaveScreen(GameController controller, Runnable onBack) {
         this.controller = controller;
+        this.onBack = onBack;
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
 
@@ -24,7 +26,7 @@ public class SaveScreen extends JPanel {
         header.setBorder(new EmptyBorder(30, 50, 0, 0));
 
         JButton backBtn = createRoundedButton("< ย้อนกลับ", 200, 70, Color.WHITE, Color.BLACK);
-        backBtn.addActionListener(e -> controller.showSettings());
+        backBtn.addActionListener(e -> onBack.run());
         header.add(backBtn);
         add(header, BorderLayout.NORTH);
 
@@ -107,7 +109,7 @@ public class SaveScreen extends JPanel {
                     SaveSystem.saveToFile(slot, controller.getPlayer().getName(), controller.getPlayer().getMoney(),
                             dateFormat.format(new Date()));
                     JOptionPane.showMessageDialog(this, "บันทึกลงเครื่องเรียบร้อย!");
-                    controller.showSaveScreen(); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
+                    controller.showSaveScreen(onBack); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
                 }
             });
 
