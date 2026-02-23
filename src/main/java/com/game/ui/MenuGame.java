@@ -1,13 +1,13 @@
 package com.game.ui;
 
 import com.game.controllers.GameController;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.*;
 
 public class MenuGame extends JPanel {
 
@@ -22,6 +22,11 @@ public class MenuGame extends JPanel {
         layeredPane = new JLayeredPane();
         add(layeredPane, BorderLayout.CENTER);
 
+        // ====== เริ่มเล่นเพลง BGM หน้าเมนู ======
+        if (controller.getAudioSystem() != null) {
+            controller.getAudioSystem().playBGM("audiotest.wav");
+        }
+
         // ฟัง resize ทุกครั้ง
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
@@ -33,11 +38,11 @@ public class MenuGame extends JPanel {
 
     // ================== Responsive Layout ==================
     private void layoutComponents() {
-
         int screenW = layeredPane.getWidth();
         int screenH = layeredPane.getHeight();
 
-        if (screenW == 0 || screenH == 0) return;
+        if (screenW == 0 || screenH == 0)
+            return;
 
         layeredPane.removeAll();
 
@@ -57,7 +62,7 @@ public class MenuGame extends JPanel {
         int femaleX = (int) (screenW * 0.72);
         int femaleY = screenH - femaleH;
         int maleY = screenH - maleH;
-        int overlap = (int)(screenW * 0.05);
+        int overlap = (int) (screenW * 0.05);
 
         JLabel female = createFlippedImage(
                 "src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png",
@@ -89,7 +94,7 @@ public class MenuGame extends JPanel {
         layeredPane.add(title, Integer.valueOf(4));
 
         // ===== Buttons =====
-        String[] menuText = {"เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม"};
+        String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม" };
         int btnW = screenW / 8;
         int btnH = screenH / 14;
         int startY = (int) (screenH * 0.35);
@@ -103,10 +108,20 @@ public class MenuGame extends JPanel {
 
             String text = menuText[i];
             btn.addActionListener(e -> {
-                if (text.equals("เริ่มเกม")) controller.showGameScene();
-                else if (text.equals("โหลดเซฟ")) controller.showSaveScreen();
-                else if (text.equals("ตั้งค่า")) controller.showSettings();
-                else if (text.equals("ออกเกม")) controller.exitGame();
+                // ====== เล่นเสียง SFX เมื่อคลิกปุ่ม ======
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
+                }
+
+                // ในหน้า MenuGame.java ตรงปุ่มเริ่มเกม
+                if (text.equals("เริ่มเกม")) {
+                    controller.showChangescene(); // เรียกหน้า Changescene ที่มีระบบ CardLayout
+                } else if (text.equals("โหลดเซฟ"))
+                    controller.showSaveScreen();
+                else if (text.equals("ตั้งค่า"))
+                    controller.showSettings();
+                else if (text.equals("ออกเกม"))
+                    controller.exitGame();
             });
 
             layeredPane.add(btn, Integer.valueOf(4));
@@ -132,6 +147,7 @@ public class MenuGame extends JPanel {
             ImageIcon icon = new ImageIcon(path);
             BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = img.createGraphics();
+            // พลิกภาพตัวละคร
             g2.drawImage(icon.getImage(), w, 0, 0, h,
                     0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
             g2.dispose();
@@ -157,6 +173,7 @@ public class MenuGame extends JPanel {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
+            // สีชมพูพาสเทล
             g2.setColor(new Color(255, 215, 230));
             g2.fill(new RoundRectangle2D.Double(
                     0, 0, getWidth(), getHeight(), 45, 45));
@@ -191,7 +208,8 @@ public class MenuGame extends JPanel {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
-            g2.setColor(new Color(255, 182, 193, 160));
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(new Color(255, 182, 193, 160)); // สีกลีบซากุระ
             for (SakuraParticle p : particles)
                 g2.fill(p.getShape());
         }
@@ -213,7 +231,7 @@ public class MenuGame extends JPanel {
             x += Math.sin(y / 40.0) * 1.5;
             if (y > h) {
                 y = -20;
-                x = new Random().nextInt(w);
+                x = new Random().nextInt(Math.max(1, w));
             }
         }
 

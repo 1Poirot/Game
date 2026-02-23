@@ -7,14 +7,15 @@ import javax.swing.border.EmptyBorder;
 
 public class AudioSettingsScreen extends JPanel {
     private GameController controller;
+    private boolean isMuted = false;
+    private float lastVolume = 0.8f;
 
     public AudioSettingsScreen(GameController controller) {
         this.controller = controller;
-        // ใช้ BorderLayout เป็นโครงสร้างหลัก
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
 
-        // 1. Header (ปุ่ม < ตั้งค่า)
+        // 1. Header
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(30, 30, 0, 0));
@@ -24,11 +25,11 @@ public class AudioSettingsScreen extends JPanel {
         header.add(backTitleBtn);
         add(header, BorderLayout.NORTH);
 
-        // 2. Center Panel (ใช้ GridBagLayout เพื่อให้กล่องขาวหดตัวตามพื้นที่จริง)
+        // 2. Center Panel
         JPanel centerWrapper = new JPanel(new GridBagLayout());
         centerWrapper.setOpaque(false);
 
-        // กล่องสีขาวหลัก (วาดขอบมน)
+        // กล่องสีขาวหลัก
         JPanel whiteBox = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -40,20 +41,19 @@ public class AudioSettingsScreen extends JPanel {
                 g2.setStroke(new BasicStroke(3));
                 g2.drawRoundRect(1, 1, getWidth()-2, getHeight()-2, 30, 30);
                 g2.dispose();
+                super.paintComponent(g); // วาดคอมโพเนนต์ลูกทับลงบนพื้นหลังที่วาดเสร็จแล้ว
             }
         };
-        // ลดขนาดลงเหลือ 750x400 เพื่อให้มั่นใจว่าไม่ล้นแน่นอน
         whiteBox.setPreferredSize(new Dimension(800, 420));
         whiteBox.setOpaque(false);
         whiteBox.setBorder(new EmptyBorder(30, 40, 30, 40));
 
-        // --- จัดของในกล่องขาวด้วย GBC ---
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 15, 10, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // แถวบน: ลำโพง + Slider + On/Off
-        // ไอคอนลำโพง
+        // --- แถวบน: ไอคอนลำโพง + Slider + On/Off ---
+        
         JLabel speakerIcon = new JLabel("🔊", SwingConstants.CENTER);
         speakerIcon.setFont(new Font("Tahoma", Font.BOLD, 30));
         speakerIcon.setPreferredSize(new Dimension(70, 70));
@@ -63,19 +63,55 @@ public class AudioSettingsScreen extends JPanel {
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         whiteBox.add(speakerIcon, gbc);
 
-        // Slider
-        JSlider volumeSlider = new JSlider(0, 100, 50);
+        // ดึงระดับเสียงปัจจุบัน
+        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.8f;
+        JSlider volumeSlider = new JSlider(0, 100, (int)(currentVol * 100));
         volumeSlider.setBackground(Color.WHITE);
+        volumeSlider.setOpaque(true); // มั่นใจว่าเห็นตัว Slider ชัดเจน
         volumeSlider.setForeground(new Color(255, 105, 180));
+
+        // ปุ่ม On/Off (สร้างก่อนเพื่อให้ Slider เรียกใช้ได้)
+        JButton onOffBtn = createRoundedButton(currentVol > 0 ? "On" : "Off", 120, 50, 
+                currentVol > 0 ? new Color(255, 105, 180) : Color.LIGHT_GRAY, Color.WHITE, 16);
+        
+        // ====== ปรับเสียงแบบ Real-time (ดังตามมือ) ======
+        volumeSlider.addChangeListener(e -> {
+            float vol = volumeSlider.getValue() / 100f;
+            if (controller.getAudioSystem() != null) {
+                controller.getAudioSystem().setVolume(vol);
+                
+                // ปรับสถานะปุ่ม On/Off ตามการลาก
+                if (vol > 0) {
+                    onOffBtn.setText("On");
+                    onOffBtn.setBackground(new Color(255, 105, 180));
+                    isMuted = false;
+                } else {
+                    onOffBtn.setText("Off");
+                    onOffBtn.setBackground(Color.LIGHT_GRAY);
+                    isMuted = true;
+                }
+            }
+        });
+
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1.0;
         whiteBox.add(volumeSlider, gbc);
 
-        // ปุ่ม On/Off
-        JButton onOffBtn = createRoundedButton("On / Off", 120, 50, new Color(255, 105, 180), Color.WHITE, 16);
+        // Action สำหรับปุ่ม On/Off
+        onOffBtn.addActionListener(e -> {
+            if (controller.getAudioSystem() == null) return;
+            if (!isMuted) {
+                lastVolume = controller.getAudioSystem().getVolume();
+                if(lastVolume == 0) lastVolume = 0.5f; // กันบั๊กถ้า mute ตอนเป็น 0
+                volumeSlider.setValue(0); // ChangeListener จะทำงานอัตโนมัติ
+            } else {
+                volumeSlider.setValue((int)(lastVolume * 100));
+            }
+        });
+        
         gbc.gridx = 2; gbc.gridy = 0; gbc.weightx = 0;
         whiteBox.add(onOffBtn, gbc);
 
-        // แถวล่าง: ปุ่มกลับ + ยืนยัน (เว้นระยะห่างตรงกลาง)
+        // --- แถวล่าง: ปุ่มกลับ + ยืนยัน ---
         JPanel footer = new JPanel(new GridLayout(1, 2, 100, 0));
         footer.setOpaque(false);
         
@@ -83,14 +119,17 @@ public class AudioSettingsScreen extends JPanel {
         btnBack.addActionListener(e -> controller.showSettings());
         
         JButton btnConfirm = createRoundedButton("ยืนยัน", 180, 65, Color.WHITE, Color.BLACK, 22);
-        btnConfirm.addActionListener(e -> controller.showSettings());
+        btnConfirm.addActionListener(e -> {
+            if (controller.getAudioSystem() != null) controller.getAudioSystem().playSFX("click.wav");
+            controller.showSettings();
+        });
 
         footer.add(btnBack);
         footer.add(btnConfirm);
 
         gbc.gridx = 0; gbc.gridy = 1; 
         gbc.gridwidth = 3; 
-        gbc.insets = new Insets(80, 0, 0, 0); // เว้นระยะลงมาจากแถวบนเยอะหน่อย
+        gbc.insets = new Insets(80, 0, 0, 0); 
         whiteBox.add(footer, gbc);
 
         centerWrapper.add(whiteBox);
@@ -121,6 +160,7 @@ public class AudioSettingsScreen extends JPanel {
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
 }
