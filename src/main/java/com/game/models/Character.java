@@ -18,17 +18,17 @@ public class Character {
     private int height;
     private String imagePath;
 
-    public Character(String name) {
+    public Character(String name, String imagePath) {
         this.name = name;
+        this.imagePath = imagePath; // รับ Path รูปมาจาก Controller
         this.affectionPoints = 0;
         this.currentState = "neutral";
 
-        // Default visual properties
+        // กำหนดขนาดมาตรฐาน
         this.x = 200;
         this.y = 60;
         this.width = 200;
         this.height = 300;
-        this.imagePath = "1.png";
     }
 
     // Getters and Setters

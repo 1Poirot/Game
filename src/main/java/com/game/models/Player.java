@@ -1,4 +1,3 @@
-// File: Game/src/main/java/com/game/models/Player.java
 package com.game.models;
 
 import java.util.HashMap;
@@ -15,15 +14,28 @@ public class Player {
         this.inventory = new HashMap<>();
     }
 
-    // Getters
+    // --- Getters ---
     public String getName() { return name; }
     public int getMoney() { return money; }
     public Map<String, Integer> getInventory() { return inventory; }
 
-    // Setters (ระมัดระวังการใช้ setter ตรงๆ ในเกม ควรผ่าน System)
-    public void setMoney(int money) { this.money = money; }
+    // --- Setters (เพิ่มมาใหม่เพื่อแก้ตัวแดงในหน้า Load) ---
+    
+    /**
+     * ใช้สำหรับอัปเดตชื่อผู้เล่น (เช่น ตอนโหลดเซฟ)
+     */
+    public void setName(String name) { 
+        this.name = name; 
+    }
 
-    // Methods for inventory
+    /**
+     * ใช้สำหรับอัปเดตจำนวนเงิน
+     */
+    public void setMoney(int money) { 
+        this.money = money; 
+    }
+
+    // --- Methods for Inventory ---
     public void addItemToInventory(Item item, int quantity) {
         inventory.put(item.getId(), inventory.getOrDefault(item.getId(), 0) + quantity);
     }
@@ -40,5 +52,12 @@ public class Player {
 
     public int getItemQuantity(Item item) {
         return inventory.getOrDefault(item.getId(), 0);
+    }
+    
+    /**
+     * สำหรับล้างไอเทมในตัว (ใช้ตอนเริ่มเกมใหม่หรือโหลดเซฟใหม่)
+     */
+    public void clearInventory() {
+        this.inventory.clear();
     }
 }

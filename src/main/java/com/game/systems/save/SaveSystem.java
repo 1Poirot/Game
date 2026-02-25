@@ -1,33 +1,46 @@
 package com.game.systems.save;
 
-import com.game.models.Player;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Save System - ระบบ Save/Load
- * จัดการการบันทึกและโหลดเกม
- */
 public class SaveSystem {
 
-    public void saveGame(Player player, String saveSlot) {
-        // TODO: Serialize player data and save to file
-        System.out.println("Saving game to slot: " + saveSlot);
-        // Save to: src/main/resources/saves/
+    // บันทึกข้อมูลลงเครื่อง
+    public static void saveToFile(int slot, String name, int money, String date) {
+        String fileName = "src/main/resources/saves/save_slot_" + slot + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(fileName), StandardCharsets.UTF_8))) {
+            writer.write("Name:" + name);
+            writer.newLine();
+            writer.write("Money:" + money);
+            writer.newLine();
+            writer.write("Date:" + date);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Player loadGame(String saveSlot) {
-        // TODO: Load player data from file
-        System.out.println("Loading game from slot: " + saveSlot);
-        // Load from: src/main/resources/saves/
-        return null;
-    }
+    // อ่านข้อมูลจากเครื่อง (ใช้ทั้งในหน้า Save และ Load)
+    public static Map<String, String> loadFromLocal(int slot) {
+        File file = new File("src/main/resources/saves/save_slot_" + slot + ".txt");
+        if (!file.exists())
+            return null;
 
-    public boolean saveExists(String saveSlot) {
-        // TODO: Check if save file exists
-        return false;
-    }
-
-    public void deleteSave(String saveSlot) {
-        // TODO: Delete save file
-        System.out.println("Deleting save slot: " + saveSlot);
+        Map<String, String> data = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(file), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":", 2);
+                if (parts.length == 2) {
+                    data.put(parts[0].trim(), parts[1].trim());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

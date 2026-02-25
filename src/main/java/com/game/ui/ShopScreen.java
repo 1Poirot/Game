@@ -9,34 +9,46 @@ import javax.swing.border.EmptyBorder;
 public class ShopScreen extends JPanel {
     private Image bgImage;
     private GameController controller;
-    private boolean isBlurred = false; // ตัวแปรคุมสถานะการเบลอ
+    private boolean isBlurred = false;
 
     public ShopScreen(GameController controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
 
+        // โหลด Background แบบเช็ค Error
         try {
-            // โหลด Background
-            String path = "src/main/resources/images/backgrounds/2524254.jpg";
-            bgImage = new ImageIcon(path).getImage();
-            if (bgImage.getWidth(null) == -1) {
-                System.out.println("ยังหาไฟล์ไม่เจอที่: " + path);
-            }
+            bgImage = new ImageIcon("src/main/resources/images/backgrounds/2524254.jpg").getImage();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Background image not found!");
         }
 
-        // --- 1. Header Section (วางไว้ทิศเหนือ ไม่โดนแผ่นฟิล์มบัง) ---
-        add(createHeader(), BorderLayout.NORTH);
+        // --- 1. Header Section ---
+        add(createEnhancedHeader(), BorderLayout.NORTH);
 
-        // --- 2. Center Section ---
+        // --- 2. Center Section (Item Grid) ---
         JPanel centerWrapper = new JPanel(new GridBagLayout());
         centerWrapper.setOpaque(false);
 
-        JPanel itemPanel = new JPanel(new GridLayout(0, 3, 20, 20));
-        itemPanel.setBackground(Color.decode("#f3dff7"));
-        itemPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
+        // แผงรวมไอเทมแบบกระจกฝ้า (Glass Panel)
+        JPanel itemPanel = new JPanel(new GridLayout(0, 3, 25, 25)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // พื้นหลังสีม่วงอ่อนแบบโปร่งใส
+                g2.setColor(new Color(243, 223, 247, 180)); 
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                // เส้นขอบสีขาวจางๆ ให้ดูมีมิติ
+                g2.setStroke(new BasicStroke(2f));
+                g2.setColor(new Color(255, 255, 255, 150));
+                g2.drawRoundRect(1, 1, getWidth()-2, getHeight()-2, 30, 30);
+                g2.dispose();
+            }
+        };
+        itemPanel.setOpaque(false);
+        itemPanel.setBorder(new EmptyBorder(40, 50, 40, 50));
 
+        // ดึงไอเทมมาใส่
         for (Item item : controller.getShopSystem().getAvailableItems()) {
             itemPanel.add(new ItemCard(item, () -> handleItemClick(item)));
         }
@@ -45,41 +57,66 @@ public class ShopScreen extends JPanel {
         add(centerWrapper, BorderLayout.CENTER);
     }
 
-    private JPanel createHeader() {
+    private JPanel createEnhancedHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setBorder(new EmptyBorder(15, 20, 0, 20));
+        header.setBorder(new EmptyBorder(25, 30, 10, 30));
 
-        JButton shopBtn = new JButton("< SHOP");
-        shopBtn.setBackground(new Color(255, 105, 180));
-        shopBtn.setForeground(Color.WHITE);
-        shopBtn.setFont(new Font("Arial", Font.BOLD, 18));
-        shopBtn.setPreferredSize(new Dimension(120, 45));
-
-        JButton settingsBtn = new JButton();
-        try {
-            ImageIcon settingsIcon = new ImageIcon(getClass().getResource("/images/ui/settings_icon.png"));
-            Image img = settingsIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-            settingsBtn.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            settingsBtn.setText("⚙");
-        }
-
-        settingsBtn.addActionListener(e -> {
-            controller.showSettings(); // เมื่อกดปุ่ม จะสลับไปหน้าตั้งค่าทันที
-        });
+        // ปุ่ม SHOP (สไตล์เก๋ๆ)
+        JButton shopBtn = createStyledButton("❤ SHOP MENU", new Color(255, 105, 180));
         
-        settingsBtn.setBackground(Color.WHITE);
-        settingsBtn.setPreferredSize(new Dimension(50, 50));
+        // ปุ่ม Settings (สไตล์วงกลม)
+        JButton settingsBtn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (getModel().isPressed()) g2.setColor(new Color(220, 220, 220));
+                else if (getModel().isRollover()) g2.setColor(new Color(245, 245, 245));
+                else g2.setColor(Color.WHITE);
+                g2.fillOval(0, 0, getWidth(), getHeight());
+                g2.setColor(new Color(200, 200, 200));
+                g2.drawOval(0, 0, getWidth()-1, getHeight()-1);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        settingsBtn.setText("⚙");
+        settingsBtn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 24));
+        settingsBtn.setContentAreaFilled(false);
+        settingsBtn.setBorderPainted(false);
+        settingsBtn.setFocusPainted(false);
+        settingsBtn.setPreferredSize(new Dimension(55, 55));
+        settingsBtn.addActionListener(e -> controller.showSettings());
 
         header.add(shopBtn, BorderLayout.WEST);
         header.add(settingsBtn, BorderLayout.EAST);
         return header;
+    }
 
+    private JButton createStyledButton(String text, Color bg) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        btn.setFont(new Font("Tahoma", Font.BOLD, 16));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(bg);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(160, 45));
+        return btn;
     }
 
     private void handleItemClick(Item item) {
-        // เริ่มการเบลอ (วาดสีขาวขุ่นทับ)
         isBlurred = true;
         repaint();
 
@@ -87,37 +124,39 @@ public class ShopScreen extends JPanel {
         BuyConfirmDialog dialog = new BuyConfirmDialog(topFrame, item);
         dialog.setVisible(true);
 
-        // ตรวจสอบการซื้อ
         if (dialog.isConfirmed()) {
             boolean success = controller.getShopSystem().buyItem(controller.getPlayer(), item);
             if (success) {
-                JOptionPane.showMessageDialog(this, "ซื้อสำเร็จแล้ว! เหลือเงิน: " + controller.getPlayer().getMoney());
+                showCustomMessage("ซื้อสำเร็จ!", "เหลือเงิน: " + controller.getPlayer().getMoney() + " Gold", JOptionPane.INFORMATION_MESSAGE);
                 controller.showShop();
             } else {
-                JOptionPane.showMessageDialog(this, "เงินไม่พอสำหรับการซื้อไอเทมนี้", "ยอดเงินคงเหลือไม่พอ",
-                        JOptionPane.ERROR_MESSAGE);
+                showCustomMessage("เงินไม่พอ!", "ยอดเงินของคุณไม่เพียงพอ", JOptionPane.ERROR_MESSAGE);
             }
         }
 
-        // ปิดการเบลอเมื่อ Dialog ปิดลง
         isBlurred = false;
         repaint();
+    }
+
+    private void showCustomMessage(String title, String msg, int type) {
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
+        JOptionPane.showMessageDialog(this, msg, title, type);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
-
-        // 1. วาดพื้นหลังปกติ
+        
+        // วาดพื้นหลัง
         if (bgImage != null) {
             g2.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
         }
 
-        // 2. ถ้าสถานะคือเบลอ ให้ฉาบสีขาวใสทับทั้งหน้าจอ
+        // เอฟเฟกต์เบลอ (ฉาบแผ่นฟิล์มสีขาวนวล)
         if (isBlurred) {
-            // ปรับค่า 150 (0-255) ตามความขุ่นที่ต้องการ
-            g2.setColor(new Color(255, 255, 255, 150));
+            g2.setColor(new Color(255, 255, 255, 180)); // เพิ่มความขุ่นขึ้นเล็กน้อย
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
         g2.dispose();
