@@ -17,9 +17,12 @@ public class Changescene extends JFrame {
     public Changescene(GameController controller) {
         this.controller = controller;
 
+<<<<<<< HEAD
         setTitle("Love Game");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+=======
+>>>>>>> f303d15 (Add new UI item image and initial save slot data)
         setLayout(new BorderLayout());
 
         mainPanel.add(new SceneRoom(), "room");
@@ -185,7 +188,10 @@ public class Changescene extends JFrame {
         JLabel gear = new JLabel(new ImageIcon("gear.png"));
         gear.setBounds((int) (panelW * 0.55), iconY, iconSize, iconSize);
         gear.setCursor(new Cursor(Cursor.HAND_CURSOR));
+<<<<<<< HEAD
         // ✅ เมื่อกดที่รูปเฟือง ให้ไปหน้าตั้งค่า
+=======
+>>>>>>> f303d15 (Add new UI item image and initial save slot data)
         gear.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -249,6 +255,10 @@ public class Changescene extends JFrame {
                 "โลกมันกลมเกินไปหรือเปล่า…",
                 "อีกฝ่ายเหลือบมองคุณนิดเดียว",
                 "\u201cบังเอิญอีกแล้ว\u201d",
+<<<<<<< HEAD
+=======
+
+>>>>>>> f303d15 (Add new UI item image and initial save slot data)
                 "คุณหัวเราะ"
         }, false);
     }

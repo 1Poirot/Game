@@ -108,11 +108,14 @@ public class MenuGame extends JPanel {
 
             String text = menuText[i];
             btn.addActionListener(e -> {
+<<<<<<< HEAD
                 // ====== เล่นเสียง SFX เมื่อคลิกปุ่ม ======
                 if (controller.getAudioSystem() != null) {
                     controller.getAudioSystem().playSFX("click.wav");
                 }
 
+=======
+>>>>>>> f303d15 (Add new UI item image and initial save slot data)
                 if (text.equals("เริ่มเกม"))
                     controller.showGameScene();
                 else if (text.equals("โหลดเซฟ"))

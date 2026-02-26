@@ -81,12 +81,17 @@ public class GameController {
     }
 
     public void showGameScene() {
+<<<<<<< HEAD
         // *** โค้ดเดิมที่คุณต้องการ (กู้กลับมาให้แล้ว) ***
         com.game.models.Character npc = new com.game.models.Character(
                 "Kim Jae-hyun",
                 "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
 
         changeScreen(new GamePanel(npc, dialogueSystem));
+=======
+        // Changescene เป็น JFrame แยกต่างหาก จึงต้องเปิดเป็นหน้าต่าง ไม่ใช่ใส่เป็น JPanel
+        showChangescene();
+>>>>>>> f303d15 (Add new UI item image and initial save slot data)
     }
 
     public void showShop() {
