@@ -1,6 +1,6 @@
 package com.game.ui;
 
-import com.game.controllers.GameController; // แทรก: เพื่อดึง AudioSystem
+import com.game.controllers.GameController;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Changescene extends JFrame {
 
-    private GameController controller; // แทรก: ตัวแปร controller
+    private GameController controller;
     CardLayout cardLayout = new CardLayout();
     JPanel mainPanel = new JPanel(cardLayout);
 
@@ -16,7 +16,6 @@ public class Changescene extends JFrame {
     int WIDTH = screen.width;
     int HEIGHT = screen.height;
 
-    // แก้ไข Constructor ให้รับ GameController
     public Changescene(GameController controller) {
         this.controller = controller;
 
@@ -32,13 +31,11 @@ public class Changescene extends JFrame {
         add(mainPanel);
         setVisible(true);
 
-        // ✅ แทรก: เล่นเพลง BGM ทันทีเมื่อเข้าหน้านี้
         if (controller != null && controller.getAudioSystem() != null) {
             controller.getAudioSystem().playBGM("audiotest2.wav");
         }
     }
 
-    // Constructor สำรองเผื่อรันแยก (สำหรับ Test)
     public Changescene() {
         this(null);
     }
@@ -47,10 +44,8 @@ public class Changescene extends JFrame {
     class SceneRoom extends JLayeredPane {
         public SceneRoom() {
             setLayout(null);
-            JLabel bg = createBackground("src/main/resources/images/backgrounds/มุมตึก.png");
-            add(bg, Integer.valueOf(0));
-            JLabel character = createCharacter();
-            add(character, Integer.valueOf(1));
+            add(createBackground("src/main/resources/images/backgrounds/มุมตึก.png"), Integer.valueOf(0));
+            add(createCharacter(), Integer.valueOf(1));
             add(createTopLeftUI(), Integer.valueOf(5));
             add(createTopRightUI(), Integer.valueOf(5));
             add(createDialogUI1(), Integer.valueOf(10));
@@ -61,168 +56,198 @@ public class Changescene extends JFrame {
     class SceneNext extends JLayeredPane {
         public SceneNext() {
             setLayout(null);
-            JLabel bg = createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
-            add(bg, Integer.valueOf(0));
-            JLabel character = createCharacter();
-            add(character, Integer.valueOf(1));
+            add(createBackground("src/main/resources/images/backgrounds/ห้องเรียน.jpg"), Integer.valueOf(0));
+            add(createCharacter(), Integer.valueOf(1));
             add(createTopLeftUI(), Integer.valueOf(5));
             add(createTopRightUI(), Integer.valueOf(5));
             add(createDialogUI2(), Integer.valueOf(10));
         }
     }
 
-    // ========================== TOP LEFT ==========================
+    // ========================== TOP LEFT (Affection UI) ==========================
     private JPanel createTopLeftUI() {
+
         JPanel panel = new JPanel(null);
         panel.setOpaque(false);
-        panel.setBounds(30, 20, 420, 70);
+        panel.setBounds(30, 20, 420, 90);
 
-        JLabel heart = new JLabel(new ImageIcon("heart.png"));
-        heart.setBounds(0, 10, 50, 50);
-        panel.add(heart);
+        RoundedPanel bg = new RoundedPanel(40);
+        bg.setLayout(null);
+        bg.setBackground(new Color(255, 240, 245, 230));
+        bg.setBounds(0, 0, 420, 80);
 
-        RoundedPanel barBg = new RoundedPanel(30);
-        barBg.setBackground(new Color(255, 230, 235));
-        barBg.setBounds(50, 15, 350, 40);
-        barBg.setLayout(null);
+        JLabel heart = new JLabel("❤");
+        heart.setFont(new Font("Dialog", Font.BOLD, 28));
+        heart.setForeground(new Color(255, 80, 120));
+        heart.setBounds(20, 20, 40, 40);
+        bg.add(heart);
+
+        JLabel loveText = new JLabel("Affection");
+        loveText.setFont(new Font("Tahoma", Font.BOLD, 16));
+        loveText.setBounds(70, 10, 120, 20);
+        bg.add(loveText);
+
+        JLabel percent = new JLabel("20%");
+        percent.setFont(new Font("Tahoma", Font.BOLD, 18));
+        percent.setForeground(new Color(255, 80, 120));
+        percent.setBounds(350, 10, 60, 20);
+        bg.add(percent);
 
         JProgressBar bar = new JProgressBar(0, 100);
         bar.setValue(20);
-        bar.setString("20%");
-        bar.setStringPainted(true);
-        bar.setBounds(10, 5, 330, 30);
+        bar.setBounds(70, 35, 300, 25);
+        bar.setUI(new RoundedProgressBarUI());
+        bar.setBorderPainted(false);
+        bar.setOpaque(false);
 
-        barBg.add(bar);
-        panel.add(barBg);
+        bg.add(bar);
+        panel.add(bg);
+
         return panel;
     }
 
-    // ========================== TOP RIGHT (เพิ่มปุ่มกดได้)
-    // ==========================
-    private JPanel createTopRightUI() {
-        JPanel panel = new RoundedPanel(30);
-        panel.setLayout(null);
-        panel.setBackground(new Color(230, 230, 230, 220));
-        panel.setBounds(WIDTH - 230, 20, 180, 70);
+    // ========================== TOP RIGHT ==========================
+private JPanel createTopRightUI() {
 
-        JLabel bag = new JLabel(new ImageIcon("bag.png"));
-        bag.setBounds(25, 10, 50, 50);
-        bag.setCursor(new Cursor(Cursor.HAND_CURSOR)); // เปลี่ยนเมาส์เป็นรูปมือ
+    // ===== กล่องพื้นหลัง =====
+    RoundedPanel panel = new RoundedPanel(30);
+    panel.setLayout(null);
+    panel.setBackground(new Color(255, 255, 255, 210));
+    panel.setBounds(WIDTH - 240, 20, 190, 70);
 
-        JLabel gear = new JLabel(new ImageIcon("gear.png"));
-        gear.setBounds(100, 10, 50, 50);
-        gear.setCursor(new Cursor(Cursor.HAND_CURSOR)); // เปลี่ยนเมาส์เป็นรูปมือ
+    // ===== ปุ่มกระเป๋า =====
+    JLabel bag = new JLabel(new ImageIcon("\"src/main/resources/images/icon/school-bag.png"));
+    bag.setBounds(30, 15, 40, 40);
+    bag.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // ✅ แทรก: เมื่อกดที่รูปเฟือง ให้ไปหน้าตั้งค่า
-        gear.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (controller != null) {
-                    // เล่นเสียงคลิกปุ่ม
-                    if (controller.getAudioSystem() != null) {
-                        controller.getAudioSystem().playSFX("click.wav");
-                    }
+    // ===== ปุ่มตั้งค่า =====
+    JLabel gear = new JLabel(new ImageIcon("src/main/resources/images/icon/setting.png"));
+    gear.setBounds(110, 15, 40, 40);
+    gear.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-                    // 1. แสดงหน้าหลักกลับมา (เพราะหน้าตั้งค่าอยู่ในหน้าหลัก)
-                    controller.getMainFrame().setVisible(true);
+    // ===== Hover Effect =====
+    gear.addMouseListener(new MouseAdapter() {
 
-                    // 2. สั่งเปลี่ยนหน้าจอไปที่ Audio Settings
-                    controller.showAudioSettings();
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            gear.setLocation(110, 12);
+        }
 
-                    // 3. ปิดหน้าจอ Changescene นี้ทิ้งไป
-                    dispose();
+        @Override
+        public void mouseExited(MouseEvent e) {
+            gear.setLocation(110, 15);
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+            if (controller != null) {
+
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
                 }
+
+                controller.getMainFrame().setVisible(true);
+                controller.showAudioSettings();
+                dispose();
             }
-        });
+        }
+    });
 
-        panel.add(bag);
-        panel.add(gear);
-        return panel;
-    }
+    // ===== Hover กระเป๋า =====
+    bag.addMouseListener(new MouseAdapter() {
 
-    // ========================== DIALOG SCENE 1 ==========================
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            bag.setLocation(30, 12);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            bag.setLocation(30, 15);
+        }
+    });
+
+    panel.add(bag);
+    panel.add(gear);
+
+    return panel;
+}
+
+    // ========================== DIALOG ==========================
     private JPanel createDialogUI1() {
-        return createDialogBase(new String[] {
+        return createDialogBase(new String[]{
                 "เช้าวันเปิดเทอม ลมเช้าเย็นกว่าที่คาด",
                 "คุณยืนอยู่หน้าประตูโรงเรียนในชุดนักเรียนใหม่เอี่ยม",
                 "เสียงนักเรียนรอบตัวเต็มไปด้วยบทสนทนาและเสียงหัวเราะ",
                 "แต่ไม่มีเสียงไหนเรียกชื่อคุณ",
-                "คุณสูดหายใจลึก ก้าวเท้าเข้าไปในรั้วโรงเรียน",
-                "และทันทีที่คุณเดินผ่านมุมตึกเรียน — ปึก!",
-                "คุณชนเข้ากับใครบางคนอย่างแรง",
-                "หนังสือในมือเขา/เธอร่วงกระจายบนพื้น",
-                "ดวงตาคู่หนึ่งเงยขึ้นมามองคุณ",
-                "แววตานั้นนิ่ง เย็น…แต่มีบางอย่างซ่อนอยู่",
-                "“นักเรียนใหม่…?”",
-                "น้ำเสียงไม่ได้เย็นชา แต่ก็ไม่ได้เป็นมิตร",
-                "วินาทีนั้นเอง คุณยังไม่รู้เลยว่า",
-                "การชนกันเพียงครั้งเดียว",
-                "จะเปลี่ยน 7 วันแรกของคุณไปตลอดกาล"
+                "คุณสูดหายใจลึก ก้าวเท้าเข้าไปในรั้วโรงเรียน"
         }, true);
     }
 
-    // ========================== DIALOG SCENE 2 ==========================
     private JPanel createDialogUI2() {
-        return createDialogBase(new String[] {
-                "🏫 ห้องเรียน",
+        return createDialogBase(new String[]{
+                "ห้องเรียน",
                 "หลังแนะนำตัวหน้าห้องเสร็จ",
                 "ครูให้คุณไปนั่งที่ว่างด้านหลัง",
-                "และเมื่อคุณเดินไปถึงโต๊ะเรียน",
                 "อีกฝ่ายก็นั่งอยู่โต๊ะข้าง ๆ",
-                "คุณหยุดชะงักเล็กน้อย",
-                "โลกมันกลมเกินไปหรือเปล่า…",
-                "อีกฝ่ายเหลือบมองคุณนิดเดียว",
                 "“บังเอิญอีกแล้ว”",
-                "คุณหัวเราะ"
+                "“โลกมันกลมดีเนอะ”",
+
         }, false);
     }
 
-    // ========================== DIALOG BASE ==========================
+    // ========================== Dialog Base + Name Tag ==========================
     private JPanel createDialogBase(String[] dialogs, boolean changeScene) {
+
         int dialogWidth = WIDTH - 100;
+
         JPanel container = new JPanel(null);
         container.setOpaque(false);
         container.setBounds(50, HEIGHT - 260, dialogWidth, 230);
 
+        // ===== Dialog Box =====
         RoundedPanel dialog = new RoundedPanel(40);
         dialog.setBackground(new Color(244, 169, 193, 220));
         dialog.setBounds(0, 30, dialogWidth, 200);
         dialog.setLayout(null);
 
+        JLabel text = new JLabel(dialogs[0]);
+        text.setFont(new Font("Tahoma", Font.PLAIN, 22));
+        text.setForeground(Color.WHITE);
+        text.setBounds(60, 70, dialogWidth - 200, 40);
+
+        dialog.add(text);
+
+        // ===== Name Tag =====
         RoundedPanel nameBox = new RoundedPanel(25);
         nameBox.setBackground(Color.WHITE);
-        nameBox.setBounds(40, 0, 220, 50);
+        nameBox.setBounds(40, 0, 260, 55);
         nameBox.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         JLabel name = new JLabel("คิม แจฮยอน");
-        name.setFont(new Font("Tahoma", Font.BOLD, 18));
+        name.setFont(new Font("Tahoma", Font.BOLD, 20));
+        name.setForeground(new Color(255, 80, 120));
+
         nameBox.add(name);
 
-        JLabel text = new JLabel(dialogs[0]);
-        text.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        text.setBounds(60, 70, dialogWidth - 200, 40);
-
+        // ===== Day =====
         JLabel day = new JLabel("Day 1");
         day.setFont(new Font("Tahoma", Font.BOLD, 18));
+        day.setForeground(Color.WHITE);
         day.setBounds(dialogWidth - 120, 20, 100, 30);
 
-        JLabel sparkle = new JLabel("✨");
-        sparkle.setFont(new Font("Dialog", Font.PLAIN, 28));
-        sparkle.setBounds(dialogWidth - 70, 140, 40, 40);
-
-        dialog.add(text);
         dialog.add(day);
-        dialog.add(sparkle);
 
         container.add(nameBox);
         container.add(dialog);
 
-        final int[] index = { 0 };
+        final int[] index = {0};
 
         dialog.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // ✅ แทรก: เล่นเสียง SFX คลิกเมื่อกดอ่านเนื้อเรื่อง
+
                 if (controller != null && controller.getAudioSystem() != null) {
                     controller.getAudioSystem().playSFX("click.wav");
                 }
@@ -242,28 +267,38 @@ public class Changescene extends JFrame {
 
     // ========================== BACKGROUND ==========================
     private JLabel createBackground(String path) {
+
         ImageIcon icon = new ImageIcon(path);
         Image img = icon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+
         JLabel bg = new JLabel(new ImageIcon(img));
         bg.setBounds(0, 0, WIDTH, HEIGHT);
+
         return bg;
     }
 
     // ========================== CHARACTER ==========================
     private JLabel createCharacter() {
-        int charW = WIDTH / 4;
-        int charH = HEIGHT - 300;
-        ImageIcon icon = new ImageIcon("src/main/resources/images/backgrounds/ผู้ชาย ตัวเอก.png");
+
+        int charW = WIDTH / 90 * 30;
+        int charH = HEIGHT - 100;
+
+        ImageIcon icon = new ImageIcon("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
         Image img = icon.getImage().getScaledInstance(charW, charH, Image.SCALE_SMOOTH);
+
         JLabel character = new JLabel(new ImageIcon(img));
+
         int x = (WIDTH - charW) / 2;
         int y = HEIGHT - charH - 120;
+
         character.setBounds(x, y, charW, charH);
+
         return character;
     }
 
-    // ========================== ROUNDED PANEL ==========================
+    // ========================== Rounded Panel ==========================
     class RoundedPanel extends JPanel {
+
         private int radius;
 
         public RoundedPanel(int radius) {
@@ -272,16 +307,49 @@ public class Changescene extends JFrame {
         }
 
         protected void paintComponent(Graphics g) {
+
             Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
             g2.setColor(getBackground());
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
             super.paintComponent(g);
         }
     }
 
+    // ========================== ProgressBar UI ==========================
+    class RoundedProgressBarUI extends javax.swing.plaf.basic.BasicProgressBarUI {
+
+        @Override
+        protected void paintDeterminate(Graphics g, JComponent c) {
+
+            Graphics2D g2 = (Graphics2D) g;
+
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int width = progressBar.getWidth();
+            int height = progressBar.getHeight();
+
+            g2.setColor(new Color(255, 220, 230));
+            g2.fillRoundRect(0, 0, width, height, height, height);
+
+            int amountFull = (int) (width * progressBar.getPercentComplete());
+
+            GradientPaint gp = new GradientPaint(
+                    0, 0, new Color(255, 120, 160),
+                    width, 0, new Color(255, 80, 120)
+            );
+
+            g2.setPaint(gp);
+            g2.fillRoundRect(0, 0, amountFull, height, height, height);
+        }
+    }
+
     public static void main(String[] args) {
-        // สำหรับรันแยกเพื่อ Test UI (ไม่มีเสียง)
         SwingUtilities.invokeLater(() -> new Changescene());
     }
 }
