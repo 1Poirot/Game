@@ -4,24 +4,37 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class GameServer {
-    // เก็บข้อมูลคะแนนแยกตามชื่อผู้เล่น เช่น {"Neko": 50, "John": 20}
     private static Map<String, Integer> playerScores = new ConcurrentHashMap<>();
     private static List<PrintWriter> clientWriters = new CopyOnWriteArrayList<>();
-    
-    // ตั้งเป้าหมาย: ใครถึง 100 คะแนนก่อน ชนะ!
+
     private static final int WINNING_SCORE = 100;
+    private static final int MAX_PLAYERS = 3; // <-- กำหนดผู้เล่นสูงสุด 3 คน
     private static boolean gameEnded = false;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("เปิดเซิร์ฟเวอร์ ศึกชิงนาง...");
         ServerSocket serverSocket = new ServerSocket(9090);
+
+        System.out.println("========== เปิดเซิร์ฟเวอร์ ศึกชิงนาง ==========");
+        System.out.println("รับผู้เล่นได้สูงสุด: " + MAX_PLAYERS + " คน");
+
+        // ดึง IP Address ของเครื่อง Host มาแสดงให้เพื่อนดู
+        String hostIP = InetAddress.getLocalHost().getHostAddress();
+        System.out.println(">> บอกให้เพื่อนกรอก IP นี้นะ: " + hostIP + " <<");
+        System.out.println("=============================================");
 
         while (true) {
             Socket clientSocket = serverSocket.accept();
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            clientWriters.add(out);
 
-            // สร้าง Thread ให้ผู้เล่นที่เข้ามาใหม่
+            // เช็คว่าห้องเต็มหรือยัง?
+            if (clientWriters.size() >= MAX_PLAYERS) {
+                out.println("REJECT:ห้องเต็มแล้วจ้า (รับได้แค่ 3 คนเท่านั้น!)");
+                clientSocket.close(); // เตะออก
+                System.out.println("มีคนพยายามเข้า แต่ห้องเต็มแล้ว");
+                continue;
+            }
+
+            clientWriters.add(out);
             new Thread(new ClientHandler(clientSocket, out)).start();
         }
     }
@@ -40,33 +53,27 @@ public class GameServer {
         public void run() {
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                
-                // 1. รับชื่อผู้เล่นทันทีที่เชื่อมต่อ
                 playerName = in.readLine();
-                playerScores.put(playerName, 0); // เริ่มต้นที่ 0 คะแนน
-                
-                System.out.println(playerName + " เข้าร่วมการแข่งขัน!");
-                broadcast("SYSTEM:" + playerName + " มาร่วมวงจีบสาวแล้ว!");
+                playerScores.put(playerName, 0);
+
+                System.out.println(playerName + " เข้าร่วม! (" + clientWriters.size() + "/" + MAX_PLAYERS + " คน)");
+                broadcast("SYSTEM:" + playerName + " เข้าร่วมวงจีบสาวแล้ว! (" + clientWriters.size() + "/" + MAX_PLAYERS
+                        + ")");
 
                 String message;
-                // 2. รอรับคำสั่ง (TALK หรือ GIFT)
                 while ((message = in.readLine()) != null) {
-                    if (gameEnded) continue; // ถ้ามีคนชนะแล้ว ห้ามกดเพิ่ม
+                    if (gameEnded)
+                        continue;
 
                     int currentScore = playerScores.get(playerName);
-                    
-                    if (message.equals("TALK")) {
+                    if (message.equals("TALK"))
                         currentScore += 5;
-                        broadcast("UPDATE:" + playerName + " ชวนคุยเล่น (คะแนนของ " + playerName + " = " + currentScore + ")");
-                    } else if (message.equals("GIFT")) {
+                    else if (message.equals("GIFT"))
                         currentScore += 10;
-                        broadcast("UPDATE:" + playerName + " เปย์ของขวัญ! (คะแนนของ " + playerName + " = " + currentScore + ")");
-                    }
 
-                    // อัปเดตคะแนนกลับเข้า Map
                     playerScores.put(playerName, currentScore);
+                    broadcast("UPDATE:" + playerName + " ทำคะแนนได้ " + currentScore);
 
-                    // 3. เช็คว่าชนะหรือยัง?
                     if (currentScore >= WINNING_SCORE) {
                         gameEnded = true;
                         broadcast("WINNER:" + playerName);
@@ -74,10 +81,16 @@ public class GameServer {
                 }
             } catch (IOException e) {
                 System.out.println(playerName + " หลุดออกจากเกม");
+            } finally {
+                // ถ้ามีคนออก ให้ลบข้อมูลออก ห้องจะได้ว่างให้คนอื่นเข้า
+                if (playerName != null) {
+                    playerScores.remove(playerName);
+                    clientWriters.remove(out);
+                    broadcast("SYSTEM:" + playerName + " ยอมแพ้และเดินจากไป...");
+                }
             }
         }
 
-        // ส่งข้อความไปหาผู้เล่นทุกคน
         private void broadcast(String msg) {
             for (PrintWriter writer : clientWriters) {
                 writer.println(msg);

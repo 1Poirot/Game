@@ -1,6 +1,7 @@
 package com.game.controllers;
 
 import com.game.models.Player;
+import com.game.network.GameClient;
 import com.game.systems.audio.AudioSystem;
 import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
@@ -23,18 +24,26 @@ public class GameController {
     private JFrame mainFrame;
 
     public GameController() {
+<<<<<<< HEAD
         // ===== สร้างข้อมูลผู้เล่น 3 คน แข่งจีบคนเดียวกัน =====
         this.players = new ArrayList<>();
         this.players.add(new Player("Player 1", 100));
         this.players.add(new Player("Player 2", 100));
         this.players.add(new Player("Player 3", 100));
 
+=======
+        this.player = new Player("Hero", 100);
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         this.shopSystem = new ShopSystem();
         this.dialogueSystem = new DialogueSystemAndChoice();
         this.audioSystem = new AudioSystem();
 
+<<<<<<< HEAD
         // ===== สร้างหน้าต่างหลักหน้าต่างเดียว (Single Frame) =====
         mainFrame = new JFrame("Love Game - 3 Players Rivalry");
+=======
+        mainFrame = new JFrame("Game Shop - Fantasy RPG");
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1280, 720);
         mainFrame.setResizable(true);
@@ -84,6 +93,7 @@ public class GameController {
         changeScreen(new MenuGame(this));
     }
 
+<<<<<<< HEAD
     public void showGameScene() {
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -108,6 +118,17 @@ public class GameController {
 =======
         changeScreen(new com.game.ui.GamePanel(this, npc, dialogueSystem));
 >>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
+=======
+    public void showChangescene() {
+        if (audioSystem != null)
+            audioSystem.stopBGM();
+        mainFrame.setVisible(false);
+        new Changescene(this);
+    }
+
+    public void showGameScene() {
+        showChangescene();
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
     }
 
     public void showShop() {
@@ -120,7 +141,10 @@ public class GameController {
 
     public void showAudioSettings() {
         changeScreen(new AudioSettingsScreen(this));
+<<<<<<< HEAD
         // ✅ ป้องกันตัวแดง: เรียกชื่อเพลงล่าสุดมาเล่นต่อในหน้าตั้งค่า
+=======
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         if (audioSystem != null && audioSystem.getCurrentBgmName() != null) {
             audioSystem.playBGM(audioSystem.getCurrentBgmName());
         }
@@ -146,6 +170,29 @@ public class GameController {
     public void showSaveScreen(Runnable onBack) {
         changeScreen(new SaveScreen(this, onBack));
 >>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
+    }
+
+    // ================== Multiplayer ==================
+    /**
+     * เปิดหน้า Lobby Dialog ให้กรอก IP + ชื่อ แล้วเชื่อมต่อ GameServer
+     * เรียกจาก MenuGame เมื่อกดปุ่ม "เล่นออนไลน์"
+     */
+    public void showMultiplayer() {
+        LobbyDialog.LobbyResult lobbyResult = LobbyDialog.show(mainFrame);
+        if (lobbyResult == null)
+            return; // ผู้ใช้กด Cancel
+
+        GameClient client = new GameClient(lobbyResult.ip, 9090, lobbyResult.playerName);
+        boolean ok = client.connect();
+        if (!ok) {
+            JOptionPane.showMessageDialog(mainFrame,
+                    "เชื่อมต่อ IP: " + lobbyResult.ip + " ไม่สำเร็จ!\nโปรดเช็คว่า Host เปิด GameServer แล้ว",
+                    "เชื่อมต่อไม่สำเร็จ", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // เปิดหน้าต่าง Multiplayer (เป็น JFrame แยกต่างหาก)
+        new MultiplayerScreen(client);
     }
 
     public void exitGame() {

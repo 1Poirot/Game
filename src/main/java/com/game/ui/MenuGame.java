@@ -22,12 +22,10 @@ public class MenuGame extends JPanel {
         layeredPane = new JLayeredPane();
         add(layeredPane, BorderLayout.CENTER);
 
-        // ====== เริ่มเล่นเพลง BGM หน้าเมนู ======
         if (controller.getAudioSystem() != null) {
             controller.getAudioSystem().playBGM("audiotest.wav");
         }
 
-        // ฟัง resize ทุกครั้ง
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -93,21 +91,32 @@ public class MenuGame extends JPanel {
                 screenH / 9);
         layeredPane.add(title, Integer.valueOf(4));
 
+<<<<<<< HEAD
         // ===== Buttons (จัดระเบียบใหม่) =====
         String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม" };
+=======
+        // ===== Menu Buttons (เพิ่ม "เล่นออนไลน์") =====
+        String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "เล่นออนไลน์", "ตั้งค่า", "ออกเกม" };
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         int btnW = screenW / 8;
         int btnH = screenH / 14;
-        int startY = (int) (screenH * 0.35);
+        int startY = (int) (screenH * 0.33);
 
         for (int i = 0; i < menuText.length; i++) {
-            RoundedButton btn = new RoundedButton(menuText[i]);
+            String text = menuText[i];
+
+            // ปุ่ม "เล่นออนไลน์" ใช้สีพิเศษ
+            RoundedButton btn = text.equals("เล่นออนไลน์")
+                    ? new RoundedButton(text, new Color(130, 80, 220), Color.WHITE)
+                    : new RoundedButton(text, new Color(255, 215, 230), Color.BLACK);
+
             btn.setFont(new Font("Tahoma", Font.BOLD, screenW / 60));
             btn.setBounds(screenW / 10,
-                    startY + (i * (btnH + 20)),
+                    startY + (i * (btnH + 16)),
                     btnW, btnH);
 
-            String text = menuText[i];
             btn.addActionListener(e -> {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -139,6 +148,17 @@ public class MenuGame extends JPanel {
                 } 
                 else if (text.equals("ออกเกม")) {
                     controller.exitGame();
+=======
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
+                }
+                switch (text) {
+                    case "เริ่มเกม" -> controller.showChangescene();
+                    case "โหลดเซฟ" -> controller.showSaveScreen();
+                    case "เล่นออนไลน์" -> controller.showMultiplayer();
+                    case "ตั้งค่า" -> controller.showSettings();
+                    case "ออกเกม" -> controller.exitGame();
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
                 }
             });
 
@@ -176,8 +196,14 @@ public class MenuGame extends JPanel {
 
     // ================== Rounded Button ==================
     class RoundedButton extends JButton {
-        public RoundedButton(String label) {
+
+        private final Color bgColor;
+        private final Color fgColor;
+
+        public RoundedButton(String label, Color bgColor, Color fgColor) {
             super(label);
+            this.bgColor = bgColor;
+            this.fgColor = fgColor;
             setContentAreaFilled(false);
             setFocusPainted(false);
             setBorderPainted(false);
@@ -187,14 +213,22 @@ public class MenuGame extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+<<<<<<< HEAD
             g2.setColor(new Color(255, 215, 230)); // สีชมพูพาสเทล
             g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 45, 45));
+=======
+            Color fill = getModel().isPressed() ? bgColor.darker()
+                    : getModel().isRollover() ? bgColor.brighter() : bgColor;
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
 
-            g2.setColor(Color.BLACK);
-            FontMetrics fm = g2.getFontMetrics();
+            g2.setColor(fill);
+            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 45, 45));
+
+            g2.setColor(fgColor);
+            FontMetrics fm = g2.getFontMetrics(getFont());
+            g2.setFont(getFont());
             g2.drawString(getText(),
                     (getWidth() - fm.stringWidth(getText())) / 2,
                     (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
@@ -224,7 +258,11 @@ public class MenuGame extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+<<<<<<< HEAD
             g2.setColor(new Color(255, 182, 193, 160)); 
+=======
+            g2.setColor(new Color(255, 182, 193, 160));
+>>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
             for (SakuraParticle p : particles)
                 g2.fill(p.getShape());
         }
