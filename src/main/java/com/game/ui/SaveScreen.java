@@ -11,10 +11,12 @@ import javax.swing.border.EmptyBorder;
 
 public class SaveScreen extends JPanel {
     private GameController controller;
+    private Runnable onBack;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-    public SaveScreen(GameController controller) {
+    public SaveScreen(GameController controller, Runnable onBack) {
         this.controller = controller;
+        this.onBack = onBack;
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
 
@@ -24,7 +26,7 @@ public class SaveScreen extends JPanel {
         header.setBorder(new EmptyBorder(30, 50, 0, 0));
 
         JButton backBtn = createRoundedButton("< ย้อนกลับ", 200, 70, Color.WHITE, Color.BLACK);
-        backBtn.addActionListener(e -> controller.showSettings());
+        backBtn.addActionListener(e -> onBack.run());
         header.add(backBtn);
         add(header, BorderLayout.NORTH);
 
@@ -45,15 +47,23 @@ public class SaveScreen extends JPanel {
                 g2.dispose();
             }
         };
-        saveBox.setPreferredSize(new Dimension(1500, 850));
         saveBox.setOpaque(false);
+
+        // ให้ saveBox ขยายเต็มพื้นที่แทนขนาดคงที่
+        GridBagConstraints outerGbc = new GridBagConstraints();
+        outerGbc.fill = GridBagConstraints.BOTH;
+        outerGbc.weightx = 1.0;
+        outerGbc.weighty = 1.0;
+        outerGbc.insets = new Insets(20, 40, 30, 40);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 20, 15, 20);
         gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
         JLabel titleLabel = new JLabel("ระบบจัดการข้อมูลเกม (Save & Load)");
-        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 45));
+        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 32));
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 30, 0);
         saveBox.add(titleLabel, gbc);
@@ -99,7 +109,7 @@ public class SaveScreen extends JPanel {
                     SaveSystem.saveToFile(slot, controller.getPlayer().getName(), controller.getPlayer().getMoney(),
                             dateFormat.format(new Date()));
                     JOptionPane.showMessageDialog(this, "บันทึกลงเครื่องเรียบร้อย!");
-                    controller.showSaveScreen(); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
+                    controller.showSaveScreen(onBack); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
                 }
             });
 
@@ -110,7 +120,7 @@ public class SaveScreen extends JPanel {
             saveBox.add(slotRow, gbc);
         }
 
-        centerWrapper.add(saveBox);
+        centerWrapper.add(saveBox, outerGbc);
         add(centerWrapper, BorderLayout.CENTER);
     }
 
