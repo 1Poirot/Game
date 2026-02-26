@@ -108,10 +108,29 @@ public class MenuGame extends JPanel {
 
             String text = menuText[i];
             btn.addActionListener(e -> {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+                // ====== เล่นเสียง SFX เมื่อคลิกปุ่ม ======
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
+                }
+
+                // ในหน้า MenuGame.java ตรงปุ่มเริ่มเกม
+                if (text.equals("เริ่มเกม")) {
+                    controller.showChangescene(); // เรียกหน้า Changescene ที่มีระบบ CardLayout
+                } else if (text.equals("โหลดเซฟ"))
+                    controller.showSaveScreen();
+=======
+>>>>>>> origin/dev/neko
                 if (text.equals("เริ่มเกม"))
                     controller.showGameScene();
                 else if (text.equals("โหลดเซฟ"))
                     controller.showSaveScreen(() -> controller.showMainMenu());
+<<<<<<< HEAD
+=======
+>>>>>>> 0becec2a56481e4c0a93934ab74c926e8298f718
+>>>>>>> origin/dev/neko
                 else if (text.equals("ตั้งค่า"))
                     controller.showSettings();
                 else if (text.equals("ออกเกม"))

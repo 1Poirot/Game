@@ -90,7 +90,20 @@ public class GameController {
     }
 
     public void showGameScene() {
+<<<<<<< HEAD
         showChangescene();
+=======
+<<<<<<< HEAD
+        // *** โค้ดเดิมที่คุณต้องการ (กู้กลับมาให้แล้ว) ***
+        com.game.models.Character npc = new com.game.models.Character(
+                "Kim Jae-hyun",
+                "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
+
+        changeScreen(new GamePanel(npc, dialogueSystem));
+=======
+        changeScreen(new Changescene(this));
+>>>>>>> 0becec2a56481e4c0a93934ab74c926e8298f718
+>>>>>>> origin/dev/neko
     }
 
     public void showShop() {
@@ -123,7 +136,11 @@ public class GameController {
     }
 
     public void showSaveScreen() {
-        changeScreen(new SaveScreen(this));
+        showSaveScreen(() -> showSettings());
+    }
+
+    public void showSaveScreen(Runnable onBack) {
+        changeScreen(new SaveScreen(this, onBack));
     }
 
     public void exitGame() {
