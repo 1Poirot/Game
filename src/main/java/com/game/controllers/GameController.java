@@ -6,24 +6,32 @@ import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
+import java.util.ArrayList; // แทรก: เพื่อเก็บรายการผู้เล่น
+import java.util.List;
 import javax.swing.*;
 
 public class GameController {
 
-    private Player player;
+    // ✅ แทรก: เปลี่ยนจาก Player คนเดียว เป็น List เพื่อรองรับ 3 คน
+    private List<Player> players;
+    private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
+
     private ShopSystem shopSystem;
     private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
+    private String lastScene = "MAIN_MENU";
 
     private JFrame mainFrame;
 
     public GameController() {
-        // ===== สร้างข้อมูลเกม =====
-        this.player = new Player("Hero", 100);
+        // ===== สร้างข้อมูลผู้เล่น 3 คน =====
+        this.players = new ArrayList<>();
+        this.players.add(new Player("Player 1", 100));
+        this.players.add(new Player("Player 2", 100));
+        this.players.add(new Player("Player 3", 100));
+
         this.shopSystem = new ShopSystem();
         this.dialogueSystem = new DialogueSystemAndChoice();
-
-        // ===== สร้างระบบเสียง =====
         this.audioSystem = new AudioSystem();
 
         // ===== สร้างหน้าต่างหลัก =====
@@ -35,13 +43,26 @@ public class GameController {
         mainFrame.setLocationRelativeTo(null);
     }
 
+    // ================== ระบบจัดการ Turn (แทรกใหม่) ==================
+    // ดึงข้อมูลผู้เล่นที่กำลังเล่นอยู่ตอนนี้
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
+
+    // สลับไปตาผู้เล่นคนถัดไป
+    public void nextTurn() {
+        currentPlayerIndex++;
+        if (currentPlayerIndex >= players.size()) {
+            currentPlayerIndex = 0; // วนกลับมาคนที่ 1
+        }
+        System.out.println("ตอนนี้ตาของ: " + getCurrentPlayer().getName());
+    }
+
     // ================== เริ่มเกม ==================
     public void start() {
         showMainMenu();
         mainFrame.setVisible(true);
 
-        // ✅ วิธีแก้แบบถวายหัว: ใช้ InvokeLater เพื่อสั่งให้เพลงเล่น "หลังจาก"
-        // หน้าต่างโผล่ขึ้นมาสมบูรณ์แล้ว
         SwingUtilities.invokeLater(() -> {
             if (audioSystem != null) {
                 audioSystem.playBGM("audiotest.wav");
@@ -58,35 +79,31 @@ public class GameController {
         mainFrame.repaint();
     }
 
-    // ================== หน้าต่างต่าง ๆ (โค้ดเดิมอยู่ครบ + แทรกของใหม่)
-    // ==================
-
+    // ================== หน้าต่างต่าง ๆ ==================
     public void showMainMenu() {
         changeScreen(new MenuGame(this));
     }
 
-    // ✅ แทรกเมธอดนี้: เพื่อเรียกหน้า Changescene (JFrame) ที่คุณส่งมา
     public void showChangescene() {
-        // หยุดเพลงเมนูก่อนเปลี่ยนฉาก
-        if (audioSystem != null) {
-            audioSystem.stopBGM();
-        }
-
-        // ซ่อนหน้าต่างเมนูหลัก
         mainFrame.setVisible(false);
-
-        // เปิดหน้าต่างเนื้อเรื่อง (ส่ง controller
-        // ไปด้วยเพื่อให้หน้าใหม่ใช้ระบบเสียงเดิมได้)
         new Changescene(this);
     }
 
     public void showGameScene() {
+<<<<<<< HEAD
+        showChangescene();
+=======
+<<<<<<< HEAD
         // *** โค้ดเดิมที่คุณต้องการ (กู้กลับมาให้แล้ว) ***
         com.game.models.Character npc = new com.game.models.Character(
                 "Kim Jae-hyun",
                 "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
 
         changeScreen(new GamePanel(npc, dialogueSystem));
+=======
+        changeScreen(new Changescene(this));
+>>>>>>> 0becec2a56481e4c0a93934ab74c926e8298f718
+>>>>>>> origin/dev/neko
     }
 
     public void showShop() {
@@ -94,22 +111,36 @@ public class GameController {
     }
 
     public void showSettings() {
+        if (!mainFrame.isVisible()) {
+            lastScene = "CHANGESCENE";
+            mainFrame.setVisible(true);
+        } else {
+            lastScene = "MAIN_MENU";
+        }
         changeScreen(new SettingsScreen(this));
     }
 
     public void showAudioSettings() {
         changeScreen(new AudioSettingsScreen(this));
-
-        // ✅ ระบบจะเช็คเอง: ถ้าเพลงปัจจุบันคือ audiotest2.wav (หน้าเนื้อเรื่อง)
-        // แล้วเรากดตั้งค่า มันก็จะเล่น audiotest2.wav ต่อไปยาวๆ ไม่กระตุกครับ
-        // แต่ถ้ามาจากหน้าเมนู (audiotest.wav) มันก็จะเล่นเพลงเมนูต่อไป
         if (audioSystem != null && audioSystem.getCurrentBgmName() != null) {
             audioSystem.playBGM(audioSystem.getCurrentBgmName());
         }
     }
 
+    public void backToPreviousScreen() {
+        if (lastScene.equals("CHANGESCENE")) {
+            showChangescene();
+        } else {
+            showMainMenu();
+        }
+    }
+
     public void showSaveScreen() {
-        changeScreen(new SaveScreen(this));
+        showSaveScreen(() -> showSettings());
+    }
+
+    public void showSaveScreen(Runnable onBack) {
+        changeScreen(new SaveScreen(this, onBack));
     }
 
     public void exitGame() {
@@ -117,8 +148,13 @@ public class GameController {
     }
 
     // ================== Getters ==================
+    // ✅ ปรับปรุง: ให้ getPlayer() คืนค่าผู้เล่นคนปัจจุบันเสมอ เพื่อให้หน้า Save/Shop ทำงานถูกคน
     public Player getPlayer() {
-        return player;
+        return getCurrentPlayer();
+    }
+
+    public List<Player> getAllPlayers() {
+        return players;
     }
 
     public ShopSystem getShopSystem() {

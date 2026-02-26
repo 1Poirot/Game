@@ -22,10 +22,10 @@
 
 ```bash
 # Compile
-javac -d bin src/main/java/com/game/**/*.java
+javac -d out src/main/java/com/game/**/*.java
 
 # Run
-java -cp bin com.game.Main
+java -cp out com.game.Main
 ```
 
 ## สถานะปัจจุบัน
