@@ -2,10 +2,7 @@ package com.game.ui;
 
 import com.game.controllers.GameController;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class Changescene extends JFrame {
@@ -13,17 +10,6 @@ public class Changescene extends JFrame {
     private GameController controller;
     CardLayout cardLayout = new CardLayout();
     JPanel mainPanel = new JPanel(cardLayout);
-
-<<<<<<< HEAD
-    public Changescene(GameController controller) {
-        this.controller = controller;
-
-        setLayout(new BorderLayout());
-=======
-<<<<<<< HEAD
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    int WIDTH = screen.width;
-    int HEIGHT = screen.height;
 
     public Changescene(GameController controller) {
         this.controller = controller;
@@ -60,37 +46,23 @@ public class Changescene extends JFrame {
     // คลาสพื้นฐานสำหรับทุก Scene — ฟัง resize แล้ว rebuild layout อัตโนมัติ
     abstract class ResponsiveScene extends JLayeredPane {
 
-        public ResponsiveScene() {
+        public BaseScene() {
+            setLayout(null);
+
             addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
-                    layoutComponents();
+                    resizeAll();
                 }
             });
         }
 
-        // แต่ละ Scene implement method นี้เพื่อจัด layout ตามขนาดจริง
-        protected abstract void layoutComponents();
-    }
+        protected abstract String getBackgroundPath();
+        protected abstract String[] getDialogs();
+        protected abstract boolean isChangeScene();
 
-    // ========================== SCENE 1 ==========================
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    class SceneRoom extends JLayeredPane {
-        public SceneRoom() {
-            setLayout(null);
-            add(createBackground("src/main/resources/images/backgrounds/มุมตึก.png"), Integer.valueOf(0));
-            add(createCharacter(), Integer.valueOf(1));
-            add(createTopLeftUI(), Integer.valueOf(5));
-            add(createTopRightUI(), Integer.valueOf(5));
-            add(createDialogUI1(), Integer.valueOf(10));
-=======
->>>>>>> origin/dev/neko
-    class SceneRoom extends ResponsiveScene {
+        private void resizeAll() {
 
-        @Override
-        protected void layoutComponents() {
             int w = getWidth();
             int h = getHeight();
             if (w == 0 || h == 0)
