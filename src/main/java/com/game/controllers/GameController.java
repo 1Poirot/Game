@@ -2,7 +2,6 @@ package com.game.controllers;
 
 import com.game.models.Player;
 import com.game.systems.audio.AudioSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
@@ -12,7 +11,6 @@ public class GameController {
 
     private Player player;
     private ShopSystem shopSystem;
-    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
 
     private JFrame mainFrame;
@@ -20,8 +18,7 @@ public class GameController {
     public GameController() {
         // ===== สร้างข้อมูลเกม =====
         this.player = new Player("Hero", 100);
-        this.shopSystem = new ShopSystem();
-        this.dialogueSystem = new DialogueSystemAndChoice();
+        this.shopSystem = new ShopSystem();;
 
         // ===== สร้างระบบเสียง =====
         this.audioSystem = new AudioSystem();
@@ -77,16 +74,6 @@ public class GameController {
 
         // เปิดหน้าต่างเนื้อเรื่อง (ส่ง controller
         // ไปด้วยเพื่อให้หน้าใหม่ใช้ระบบเสียงเดิมได้)
-        new Changescene(this);
-    }
-
-    public void showGameScene() {
-        // *** โค้ดเดิมที่คุณต้องการ (กู้กลับมาให้แล้ว) ***
-        com.game.models.Character npc = new com.game.models.Character(
-                "Kim Jae-hyun",
-                "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-
-        changeScreen(new GamePanel(npc, dialogueSystem));
     }
 
     public void showShop() {
@@ -125,9 +112,6 @@ public class GameController {
         return shopSystem;
     }
 
-    public DialogueSystemAndChoice getDialogueSystem() {
-        return dialogueSystem;
-    }
 
     public AudioSystem getAudioSystem() {
         return audioSystem;
