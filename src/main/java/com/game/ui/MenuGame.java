@@ -93,7 +93,7 @@ public class MenuGame extends JPanel {
                 screenH / 9);
         layeredPane.add(title, Integer.valueOf(4));
 
-        // ===== Buttons =====
+        // ===== Buttons (จัดระเบียบใหม่) =====
         String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม" };
         int btnW = screenW / 8;
         int btnH = screenH / 14;
@@ -109,11 +109,15 @@ public class MenuGame extends JPanel {
             String text = menuText[i];
             btn.addActionListener(e -> {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
                 // ====== เล่นเสียง SFX เมื่อคลิกปุ่ม ======
                 if (controller.getAudioSystem() != null) {
                     controller.getAudioSystem().playSFX("click.wav");
                 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> f303d15 (Add new UI item image and initial save slot data)
                 if (text.equals("เริ่มเกม"))
@@ -121,9 +125,21 @@ public class MenuGame extends JPanel {
                 else if (text.equals("โหลดเซฟ"))
                     controller.showSaveScreen(() -> controller.showMainMenu());
                 else if (text.equals("ตั้งค่า"))
+=======
+                // ✅ จัดระเบียบการเรียกใช้หน้าต่างๆ ใหม่ตามคำสั่ง
+                if (text.equals("เริ่มเกม")) {
+                    controller.showGameScene(); // เรียกหน้า GamePanel (JPanel)
+                } 
+                else if (text.equals("โหลดเซฟ")) {
+                    controller.showSaveScreen(() -> controller.showMainMenu());
+                } 
+                else if (text.equals("ตั้งค่า")) {
+>>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
                     controller.showSettings();
-                else if (text.equals("ออกเกม"))
+                } 
+                else if (text.equals("ออกเกม")) {
                     controller.exitGame();
+                }
             });
 
             layeredPane.add(btn, Integer.valueOf(4));
@@ -149,7 +165,6 @@ public class MenuGame extends JPanel {
             ImageIcon icon = new ImageIcon(path);
             BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = img.createGraphics();
-            // พลิกภาพตัวละคร
             g2.drawImage(icon.getImage(), w, 0, 0, h,
                     0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
             g2.dispose();
@@ -175,10 +190,8 @@ public class MenuGame extends JPanel {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // สีชมพูพาสเทล
-            g2.setColor(new Color(255, 215, 230));
-            g2.fill(new RoundRectangle2D.Double(
-                    0, 0, getWidth(), getHeight(), 45, 45));
+            g2.setColor(new Color(255, 215, 230)); // สีชมพูพาสเทล
+            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 45, 45));
 
             g2.setColor(Color.BLACK);
             FontMetrics fm = g2.getFontMetrics();
@@ -211,7 +224,7 @@ public class MenuGame extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(new Color(255, 182, 193, 160)); // สีกลีบซากุระ
+            g2.setColor(new Color(255, 182, 193, 160)); 
             for (SakuraParticle p : particles)
                 g2.fill(p.getShape());
         }
