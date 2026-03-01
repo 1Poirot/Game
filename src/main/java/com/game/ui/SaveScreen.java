@@ -10,13 +10,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class SaveScreen extends JPanel {
-    private GameController controller;
-    private Runnable onBack;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     public SaveScreen(GameController controller, Runnable onBack) {
-        this.controller = controller;
-        this.onBack = onBack;
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
 

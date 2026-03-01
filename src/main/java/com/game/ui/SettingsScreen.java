@@ -6,10 +6,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class SettingsScreen extends JPanel {
-    private GameController controller;
 
     public SettingsScreen(GameController controller) {
-        this.controller = controller;
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
 
