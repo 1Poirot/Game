@@ -1,10 +1,10 @@
 package com.game.systems.choice;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import javax.swing.*;
 
 public class Day6 {
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
@@ -78,7 +78,7 @@ public class Day6 {
             @Override
             public void componentResized(ComponentEvent E) {
                 LAYOUT_UI();
-                BG_VIEW.REPAINT_BG();
+            
             }
         });
 
@@ -90,7 +90,7 @@ public class Day6 {
 
         SHOW_SCENE(CURRENT_ID);
         LAYOUT_UI();
-        BG_VIEW.REPAINT_BG();
+        
     }
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
@@ -335,26 +335,57 @@ public class Day6 {
         SCENES.put("END", new SCENE("Narrator", "Day6", "จบตอน", null, null, null, null, null, null, null));
     }
 
+
     private void SHOW_SCENE(String ID) {
-        CURRENT_ID = ID;
-        SCENE S = SCENES.get(ID);
-        if (S == null) return;
+    CURRENT_ID = ID;
+    SCENE S = SCENES.get(ID);
+    if (S == null) return;
 
-        DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
-        DIALOG.repaint();
-
-        boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
-        CHOICE_PANEL.setVisible(HAS_CHOICES);
-        BTN_CHOICE1.setVisible(HAS_CHOICES);
-        BTN_CHOICE2.setVisible(HAS_CHOICES);
-        BTN_CHOICE3.setVisible(HAS_CHOICES);
-
-        if (HAS_CHOICES) {
-            BTN_CHOICE1.setText(S.C1);
-            BTN_CHOICE2.setText(S.C2);
-            BTN_CHOICE3.setText(S.C3);
-        }
+    // 🔥 ดึงเลขฉากออกมา
+    int sceneNumber = -1;
+    if (ID.startsWith("S")) {
+        try {
+            sceneNumber = Integer.parseInt(ID.substring(1));
+        } catch (Exception ignored) {}
     }
+
+    // ห้องนอน (S1 - S10)
+    if (sceneNumber >= 1 && sceneNumber <= 13) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องนอน.jpg");
+    }
+
+    // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
+    else if ((sceneNumber >= 14 && sceneNumber <= 19) || ID.startsWith("Q1")) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สถานีรถไฟฟ้า.jpg");
+    }
+    // ห้องเรียน (S21 - S30)
+    else if (sceneNumber >= 20 && sceneNumber <= 26) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สวนสนุก.jpg");
+    }
+    // พักกลางวัน (S27 - S44)
+    else if (sceneNumber >= 27 && sceneNumber <= 44) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงอาหาร.jpg");
+    }
+    // ทางเดิน/เย็น (S45 - S50)
+    else if (sceneNumber >= 45 && sceneNumber <= 50) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงเรียนตอนเย็น.jpg");
+    }
+
+    DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
+    DIALOG.repaint();
+
+    boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
+    CHOICE_PANEL.setVisible(HAS_CHOICES);
+    BTN_CHOICE1.setVisible(HAS_CHOICES);
+    BTN_CHOICE2.setVisible(HAS_CHOICES);
+
+
+    if (HAS_CHOICES) {
+        BTN_CHOICE1.setText(S.C1);
+        BTN_CHOICE2.setText(S.C2);
+        BTN_CHOICE3.setText(S.C3);
+    }
+}
 
     private void GOTO_NEXT_BY_CLICK() {
         SCENE S = SCENES.get(CURRENT_ID);
@@ -403,26 +434,26 @@ public class Day6 {
     }
 
     static class BGVIEW extends JPanel {
-        private final Image ORIG;
-        private Image SCALED;
+    private Image ORIG;
 
-        BGVIEW(String PATH) {
-            ORIG = new ImageIcon(PATH).getImage();
-        }
+    BGVIEW(String PATH) {
+        SET_BG(PATH);
+    }
 
-        void REPAINT_BG() {
-            if (getWidth() <= 0 || getHeight() <= 0) return;
-            SCALED = ORIG.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-            repaint();
-        }
+    void SET_BG(String PATH) {
+        ORIG = new ImageIcon(PATH).getImage();
+        repaint();   // เรียกครั้งเดียวพอ
+    }
 
-        @Override
-        protected void paintComponent(Graphics G) {
-            super.paintComponent(G);
-            if (SCALED == null) REPAINT_BG();
-            if (SCALED != null) G.drawImage(SCALED, 0, 0, getWidth(), getHeight(), this);
+    @Override
+    protected void paintComponent(Graphics G) {
+        super.paintComponent(G);
+
+        if (ORIG != null) {
+            G.drawImage(ORIG, 0, 0, getWidth(), getHeight(), this);
         }
     }
+}
 
     static class DIALOGPANEL extends JPanel {
         private String NAME;

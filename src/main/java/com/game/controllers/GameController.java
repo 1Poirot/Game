@@ -2,7 +2,6 @@ package com.game.controllers;
 
 import com.game.models.Player;
 import com.game.systems.audio.AudioSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
@@ -17,13 +16,13 @@ public class GameController {
     private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
 
     private ShopSystem shopSystem;
-    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
     private String lastScene = "MAIN_MENU";
 
     private JFrame mainFrame;
 
     public GameController() {
+<<<<<<< HEAD
         // ===== สร้างข้อมูลผู้เล่น 3 คน =====
         this.players = new ArrayList<>();
         this.players.add(new Player("Player 1", 100));
@@ -32,6 +31,13 @@ public class GameController {
 
         this.shopSystem = new ShopSystem();
         this.dialogueSystem = new DialogueSystemAndChoice();
+=======
+        // ===== สร้างข้อมูลเกม =====
+        this.player = new Player("Hero", 100);
+        this.shopSystem = new ShopSystem();;
+
+        // ===== สร้างระบบเสียง =====
+>>>>>>> origin/dev/gun
         this.audioSystem = new AudioSystem();
 
         // ===== สร้างหน้าต่างหลัก =====
@@ -86,6 +92,7 @@ public class GameController {
 
     public void showChangescene() {
         mainFrame.setVisible(false);
+<<<<<<< HEAD
         new Changescene(this);
     }
 
@@ -104,6 +111,11 @@ public class GameController {
         changeScreen(new Changescene(this));
 >>>>>>> 0becec2a56481e4c0a93934ab74c926e8298f718
 >>>>>>> origin/dev/neko
+=======
+
+        // เปิดหน้าต่างเนื้อเรื่อง (ส่ง controller
+        // ไปด้วยเพื่อให้หน้าใหม่ใช้ระบบเสียงเดิมได้)
+>>>>>>> origin/dev/gun
     }
 
     public void showShop() {
@@ -161,9 +173,6 @@ public class GameController {
         return shopSystem;
     }
 
-    public DialogueSystemAndChoice getDialogueSystem() {
-        return dialogueSystem;
-    }
 
     public AudioSystem getAudioSystem() {
         return audioSystem;
