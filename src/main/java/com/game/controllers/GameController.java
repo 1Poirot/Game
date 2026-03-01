@@ -94,6 +94,7 @@ public class GameController {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void showGameScene() {
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -131,6 +132,8 @@ public class GameController {
 >>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
     }
 
+=======
+>>>>>>> ae7ee35 (ฟฟ)
     public void showShop() {
         changeScreen(new ShopScreen(this));
     }
@@ -150,6 +153,7 @@ public class GameController {
         }
     }
 
+<<<<<<< HEAD
     // ✅ เมธอดสำหรับปุ่มย้อนกลับ (แก้ Error: undefined backToPreviousScreen)
     public void backToPreviousScreen() {
         if (lastScene.equals("GAME_SCENE")) {
@@ -159,6 +163,8 @@ public class GameController {
         }
     }
 
+=======
+>>>>>>> ae7ee35 (ฟฟ)
     public void showSaveScreen() {
 <<<<<<< HEAD
         changeScreen(new SaveScreen(this));

@@ -1,7 +1,8 @@
 package com.game.ui;
 
-import javax.swing.*;
+import com.game.multi.dating.MultiDatingSound; // ✅ 1. Import ตัวจัดการเสียง
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * LobbyDialog — Dialog สำหรับให้ผู้เล่นกรอก IP และชื่อก่อนเข้าเกม Multiplayer
@@ -23,7 +24,6 @@ public class LobbyDialog extends JDialog {
     }
 
     private LobbyResult result = null;
-
     private final JTextField ipField;
     private final JTextField nameField;
 
@@ -124,6 +124,10 @@ public class LobbyDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "กรุณากรอกชื่อผู้เล่น", "แจ้งเตือน", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // ✅ 2. สั่งหยุดเพลงหน้าเมนูทันทีก่อนจะปิด Dialog นี้
+        // เพื่อให้หน้า MultiplayerScreen เริ่มเพลง Lobby ได้แบบไม่มีเพลงเก่าค้าง
+        MultiDatingSound.getInstance().stopBGM();
 
         result = new LobbyResult(ip, name);
         dispose();

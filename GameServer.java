@@ -1,41 +1,46 @@
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
 public class GameServer {
     private static Map<String, Integer> playerScores = new ConcurrentHashMap<>();
-    private static List<PrintWriter> clientWriters = new CopyOnWriteArrayList<>();
-
-    private static final int WINNING_SCORE = 100;
-    private static final int MAX_PLAYERS = 3; // <-- กำหนดผู้เล่นสูงสุด 3 คน
-    private static boolean gameEnded = false;
+    private static Map<String, PrintWriter> playerWriters = new ConcurrentHashMap<>();
+    private static final int MAX_PLAYERS = 3;
+    private static boolean gameStarted = false;
+    private static Set<String> finishedPlayers = ConcurrentHashMap.newKeySet();
 
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(9090);
-
-        System.out.println("========== เปิดเซิร์ฟเวอร์ ศึกชิงนาง ==========");
-        System.out.println("รับผู้เล่นได้สูงสุด: " + MAX_PLAYERS + " คน");
-
-        // ดึง IP Address ของเครื่อง Host มาแสดงให้เพื่อนดู
+        System.out.println("========== ✅ เซิร์ฟเวอร์ ศึกชิงนาง ONLINE ==========");
+        System.out.println("รองรับผู้เล่นสูงสุด: " + MAX_PLAYERS + " ท่าน");
         String hostIP = InetAddress.getLocalHost().getHostAddress();
-        System.out.println(">> บอกให้เพื่อนกรอก IP นี้นะ: " + hostIP + " <<");
+        System.out.println(">> IP: " + hostIP + " <<");
         System.out.println("=============================================");
 
         while (true) {
-            Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            Socket socket = serverSocket.accept();
+            PrintWriter out = new PrintWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
-            // เช็คว่าห้องเต็มหรือยัง?
-            if (clientWriters.size() >= MAX_PLAYERS) {
-                out.println("REJECT:ห้องเต็มแล้วจ้า (รับได้แค่ 3 คนเท่านั้น!)");
-                clientSocket.close(); // เตะออก
-                System.out.println("มีคนพยายามเข้า แต่ห้องเต็มแล้ว");
+            if (playerWriters.size() >= MAX_PLAYERS) {
+                out.println("REJECT:ขออภัยครับ ห้องเต็มแล้ว");
+                socket.close();
                 continue;
             }
+            new Thread(new ClientHandler(socket, out)).start();
+        }
+    }
 
-            clientWriters.add(out);
-            new Thread(new ClientHandler(clientSocket, out)).start();
+    private static void updatePlayerList() {
+        String listMsg = "PLAYER_LIST:" + String.join(",", playerWriters.keySet());
+        broadcast(listMsg);
+    }
+
+    private static void broadcast(String msg) {
+        for (PrintWriter writer : playerWriters.values()) {
+            writer.println(msg);
         }
     }
 
@@ -50,50 +55,72 @@ public class GameServer {
             this.out = out;
         }
 
+        @Override
         public void run() {
             try {
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
                 playerName = in.readLine();
-                playerScores.put(playerName, 0);
 
-                System.out.println(playerName + " เข้าร่วม! (" + clientWriters.size() + "/" + MAX_PLAYERS + " คน)");
-                broadcast("SYSTEM:" + playerName + " เข้าร่วมวงจีบสาวแล้ว! (" + clientWriters.size() + "/" + MAX_PLAYERS
-                        + ")");
-
-                String message;
-                while ((message = in.readLine()) != null) {
-                    if (gameEnded)
-                        continue;
-
-                    int currentScore = playerScores.get(playerName);
-                    if (message.equals("TALK"))
-                        currentScore += 5;
-                    else if (message.equals("GIFT"))
-                        currentScore += 10;
-
-                    playerScores.put(playerName, currentScore);
-                    broadcast("UPDATE:" + playerName + " ทำคะแนนได้ " + currentScore);
-
-                    if (currentScore >= WINNING_SCORE) {
-                        gameEnded = true;
-                        broadcast("WINNER:" + playerName);
-                    }
+                if (playerName != null) {
+                    playerScores.put(playerName, 0);
+                    playerWriters.put(playerName, out);
+                    System.out.println(">>> [JOIN]: " + playerName);
+                    broadcast("SYSTEM:" + playerName + " เข้าร่วมวงจีบสาวแล้ว");
+                    updatePlayerList();
                 }
-            } catch (IOException e) {
-                System.out.println(playerName + " หลุดออกจากเกม");
+
+                String msg;
+                while ((msg = in.readLine()) != null) {
+                    // ✅ แก้ไขจุดนี้: เมื่อกด START_GAME ให้ล้างสถานะเก่าทันที
+                    if (msg.equals("START_GAME")) {
+                        gameStarted = true; // บังคับเป็น true เพื่อเริ่มใหม่
+                        finishedPlayers.clear(); // ล้างรายชื่อคนที่จบจากรอบที่แล้ว
+
+                        // ล้างคะแนนทุกคนให้เป็น 0 ก่อนเริ่มรอบใหม่
+                        for (String name : playerScores.keySet()) {
+                            playerScores.put(name, 0);
+                        }
+
+                        System.out.println("--- [NEW GAME STARTED] ---");
+                        broadcast("SYSTEM:เริ่มการแข่งขันรอบใหม่!");
+                        broadcast("START");
+                    } else if (msg.startsWith("FINISH:")) {
+                        int finalScore = Integer.parseInt(msg.split(":")[1]);
+                        playerScores.put(playerName, finalScore);
+                        finishedPlayers.add(playerName);
+                        broadcast("SYSTEM:" + playerName + " เล่นจบแล้ว");
+
+                        // ถ้าเล่นจบครบทุกคนที่อยู่ในห้องขณะนั้น
+                        if (finishedPlayers.size() >= playerWriters.size()) {
+                            broadcast("FINAL_SCORE");
+                            for (String p : playerScores.keySet()) {
+                                broadcast("SCORE:" + p + ":" + playerScores.get(p));
+                            }
+                            gameStarted = false; // จบเกมอย่างสมบูรณ์
+                        }
+                    }
+                    // รองรับ ACTION อื่นๆ (GIFT/TALK) ตามโค้ดเดิมของท่าน...
+                }
+            } catch (Exception e) {
+                System.out.println(playerName + " Disconnected.");
             } finally {
-                // ถ้ามีคนออก ให้ลบข้อมูลออก ห้องจะได้ว่างให้คนอื่นเข้า
                 if (playerName != null) {
                     playerScores.remove(playerName);
-                    clientWriters.remove(out);
-                    broadcast("SYSTEM:" + playerName + " ยอมแพ้และเดินจากไป...");
-                }
-            }
-        }
+                    playerWriters.remove(playerName);
+                    finishedPlayers.remove(playerName);
+                    broadcast("SYSTEM:" + playerName + " ออกจากห้อง");
+                    updatePlayerList();
 
-        private void broadcast(String msg) {
-            for (PrintWriter writer : clientWriters) {
-                writer.println(msg);
+                    // ✅ ถ้าในห้องไม่เหลือใครเลย ให้รีเซ็ตสถานะเกม
+                    if (playerWriters.isEmpty()) {
+                        gameStarted = false;
+                        finishedPlayers.clear();
+                    }
+                }
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
