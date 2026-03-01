@@ -3,25 +3,42 @@ package com.game.controllers;
 import com.game.models.Player;
 import com.game.network.GameClient;
 import com.game.systems.audio.AudioSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
+import java.util.ArrayList; // แทรก: เพื่อเก็บรายการผู้เล่น
+import java.util.List;
 import javax.swing.*;
 
 public class GameController {
 
-    private Player player;
+    // ✅ แทรก: เปลี่ยนจาก Player คนเดียว เป็น List เพื่อรองรับ 3 คน
+    private List<Player> players;
+    private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
+
     private ShopSystem shopSystem;
-    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
+    private String lastScene = "MAIN_MENU";
 
     private JFrame mainFrame;
 
     public GameController() {
-        this.player = new Player("Hero", 100);
+<<<<<<< HEAD
+        // ===== สร้างข้อมูลผู้เล่น 3 คน =====
+        this.players = new ArrayList<>();
+        this.players.add(new Player("Player 1", 100));
+        this.players.add(new Player("Player 2", 100));
+        this.players.add(new Player("Player 3", 100));
+
         this.shopSystem = new ShopSystem();
         this.dialogueSystem = new DialogueSystemAndChoice();
+=======
+        // ===== สร้างข้อมูลเกม =====
+        this.player = new Player("Hero", 100);
+        this.shopSystem = new ShopSystem();;
+
+        // ===== สร้างระบบเสียง =====
+>>>>>>> origin/dev/gun
         this.audioSystem = new AudioSystem();
 
         mainFrame = new JFrame("Game Shop - Fantasy RPG");
@@ -30,6 +47,21 @@ public class GameController {
         mainFrame.setResizable(true);
         mainFrame.setMinimumSize(new Dimension(960, 540));
         mainFrame.setLocationRelativeTo(null);
+    }
+
+    // ================== ระบบจัดการ Turn (แทรกใหม่) ==================
+    // ดึงข้อมูลผู้เล่นที่กำลังเล่นอยู่ตอนนี้
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
+
+    // สลับไปตาผู้เล่นคนถัดไป
+    public void nextTurn() {
+        currentPlayerIndex++;
+        if (currentPlayerIndex >= players.size()) {
+            currentPlayerIndex = 0; // วนกลับมาคนที่ 1
+        }
+        System.out.println("ตอนนี้ตาของ: " + getCurrentPlayer().getName());
     }
 
     // ================== เริ่มเกม ==================
@@ -54,20 +86,27 @@ public class GameController {
     }
 
     // ================== หน้าต่างต่าง ๆ ==================
-
     public void showMainMenu() {
         changeScreen(new MenuGame(this));
     }
 
     public void showChangescene() {
-        if (audioSystem != null)
-            audioSystem.stopBGM();
         mainFrame.setVisible(false);
+<<<<<<< HEAD
         new Changescene(this);
     }
 
     public void showGameScene() {
+<<<<<<< HEAD
         showChangescene();
+=======
+        showChangescene();
+>>>>>>> origin/dev/neko
+=======
+
+        // เปิดหน้าต่างเนื้อเรื่อง (ส่ง controller
+        // ไปด้วยเพื่อให้หน้าใหม่ใช้ระบบเสียงเดิมได้)
+>>>>>>> origin/dev/gun
     }
 
     public void showShop() {
@@ -75,6 +114,12 @@ public class GameController {
     }
 
     public void showSettings() {
+        if (!mainFrame.isVisible()) {
+            lastScene = "CHANGESCENE";
+            mainFrame.setVisible(true);
+        } else {
+            lastScene = "MAIN_MENU";
+        }
         changeScreen(new SettingsScreen(this));
     }
 
@@ -82,6 +127,14 @@ public class GameController {
         changeScreen(new AudioSettingsScreen(this));
         if (audioSystem != null && audioSystem.getCurrentBgmName() != null) {
             audioSystem.playBGM(audioSystem.getCurrentBgmName());
+        }
+    }
+
+    public void backToPreviousScreen() {
+        if (lastScene.equals("CHANGESCENE")) {
+            showChangescene();
+        } else {
+            showMainMenu();
         }
     }
 
@@ -121,16 +174,18 @@ public class GameController {
     }
 
     // ================== Getters ==================
+    // ✅ ปรับปรุง: ให้ getPlayer() คืนค่าผู้เล่นคนปัจจุบันเสมอ เพื่อให้หน้า
+    // Save/Shop ทำงานถูกคน
     public Player getPlayer() {
-        return player;
+        return getCurrentPlayer();
+    }
+
+    public List<Player> getAllPlayers() {
+        return players;
     }
 
     public ShopSystem getShopSystem() {
         return shopSystem;
-    }
-
-    public DialogueSystemAndChoice getDialogueSystem() {
-        return dialogueSystem;
     }
 
     public AudioSystem getAudioSystem() {

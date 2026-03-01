@@ -111,6 +111,7 @@ public class MenuGame extends JPanel {
                     btnW, btnH);
 
             btn.addActionListener(e -> {
+<<<<<<< HEAD
                 if (controller.getAudioSystem() != null) {
                     controller.getAudioSystem().playSFX("click.wav");
                 }
@@ -121,6 +122,27 @@ public class MenuGame extends JPanel {
                     case "ตั้งค่า" -> controller.showSettings();
                     case "ออกเกม" -> controller.exitGame();
                 }
+=======
+                // ====== เล่นเสียง SFX เมื่อคลิกปุ่ม ======
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
+                }
+
+                // ในหน้า MenuGame.java ตรงปุ่มเริ่มเกม
+                if (text.equals("เริ่มเกม")) {
+                    controller.showChangescene(); // เรียกหน้า Changescene ที่มีระบบ CardLayout
+                } else if (text.equals("โหลดเซฟ"))
+                    controller.showSaveScreen();
+
+                if (text.equals("เริ่มเกม"))
+                    controller.showGameScene();
+                else if (text.equals("โหลดเซฟ"))
+                    controller.showSaveScreen(() -> controller.showMainMenu());
+                else if (text.equals("ตั้งค่า"))
+                    controller.showSettings();
+                else if (text.equals("ออกเกม"))
+                    controller.exitGame();
+>>>>>>> dev/min
             });
 
             layeredPane.add(btn, Integer.valueOf(4));
