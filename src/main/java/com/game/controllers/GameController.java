@@ -23,7 +23,6 @@ public class GameController {
     private JFrame mainFrame;
 
     public GameController() {
-<<<<<<< HEAD
         // ===== สร้างข้อมูลผู้เล่น 3 คน =====
         this.players = new ArrayList<>();
         this.players.add(new Player("Player 1", 100));
@@ -31,17 +30,9 @@ public class GameController {
         this.players.add(new Player("Player 3", 100));
 
         this.shopSystem = new ShopSystem();
-        this.dialogueSystem = new DialogueSystemAndChoice();
-=======
-        // ===== สร้างข้อมูลเกม =====
-        this.player = new Player("Hero", 100);
-        this.shopSystem = new ShopSystem();;
-
-        // ===== สร้างระบบเสียง =====
->>>>>>> origin/dev/gun
         this.audioSystem = new AudioSystem();
 
-        mainFrame = new JFrame("Game Shop - Fantasy RPG");
+        mainFrame = new JFrame("Love Game - 3 Players Rivalry");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1280, 720);
         mainFrame.setResizable(true);
@@ -91,22 +82,14 @@ public class GameController {
     }
 
     public void showChangescene() {
+        if (audioSystem != null)
+            audioSystem.stopBGM();
         mainFrame.setVisible(false);
-<<<<<<< HEAD
         new Changescene(this);
     }
 
     public void showGameScene() {
-<<<<<<< HEAD
         showChangescene();
-=======
-        showChangescene();
->>>>>>> origin/dev/neko
-=======
-
-        // เปิดหน้าต่างเนื้อเรื่อง (ส่ง controller
-        // ไปด้วยเพื่อให้หน้าใหม่ใช้ระบบเสียงเดิมได้)
->>>>>>> origin/dev/gun
     }
 
     public void showShop() {
