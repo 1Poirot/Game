@@ -159,7 +159,6 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
     public void onScoreUpdate(String message) {
         SwingUtilities.invokeLater(() -> {
             appendLog(message);
-            // Parse "NAME ทำคะแนนได้ SCORE" เพื่ออัปเดต scoreboard
             updateScoreBoard(message);
         });
     }
@@ -189,6 +188,26 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
                     "Error", JOptionPane.ERROR_MESSAGE);
             dispose();
         });
+    }
+
+    @Override
+    public void onPlayerListUpdate(java.util.List<String> players) {
+        // Not used in this version — scoreboard tracks players via score updates
+    }
+
+    @Override
+    public void onGameStart() {
+        SwingUtilities.invokeLater(() -> appendLog("[ระบบ] เกมเริ่มแล้ว!"));
+    }
+
+    @Override
+    public void onFinalScore() {
+        SwingUtilities.invokeLater(() -> logArea.append("\n🏁 ทุกคนเล่นเสร็จแล้ว! กำลังสรุปคะแนน...\n"));
+    }
+
+    @Override
+    public void onFinalScoreItem(String playerName, int score) {
+        SwingUtilities.invokeLater(() -> logArea.append("🏆 " + playerName + " ได้ " + score + " คะแนน\n"));
     }
 
     // ======================================================

@@ -3,35 +3,39 @@ package com.game.controllers;
 import com.game.models.Player;
 import com.game.network.GameClient;
 import com.game.systems.audio.AudioSystem;
+import com.game.systems.dialogue.DialogueSystemAndChoice;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
-import java.util.ArrayList; // แทรก: เพื่อเก็บรายการผู้เล่น
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
 public class GameController {
 
-    // ✅ แทรก: เปลี่ยนจาก Player คนเดียว เป็น List เพื่อรองรับ 3 คน
+    // เปลี่ยนจาก Player คนเดียว เป็น List เพื่อรองรับ 3 คน
     private List<Player> players;
     private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
 
     private ShopSystem shopSystem;
+    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
     private String lastScene = "MAIN_MENU";
 
     private JFrame mainFrame;
 
     public GameController() {
-        // ===== สร้างข้อมูลผู้เล่น 3 คน =====
+        // ===== สร้างข้อมูลผู้เล่น 3 คน แข่งจีบคนเดียวกัน =====
         this.players = new ArrayList<>();
         this.players.add(new Player("Player 1", 100));
         this.players.add(new Player("Player 2", 100));
         this.players.add(new Player("Player 3", 100));
 
         this.shopSystem = new ShopSystem();
+        this.dialogueSystem = new DialogueSystemAndChoice();
         this.audioSystem = new AudioSystem();
 
+        // ===== สร้างหน้าต่างหลักหน้าต่างเดียว (Single Frame) =====
         mainFrame = new JFrame("Love Game - 3 Players Rivalry");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1280, 720);
@@ -40,7 +44,7 @@ public class GameController {
         mainFrame.setLocationRelativeTo(null);
     }
 
-    // ================== ระบบจัดการ Turn (แทรกใหม่) ==================
+    // ================== ระบบจัดการ Turn ==================
     // ดึงข้อมูลผู้เล่นที่กำลังเล่นอยู่ตอนนี้
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);
@@ -56,6 +60,7 @@ public class GameController {
     }
 
     // ================== เริ่มเกม ==================
+
     public void start() {
         showMainMenu();
         mainFrame.setVisible(true);
@@ -67,7 +72,8 @@ public class GameController {
         });
     }
 
-    // ================== เปลี่ยนหน้าจอ ==================
+    // ================== เปลี่ยนหน้าจอ (รับเฉพาะ JPanel) ==================
+
     private void changeScreen(JPanel panel) {
         panel.setPreferredSize(null);
         panel.setMinimumSize(null);
@@ -78,6 +84,7 @@ public class GameController {
 
     // ================== หน้าต่างต่าง ๆ ==================
     public void showMainMenu() {
+        lastScene = "MAIN_MENU";
         changeScreen(new MenuGame(this));
     }
 
@@ -89,6 +96,7 @@ public class GameController {
     }
 
     public void showGameScene() {
+        lastScene = "GAME_SCENE";
         showChangescene();
     }
 
@@ -113,8 +121,9 @@ public class GameController {
         }
     }
 
+    // เมธอดสำหรับปุ่มย้อนกลับ
     public void backToPreviousScreen() {
-        if (lastScene.equals("CHANGESCENE")) {
+        if (lastScene.equals("CHANGESCENE") || lastScene.equals("GAME_SCENE")) {
             showChangescene();
         } else {
             showMainMenu();
@@ -157,8 +166,7 @@ public class GameController {
     }
 
     // ================== Getters ==================
-    // ✅ ปรับปรุง: ให้ getPlayer() คืนค่าผู้เล่นคนปัจจุบันเสมอ เพื่อให้หน้า
-    // Save/Shop ทำงานถูกคน
+    // ให้ getPlayer() คืนค่าผู้เล่นคนปัจจุบันเสมอ เพื่อให้หน้า Save/Shop ทำงานถูกคน
     public Player getPlayer() {
         return getCurrentPlayer();
     }
