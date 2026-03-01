@@ -1,13 +1,13 @@
 package com.game.ui;
 
 import com.game.controllers.GameController;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.*;
 
 public class MenuGame extends JPanel {
 
@@ -22,7 +22,10 @@ public class MenuGame extends JPanel {
         layeredPane = new JLayeredPane();
         add(layeredPane, BorderLayout.CENTER);
 
-        // ฟัง resize ทุกครั้ง
+        if (controller.getAudioSystem() != null) {
+            controller.getAudioSystem().playBGM("audiotest.wav");
+        }
+
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -33,7 +36,6 @@ public class MenuGame extends JPanel {
 
     // ================== Responsive Layout ==================
     private void layoutComponents() {
-
         int screenW = layeredPane.getWidth();
         int screenH = layeredPane.getHeight();
 
@@ -89,29 +91,36 @@ public class MenuGame extends JPanel {
                 screenH / 9);
         layeredPane.add(title, Integer.valueOf(4));
 
-        // ===== Buttons =====
-        String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "ตั้งค่า", "ออกเกม" };
+        // ===== Menu Buttons (เพิ่ม "เล่นออนไลน์") =====
+        String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "เล่นออนไลน์", "ตั้งค่า", "ออกเกม" };
         int btnW = screenW / 8;
         int btnH = screenH / 14;
-        int startY = (int) (screenH * 0.35);
+        int startY = (int) (screenH * 0.33);
 
         for (int i = 0; i < menuText.length; i++) {
-            RoundedButton btn = new RoundedButton(menuText[i]);
+            String text = menuText[i];
+
+            // ปุ่ม "เล่นออนไลน์" ใช้สีพิเศษ
+            RoundedButton btn = text.equals("เล่นออนไลน์")
+                    ? new RoundedButton(text, new Color(130, 80, 220), Color.WHITE)
+                    : new RoundedButton(text, new Color(255, 215, 230), Color.BLACK);
+
             btn.setFont(new Font("Tahoma", Font.BOLD, screenW / 60));
             btn.setBounds(screenW / 10,
-                    startY + (i * (btnH + 20)),
+                    startY + (i * (btnH + 16)),
                     btnW, btnH);
 
-            String text = menuText[i];
             btn.addActionListener(e -> {
-                if (text.equals("เริ่มเกม"))
-                    controller.showGameScene();
-                else if (text.equals("โหลดเซฟ"))
-                    controller.showSaveScreen(() -> controller.showMainMenu());
-                else if (text.equals("ตั้งค่า"))
-                    controller.showSettings();
-                else if (text.equals("ออกเกม"))
-                    controller.exitGame();
+                if (controller.getAudioSystem() != null) {
+                    controller.getAudioSystem().playSFX("click.wav");
+                }
+                switch (text) {
+                    case "เริ่มเกม" -> controller.showChangescene();
+                    case "โหลดเซฟ" -> controller.showSaveScreen();
+                    case "เล่นออนไลน์" -> controller.showMultiplayer();
+                    case "ตั้งค่า" -> controller.showSettings();
+                    case "ออกเกม" -> controller.exitGame();
+                }
             });
 
             layeredPane.add(btn, Integer.valueOf(4));
@@ -148,8 +157,14 @@ public class MenuGame extends JPanel {
 
     // ================== Rounded Button ==================
     class RoundedButton extends JButton {
-        public RoundedButton(String label) {
+
+        private final Color bgColor;
+        private final Color fgColor;
+
+        public RoundedButton(String label, Color bgColor, Color fgColor) {
             super(label);
+            this.bgColor = bgColor;
+            this.fgColor = fgColor;
             setContentAreaFilled(false);
             setFocusPainted(false);
             setBorderPainted(false);
@@ -159,15 +174,17 @@ public class MenuGame extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            g2.setColor(new Color(255, 215, 230));
-            g2.fill(new RoundRectangle2D.Double(
-                    0, 0, getWidth(), getHeight(), 45, 45));
+            Color fill = getModel().isPressed() ? bgColor.darker()
+                    : getModel().isRollover() ? bgColor.brighter() : bgColor;
 
-            g2.setColor(Color.BLACK);
-            FontMetrics fm = g2.getFontMetrics();
+            g2.setColor(fill);
+            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 45, 45));
+
+            g2.setColor(fgColor);
+            FontMetrics fm = g2.getFontMetrics(getFont());
+            g2.setFont(getFont());
             g2.drawString(getText(),
                     (getWidth() - fm.stringWidth(getText())) / 2,
                     (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
@@ -196,6 +213,7 @@ public class MenuGame extends JPanel {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(255, 182, 193, 160));
             for (SakuraParticle p : particles)
                 g2.fill(p.getShape());
@@ -218,7 +236,7 @@ public class MenuGame extends JPanel {
             x += Math.sin(y / 40.0) * 1.5;
             if (y > h) {
                 y = -20;
-                x = new Random().nextInt(w);
+                x = new Random().nextInt(Math.max(1, w));
             }
         }
 
