@@ -3,7 +3,7 @@ package com.game.controllers;
 import com.game.models.Player;
 import com.game.network.GameClient;
 import com.game.systems.audio.AudioSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
+
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
@@ -18,7 +18,6 @@ public class GameController {
     private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
 
     private ShopSystem shopSystem;
-    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
     private String lastScene = "MAIN_MENU";
 
@@ -32,7 +31,6 @@ public class GameController {
         this.players.add(new Player("Player 3", 100));
 
         this.shopSystem = new ShopSystem();
-        this.dialogueSystem = new DialogueSystemAndChoice();
         this.audioSystem = new AudioSystem();
 
         // ===== สร้างหน้าต่างหลักหน้าต่างเดียว (Single Frame) =====

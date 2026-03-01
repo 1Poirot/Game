@@ -1,7 +1,6 @@
 package com.game.systems.ending;
 
 import com.game.models.Player;
-import java.util.Map;
 
 /**
  * Ending System - ระบบหลายตอนจบ
@@ -22,7 +21,6 @@ public class EndingSystem {
 
         // Example logic:
         int maxAffection = 0;
-        String favoriteCharacter = "";
 
         // Find character with highest affection
         // (This is placeholder logic)

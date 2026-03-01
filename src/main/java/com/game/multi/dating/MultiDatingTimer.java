@@ -1,7 +1,6 @@
 package com.game.multi.dating;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class MultiDatingTimer {
     private int seconds;
