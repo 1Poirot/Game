@@ -24,26 +24,18 @@ public class GameController {
     private JFrame mainFrame;
 
     public GameController() {
-<<<<<<< HEAD
         // ===== สร้างข้อมูลผู้เล่น 3 คน แข่งจีบคนเดียวกัน =====
         this.players = new ArrayList<>();
         this.players.add(new Player("Player 1", 100));
         this.players.add(new Player("Player 2", 100));
         this.players.add(new Player("Player 3", 100));
 
-=======
-        this.player = new Player("Hero", 100);
->>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         this.shopSystem = new ShopSystem();
         this.dialogueSystem = new DialogueSystemAndChoice();
         this.audioSystem = new AudioSystem();
 
-<<<<<<< HEAD
         // ===== สร้างหน้าต่างหลักหน้าต่างเดียว (Single Frame) =====
         mainFrame = new JFrame("Love Game - 3 Players Rivalry");
-=======
-        mainFrame = new JFrame("Game Shop - Fantasy RPG");
->>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1280, 720);
         mainFrame.setResizable(true);
@@ -93,33 +85,6 @@ public class GameController {
         changeScreen(new MenuGame(this));
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public void showGameScene() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        // *** โค้ดเดิมที่คุณต้องการ (กู้กลับมาให้แล้ว) ***
-=======
-        lastScene = "GAME_SCENE";
-        // เรียกหน้า GamePanel (JPanel) ที่มีตัวละคร คิม แจฮยอน
->>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
-        com.game.models.Character npc = new com.game.models.Character(
-                "Kim Jae-hyun",
-                "src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-
-<<<<<<< HEAD
-        changeScreen(new GamePanel(npc, dialogueSystem));
-=======
-        // Changescene เป็น JFrame แยกต่างหาก จึงต้องเปิดเป็นหน้าต่าง ไม่ใช่ใส่เป็น JPanel
-=======
->>>>>>> 48e7dd8 (11)
-        showChangescene();
->>>>>>> f303d15 (Add new UI item image and initial save slot data)
-=======
-        changeScreen(new com.game.ui.GamePanel(this, npc, dialogueSystem));
->>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
-=======
     public void showChangescene() {
         if (audioSystem != null)
             audioSystem.stopBGM();
@@ -128,12 +93,10 @@ public class GameController {
     }
 
     public void showGameScene() {
+        lastScene = "GAME_SCENE";
         showChangescene();
->>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
     }
 
-=======
->>>>>>> ae7ee35 (ฟฟ)
     public void showShop() {
         changeScreen(new ShopScreen(this));
     }
@@ -144,17 +107,12 @@ public class GameController {
 
     public void showAudioSettings() {
         changeScreen(new AudioSettingsScreen(this));
-<<<<<<< HEAD
-        // ✅ ป้องกันตัวแดง: เรียกชื่อเพลงล่าสุดมาเล่นต่อในหน้าตั้งค่า
-=======
->>>>>>> 4c87bcb (feat: Implement multiplayer game mode by adding new UI components, a network client, a game controller, and modifying the game server.)
         if (audioSystem != null && audioSystem.getCurrentBgmName() != null) {
             audioSystem.playBGM(audioSystem.getCurrentBgmName());
         }
     }
 
-<<<<<<< HEAD
-    // ✅ เมธอดสำหรับปุ่มย้อนกลับ (แก้ Error: undefined backToPreviousScreen)
+    // เมธอดสำหรับปุ่มย้อนกลับ (แก้ Error: undefined backToPreviousScreen)
     public void backToPreviousScreen() {
         if (lastScene.equals("GAME_SCENE")) {
             showGameScene();
@@ -163,19 +121,12 @@ public class GameController {
         }
     }
 
-=======
->>>>>>> ae7ee35 (ฟฟ)
     public void showSaveScreen() {
-<<<<<<< HEAD
-        changeScreen(new SaveScreen(this));
-=======
-        // ✅ แก้ Error: Constructor mismatch โดยการส่ง Runnable (Callback) เข้าไป
         showSaveScreen(() -> showSettings());
     }
 
     public void showSaveScreen(Runnable onBack) {
         changeScreen(new SaveScreen(this, onBack));
->>>>>>> 279179a (Refactor GameController and UI components for multi-player support; remove Changescene class; enhance MenuGame layout and button functionality; implement GamePanel for player interactions.)
     }
 
     // ================== Multiplayer ==================
