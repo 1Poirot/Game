@@ -2,7 +2,7 @@ package com.game.multi.dating;
 
 import com.game.controllers.GameController;
 import com.game.network.GameClient;
-import com.game.ui.MenuGame; // ✅ มั่นใจว่า Import ตัวนี้มาแล้ว
+import com.game.ui.MenuGame;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -20,7 +20,7 @@ public class MultiDatingScreen extends JFrame {
     private int score = 0, money = 1000;
     private Map<String, Integer> inventory = new HashMap<>();
     private GameClient client;
-    private GameController controller; // ✅ เพิ่มตัวแปรเก็บ Controller
+    private GameController controller; 
 
     private JLayeredPane layeredPane = new JLayeredPane();
     private JLabel bgLabel = new JLabel();
@@ -39,10 +39,9 @@ public class MultiDatingScreen extends JFrame {
     private String currentBG = "";
     private final Font thaiFont = new Font("Tahoma", Font.BOLD, 18);
 
-    // ✅ ปรับ Constructor ให้รับ 2 ค่า (Client และ Controller)
     public MultiDatingScreen(GameClient client, GameController controller) {
         this.client = client;
-        this.controller = controller; // ✅ เก็บไว้ส่งต่อให้ MenuGame
+        this.controller = controller; 
 
         btnA = createChoiceBtn();
         btnB = createChoiceBtn();
@@ -53,7 +52,7 @@ public class MultiDatingScreen extends JFrame {
         btnExit = createIconBtn("❌");
 
         setTitle("💕 ศึกชิงนาง Online - Competition");
-        setSize(1000, 700);
+        setSize(1100, 750);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -87,97 +86,167 @@ public class MultiDatingScreen extends JFrame {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 int w = c.getWidth(), h = c.getHeight();
                 int mappedW = (int) (w * heartBar.getPercentComplete());
-                g2d.setColor(new Color(255, 230, 235));
-                g2d.fillRoundRect(0, 0, w, h, 15, 15);
-                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 105, 180), mappedW, 0,
-                        new Color(255, 182, 193));
+                g2d.setColor(new Color(255, 255, 255, 120));
+                g2d.fillRoundRect(0, 0, w, h, 20, 20);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 20, 147), mappedW, 0, new Color(255, 182, 193));
                 g2d.setPaint(gp);
-                g2d.fillRoundRect(0, 0, mappedW, h, 15, 15);
+                g2d.fillRoundRect(0, 0, mappedW, h, 20, 20);
             }
         });
         heartBar.setFont(thaiFont.deriveFont(14f));
         heartBar.setStringPainted(true);
 
-        // ✅ แก้ไขพื้นหลังชื่อให้ดูพรีเมียม ขอบชมพูเข้ม
+        // ✅ ปรับแต่งป้ายชื่อให้เด่นและอยู่ชั้นบนสุด
         nameLabel.setOpaque(true);
-        nameLabel.setBackground(new Color(255, 255, 255, 245));
+        nameLabel.setBackground(new Color(255, 20, 147)); // ชมพูเข้ม
+        nameLabel.setForeground(Color.WHITE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        nameLabel.setBorder(BorderFactory.createLineBorder(new Color(255, 20, 147), 3, true));
+        nameLabel.setFont(thaiFont.deriveFont(Font.BOLD, 22f));
+        nameLabel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.WHITE, 2, true),
+            BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
     }
 
     private void setupLayout() {
+        // ชั้น 0: พื้นหลัง
         bgLabel.setHorizontalAlignment(SwingConstants.CENTER);
         layeredPane.add(bgLabel, Integer.valueOf(0));
 
+        // ชั้น 100: ตัวละคร
         characterLabel.setHorizontalAlignment(SwingConstants.CENTER);
         layeredPane.add(characterLabel, Integer.valueOf(100));
 
-        JPanel topUI = new JPanel(new BorderLayout());
-        topUI.setOpaque(false);
-        topUI.setName("topBar");
+        // ชั้น 200: แถบเครื่องมือบน
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setOpaque(false);
+        topBar.setName("topBar");
+        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        statusPanel.setOpaque(false);
+        statusPanel.add(heartBar);
+        statusPanel.add(moneyLabel);
+        topBar.add(statusPanel, BorderLayout.WEST);
+        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
+        toolPanel.setOpaque(false);
+        toolPanel.add(btnBag);
+        toolPanel.add(btnShop);
+        toolPanel.add(btnSound);
+        toolPanel.add(timerLabel);
+        toolPanel.add(btnExit);
+        topBar.add(toolPanel, BorderLayout.EAST);
+        layeredPane.add(topBar, Integer.valueOf(200));
 
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        leftPanel.setOpaque(false);
-        leftPanel.add(heartBar);
-        leftPanel.add(moneyLabel);
-        leftPanel.add(btnBag);
-        leftPanel.add(btnShop);
-        leftPanel.add(btnSound);
-
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
-        rightPanel.setOpaque(false);
-        rightPanel.add(timerLabel);
-        rightPanel.add(btnExit);
-
-        topUI.add(leftPanel, BorderLayout.WEST);
-        topUI.add(rightPanel, BorderLayout.EAST);
-        layeredPane.add(topUI, Integer.valueOf(200));
-
-        JPanel dialogBox = new JPanel(new BorderLayout()) {
+        // ชั้น 300: กล่องโต้ตอบสีขาว (เปลี่ยนสีขาวมุกตามสั่ง)
+        JPanel interactionPanel = new JPanel(new BorderLayout(25, 0)) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(255, 255, 255, 215));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                g2d.setColor(new Color(255, 255, 255, 240)); // สีขาวมุก
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
                 g2d.setColor(new Color(255, 182, 193));
                 g2d.setStroke(new BasicStroke(3));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
+                g2d.drawRoundRect(1, 1, getWidth()-2, getHeight()-2, 40, 40);
             }
         };
-        dialogBox.setOpaque(false);
-        dialogBox.setName("dialogBox");
-        dialogLabel.setBorder(new EmptyBorder(20, 30, 20, 30));
-        dialogBox.add(dialogLabel, BorderLayout.CENTER);
+        interactionPanel.setName("interactionPanel");
+        interactionPanel.setOpaque(false);
+        interactionPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
 
-        JPanel choicePanel = new JPanel(new GridLayout(3, 1, 8, 8));
-        choicePanel.setOpaque(false);
-        choicePanel.add(btnA);
-        choicePanel.add(btnB);
-        choicePanel.add(btnC);
-        dialogBox.add(choicePanel, BorderLayout.EAST);
+        dialogLabel.setForeground(new Color(40, 40, 40)); // ตัวหนังสือเข้มบนพื้นขาว
+        interactionPanel.add(dialogLabel, BorderLayout.CENTER);
 
-        layeredPane.add(nameLabel, Integer.valueOf(300));
-        layeredPane.add(dialogBox, Integer.valueOf(300));
+        JPanel choiceContainer = new JPanel(new GridLayout(3, 1, 0, 10));
+        choiceContainer.setOpaque(false);
+        choiceContainer.setPreferredSize(new Dimension(300, 0));
+        choiceContainer.add(btnA);
+        choiceContainer.add(btnB);
+        choiceContainer.add(btnC);
+        interactionPanel.add(choiceContainer, BorderLayout.EAST);
+
+        layeredPane.add(interactionPanel, Integer.valueOf(300));
+
+        // ชั้น 400: ป้ายชื่อ (ชั้นบนสุดเพื่อให้มองเห็นและไม่ถูกบัง)
+        layeredPane.add(nameLabel, Integer.valueOf(400));
+    }
+
+    private void relayoutUI() {
+        int w = layeredPane.getWidth(), h = layeredPane.getHeight();
+        if (w <= 0 || h <= 0) return;
+
+        bgLabel.setBounds(0, 0, w, h);
+        
+        Component topBar = getComponentByName("topBar");
+        if (topBar != null) topBar.setBounds(0, 0, w, 100);
+
+        int panelH = 210;
+        int panelW = (int)(w * 0.92);
+        int panelX = (w - panelW) / 2;
+        int panelY = h - panelH - 40;
+
+        Component interactionPanel = getComponentByName("interactionPanel");
+        if (interactionPanel != null) {
+            interactionPanel.setBounds(panelX, panelY, panelW, panelH);
+        }
+        
+        // ✅ วางป้ายชื่อทับขอบกล่องข้อความ
+        nameLabel.setBounds(panelX + 50, panelY - 30, 200, 50);
+
+        refreshImages();
+        layeredPane.repaint();
+    }
+
+    private void refreshImages() {
+        int w = layeredPane.getWidth(), h = layeredPane.getHeight();
+        if (w <= 0 || h <= 0) return;
+        bgLabel.setIcon(loadImage("src/main/resources/images/backgrounds/" + currentBG, w, h, false));
+
+        int targetH = (int) (h * 0.85);
+        ImageIcon charIcon = loadImage("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png", -1, targetH, true);
+        if (charIcon != null) {
+            characterLabel.setIcon(charIcon);
+            int newW = charIcon.getIconWidth();
+            int newH = charIcon.getIconHeight();
+            // วางตัวละครให้ดูดี ไม่บวม และไม่บังกล่องตอบจนเกินไป
+            characterLabel.setBounds((w/2) - (newW/2), h - newH - 20, newW, newH);
+        }
+    }
+
+    private void loadEvent() {
+        if (manager.isFinished()) {
+            finishGame();
+            return;
+        }
+        MultiDatingEvent ev = manager.getCurrent();
+        currentBG = ev.getBackground();
+        moneyLabel.setText("💰 " + String.format("%,d", money));
+        moneyLabel.setForeground(new Color(255, 140, 0));
+
+        nameLabel.setText("คิม แจฮยอน");
+
+        dialogLabel.setText("<html><body style='width: 450px; color: #222222; font-family: Tahoma; font-size: 18px;'>"
+                + "<p style='line-height: 1.4;'>“" + ev.getDialog() + "”</p></body></html>");
+
+        btnA.setText("<html><center>" + ev.getChoiceA() + "</center></html>");
+        btnB.setText("<html><center>" + ev.getChoiceB() + "</center></html>");
+        btnC.setText("<html><center>" + ev.getChoiceC() + "</center></html>");
+        
+        relayoutUI();
     }
 
     private void setupActions() {
         btnA.addActionListener(e -> nextStep(manager.getCurrent().getScoreA()));
         btnB.addActionListener(e -> nextStep(manager.getCurrent().getScoreB()));
         btnC.addActionListener(e -> nextStep(manager.getCurrent().getScoreC()));
-
+        
         btnSound.addActionListener(e -> {
             sound.toggleMute();
             btnSound.setText(sound.isMuted() ? "🔇" : "🔊");
         });
 
         btnExit.addActionListener(e -> {
-            int choice = JOptionPane.showConfirmDialog(this,
-                    "คุณต้องการออกจากเกมและกลับสู่หน้าหลักใช่หรือไม่?",
-                    "ยืนยันการออก", JOptionPane.YES_NO_OPTION);
-            if (choice == JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(this, "ออกจากเกมใช่หรือไม่?", "ยืนยัน", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
                 exitAndDisconnect();
-            }
         });
 
         btnBag.addActionListener(e -> new MultiDatingInventory(this, inventory, (item) -> {
@@ -198,106 +267,15 @@ public class MultiDatingScreen extends JFrame {
 
     private void exitAndDisconnect() {
         sound.stopBGM();
-        if (timer != null)
-            timer.stop();
+        if (timer != null) timer.stop();
         if (client != null) {
             client.sendAction("LEAVE");
             client.disconnect();
         }
         dispose();
-
-        // ✅ แก้บัค NPE: ส่งตัวแปร controller ที่เก็บไว้เข้าไปแทน null
         SwingUtilities.invokeLater(() -> {
-            if (controller != null) {
-                new MenuGame(controller).setVisible(true);
-            } else {
-                System.err.println("❌ Error: Controller is null, cannot return to Menu");
-            }
+            if (controller != null) new MenuGame(controller).setVisible(true);
         });
-    }
-
-    private void relayoutUI() {
-        int w = layeredPane.getWidth(), h = layeredPane.getHeight();
-        if (w <= 0 || h <= 0)
-            return;
-
-        bgLabel.setBounds(0, 0, w, h);
-        int charW = (int) (w * 0.45), charH = (int) (h * 0.85);
-        characterLabel.setBounds((w - charW) / 2, h - charH - 20, charW, charH);
-
-        Component topBar = getComponentByName("topBar");
-        if (topBar != null)
-            topBar.setBounds(15, 15, w - 30, 60);
-
-        int boxH = 180;
-        Component dialogBox = getComponentByName("dialogBox");
-        if (dialogBox != null)
-            dialogBox.setBounds(30, h - boxH - 40, w - 60, boxH);
-        nameLabel.setBounds(70, h - boxH - 95, 220, 48);
-
-        refreshImages();
-        layeredPane.repaint();
-    }
-
-    private void refreshImages() {
-        int w = bgLabel.getWidth(), h = bgLabel.getHeight();
-        if (w <= 0 || h <= 0)
-            return;
-        bgLabel.setIcon(loadImage("src/main/resources/images/backgrounds/" + currentBG, w, h));
-        int cw = characterLabel.getWidth(), ch = characterLabel.getHeight();
-        if (cw > 0 && ch > 0) {
-            characterLabel.setIcon(loadImage("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png", cw, ch));
-        }
-    }
-
-    private ImageIcon loadImage(String path, int w, int h) {
-        try {
-            File file = new File(path);
-            Image img = null;
-            if (file.exists()) {
-                img = new ImageIcon(file.getAbsolutePath()).getImage();
-            } else {
-                String resPath = path.replace("src/main/resources", "");
-                URL url = getClass().getResource(resPath);
-                if (url != null)
-                    img = new ImageIcon(url).getImage();
-            }
-            if (img != null)
-                return new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void loadEvent() {
-        if (manager.isFinished()) {
-            finishGame();
-            return;
-        }
-        MultiDatingEvent ev = manager.getCurrent();
-        currentBG = ev.getBackground();
-        moneyLabel.setText("💰 " + money);
-        moneyLabel.setFont(thaiFont.deriveFont(22f));
-        moneyLabel.setForeground(new Color(255, 140, 0));
-
-        // ✅ แก้ไขชื่อตัวละคร: สีชมพูเข้ม พร้อมเงาขาวให้อ่านง่าย
-        nameLabel.setText("<html><body style='padding: 5px; font-family:Tahoma; color:#FF1493;'>"
-                + "<span style='text-shadow: 1px 1px 2px #FFFFFF;'>คิม แจฮยอน</span></body></html>");
-
-        dialogLabel.setText(
-                "<html><body style='width: 450px; font-family:Tahoma;'>“" + ev.getDialog() + "”</body></html>");
-
-        btnA.setText("<html><body style='font-family:Tahoma;'>" + ev.getChoiceA() + "</body></html>");
-        btnB.setText("<html><body style='font-family:Tahoma;'>" + ev.getChoiceB() + "</body></html>");
-        btnC.setText("<html><body style='font-family:Tahoma;'>" + ev.getChoiceC() + "</body></html>");
-
-        relayoutUI();
-    }
-
-    private void updateScoreUI() {
-        heartBar.setValue(Math.min(score, 100));
-        heartBar.setString("ความประทับใจ: " + score + "%");
     }
 
     private void nextStep(int pts) {
@@ -307,11 +285,47 @@ public class MultiDatingScreen extends JFrame {
         loadEvent();
     }
 
+    private void updateScoreUI() {
+        heartBar.setValue(Math.min(score, 100));
+        heartBar.setString("ความประทับใจ: " + score + "%");
+    }
+
+    private void finishGame() {
+        if (client != null) client.sendAction("FINISH:" + score);
+        Map<String, Integer> allScores = new HashMap<>();
+        String myName = (client != null) ? client.getPlayerName() : "ผู้เล่น";
+        allScores.put(myName, score);
+        allScores.put("คู่แข่ง A", 70); 
+        allScores.put("คู่แข่ง B", 50);
+        MultiDatingResultDialog.showResult(allScores, myName);
+        exitAndDisconnect();
+    }
+
     private Component getComponentByName(String name) {
         for (Component c : layeredPane.getComponents()) {
-            if (name.equals(c.getName()))
-                return c;
+            if (name.equals(c.getName())) return c;
         }
+        return null;
+    }
+
+    private ImageIcon loadImage(String path, int targetW, int targetH, boolean keepRatio) {
+        try {
+            File file = new File(path);
+            Image img = (file.exists()) ? new ImageIcon(file.getAbsolutePath()).getImage() : null;
+            if (img == null) {
+                URL url = getClass().getResource(path.replace("src/main/resources", ""));
+                if (url != null) img = new ImageIcon(url).getImage();
+            }
+            if (img != null) {
+                int finalW = targetW, finalH = targetH;
+                if (keepRatio) {
+                    double ratio = (double)img.getWidth(null) / img.getHeight(null);
+                    if (targetW == -1) finalW = (int) (targetH * ratio);
+                    else if (targetH == -1) finalH = (int) (targetW / ratio);
+                }
+                return new ImageIcon(img.getScaledInstance(finalW, finalH, Image.SCALE_SMOOTH));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 
@@ -321,47 +335,35 @@ public class MultiDatingScreen extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
+                if (getModel().isPressed()) g2.setColor(new Color(255, 105, 180));
+                else if (getModel().isRollover()) g2.setColor(new Color(255, 182, 193));
+                else g2.setColor(new Color(255, 240, 245));
+                
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                g2.setColor(new Color(255, 20, 147));
+                g2.setStroke(new BasicStroke(2));
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
                 super.paintComponent(g);
                 g2.dispose();
             }
         };
-        b.setBackground(new Color(255, 255, 255, 230));
-        b.setFont(thaiFont.deriveFont(Font.PLAIN, 15f));
+        b.setForeground(new Color(255, 20, 147));
+        b.setFont(thaiFont.deriveFont(Font.BOLD, 16f));
         b.setContentAreaFilled(false);
-        b.setBorder(BorderFactory.createLineBorder(new Color(255, 182, 193), 2, true));
         b.setFocusPainted(false);
+        b.setBorder(new EmptyBorder(5, 10, 5, 10));
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return b;
     }
 
     private JButton createIconBtn(String icon) {
-        JButton b = new JButton(icon) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, 200));
-                g2.fillOval(5, 5, getWidth() - 10, getHeight() - 10);
-                g2.setColor(new Color(255, 182, 193));
-                g2.drawOval(5, 5, getWidth() - 10, getHeight() - 10);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        b.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+        JButton b = new JButton(icon);
+        b.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+        b.setForeground(Color.WHITE);
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);
         b.setFocusPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return b;
-    }
-
-    private void finishGame() {
-        if (client != null)
-            client.sendAction("FINISH:" + score);
-        MultiDatingResultDialog.showResult(score);
-        exitAndDisconnect();
     }
 }

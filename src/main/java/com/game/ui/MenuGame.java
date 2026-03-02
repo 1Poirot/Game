@@ -23,7 +23,7 @@ public class MenuGame extends JPanel {
         add(layeredPane, BorderLayout.CENTER);
 
         if (controller.getAudioSystem() != null) {
-            controller.getAudioSystem().playBGM("audiotest.wav");
+            controller.getAudioSystem().playBGM("backgroundhome.wav");
         }
 
         layeredPane.addComponentListener(new ComponentAdapter() {
