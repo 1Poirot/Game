@@ -1,36 +1,38 @@
 package com.game.ui;
 
+import com.game.controllers.GameController;
+import com.game.multi.dating.MultiDatingScreen;
 import com.game.network.GameClient;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.*; // ✅ เพิ่ม import
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
- * MultiplayerScreen — หน้าเกม Multiplayer สำหรับ Max 3 ผู้เล่น
- *
- * ฟัง events จาก GameClient.MessageListener แล้วอัปเดต UI บน EDT
+ * MultiplayerScreen — หน้า Lobby และจัดการการเริ่มเกม
  */
 public class MultiplayerScreen extends JFrame implements GameClient.MessageListener {
 
     private final GameClient client;
+    private final GameController controller; // ✅ เพิ่มตัวแปรเก็บ Controller
 
     // ===== UI Components =====
     private JTextArea logArea;
     private JPanel scoreboardPanel;
-    private JButton btnTalk;
-    private JButton btnGift;
+    private JButton btnTalk; // ใช้เป็นปุ่มเริ่มเกม
+    private JButton btnGift; // ใช้เป็นปุ่มออกจากห้อง
 
     private final Map<String, JLabel> scoreLabels = new LinkedHashMap<>();
 
     // ======================================================
-    // Constructor
+    // Constructor (รับ 3 พารามิเตอร์เพื่อให้หายแดงใน GameController)
     // ======================================================
-    public MultiplayerScreen(GameClient client) {
+    public MultiplayerScreen(GameClient client, boolean isHost, GameController controller) {
         this.client = client;
+        this.controller = controller; // ✅ เก็บค่าไว้ส่งต่อ
         client.setMessageListener(this);
 
-        setTitle("ศึกชิงนาง — Online  |  ผู้เล่น: " + client.getPlayerName());
+        setTitle("ศึกชิงนาง — Lobby  |  ผู้เล่น: " + client.getPlayerName());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(800, 580);
         setMinimumSize(new Dimension(640, 480));
@@ -39,8 +41,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                client.disconnect();
-                dispose();
+                exitRoom();
             }
         });
 
@@ -48,9 +49,6 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         setVisible(true);
     }
 
-    // ======================================================
-    // Build UI
-    // ======================================================
     private void buildUI() {
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBackground(new Color(30, 15, 30));
@@ -58,7 +56,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         setContentPane(root);
 
         // ===== TOP — Title =====
-        JLabel title = new JLabel("💖 ศึกชิงนาง — Multiplayer", SwingConstants.CENTER);
+        JLabel title = new JLabel("💖 ศึกชิงนาง — Lobby", SwingConstants.CENTER);
         title.setFont(new Font("Tahoma", Font.BOLD, 22));
         title.setForeground(new Color(255, 180, 210));
         root.add(title, BorderLayout.NORTH);
@@ -77,74 +75,65 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         scoreboardPanel.setPreferredSize(new Dimension(220, 0));
 
-        JLabel sbTitle = new JLabel("📊 คะแนน");
+        JLabel sbTitle = new JLabel("📊 รายชื่อผู้เล่น");
         sbTitle.setFont(new Font("Tahoma", Font.BOLD, 16));
         sbTitle.setForeground(new Color(255, 200, 220));
         sbTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sbTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         scoreboardPanel.add(sbTitle);
-
         center.add(scoreboardPanel, BorderLayout.WEST);
 
-        // -- Log Area (center-right) --
+        // -- Log Area (right) --
         logArea = new JTextArea();
         logArea.setEditable(false);
         logArea.setLineWrap(true);
-        logArea.setWrapStyleWord(true);
         logArea.setFont(new Font("Tahoma", Font.PLAIN, 14));
         logArea.setBackground(new Color(40, 18, 40));
         logArea.setForeground(new Color(240, 200, 220));
-        logArea.setCaretColor(new Color(255, 150, 180));
         logArea.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
         logArea.setText("กำลังรอผู้เล่นคนอื่น...\n");
 
         JScrollPane scroll = new JScrollPane(logArea);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(150, 80, 120), 1));
-        scroll.getViewport().setBackground(logArea.getBackground());
         center.add(scroll, BorderLayout.CENTER);
 
         // ===== BOTTOM — Buttons =====
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8));
         btnPanel.setOpaque(false);
 
-        btnTalk = makeActionButton("💬 คุย  (+5)", new Color(100, 180, 255));
+        // ✅ ใช้ตัวแปรคลาส btnTalk มาทำเป็นปุ่มเริ่มเกม
+        btnTalk = makeActionButton("🚀 เริ่มเกม", new Color(50, 200, 100));
+        btnTalk.setEnabled(true);
         btnTalk.addActionListener(e -> {
-            client.sendAction("TALK");
-            btnTalk.setEnabled(false);
-            btnGift.setEnabled(false);
-            javax.swing.Timer t = new javax.swing.Timer(600, ev -> {
-                btnTalk.setEnabled(true);
-                btnGift.setEnabled(true);
-            });
-            t.setRepeats(false);
-            t.start();
+            client.sendAction("START_GAME");
+            appendLog("[ระบบ] ส่งคำสั่งเริ่มเกม...");
         });
 
-        btnGift = makeActionButton("🎁 ให้ของขวัญ  (+10)", new Color(255, 130, 180));
-        btnGift.addActionListener(e -> {
-            client.sendAction("GIFT");
-            btnTalk.setEnabled(false);
-            btnGift.setEnabled(false);
-            javax.swing.Timer t = new javax.swing.Timer(600, ev -> {
-                btnTalk.setEnabled(true);
-                btnGift.setEnabled(true);
-            });
-            t.setRepeats(false);
-            t.start();
-        });
+        // ✅ ใช้ตัวแปรคลาส btnGift มาทำเป็นปุ่มออกจากห้อง
+        btnGift = makeActionButton("❌ ออกจากห้อง", new Color(220, 50, 50));
+        btnGift.addActionListener(e -> exitRoom());
 
         btnPanel.add(btnTalk);
         btnPanel.add(btnGift);
         root.add(btnPanel, BorderLayout.SOUTH);
     }
 
+    private void exitRoom() {
+        int choice = JOptionPane.showConfirmDialog(this, "ต้องการออกจากห้องใช่หรือไม่?", "ยืนยัน",
+                JOptionPane.YES_NO_OPTION);
+        if (choice == JOptionPane.YES_OPTION) {
+            client.disconnect();
+            dispose();
+            if (controller != null)
+                controller.showMainMenu(); // กลับหน้าหลัก
+        }
+    }
+
     // ======================================================
-    // GameClient.MessageListener — called from background thread
+    // GameClient.MessageListener
     // ======================================================
     @Override
     public void onRejected(String reason) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, reason, "เข้าเกมไม่ได้ — ห้องเต็ม", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, reason, "ห้องเต็ม", JOptionPane.ERROR_MESSAGE);
             client.disconnect();
             dispose();
         });
@@ -157,88 +146,59 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
 
     @Override
     public void onScoreUpdate(String message) {
-        SwingUtilities.invokeLater(() -> {
-            appendLog(message);
-            updateScoreBoard(message);
-        });
+        SwingUtilities.invokeLater(() -> appendLog(message));
     }
 
     @Override
     public void onWinner(String winnerName) {
-        SwingUtilities.invokeLater(() -> {
-            String myName = client.getPlayerName();
-            if (winnerName.equals(myName)) {
-                JOptionPane.showMessageDialog(this,
-                        "💖 ยินดีด้วย! คุณจีบติดแล้ว!\n\nคุณคือผู้ชนะ!", "คุณชนะ!", JOptionPane.PLAIN_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "💔 แห้วแดก...\n\nเธอเลือก " + winnerName, "แพ้แล้ว", JOptionPane.PLAIN_MESSAGE);
-            }
-            appendLog("🏆 ผู้ชนะ: " + winnerName);
-            btnTalk.setEnabled(false);
-            btnGift.setEnabled(false);
-        });
     }
 
     @Override
     public void onConnectionFailed(String ip) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    "เชื่อมต่อ IP: " + ip + " ไม่สำเร็จ!\nโปรดเช็คว่า Host เปิดเกมหรือยัง",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "เชื่อมต่อล้มเหลว", "Error", JOptionPane.ERROR_MESSAGE);
             dispose();
         });
     }
 
     @Override
     public void onPlayerListUpdate(java.util.List<String> players) {
-        // Not used in this version — scoreboard tracks players via score updates
+        SwingUtilities.invokeLater(() -> {
+            scoreboardPanel.removeAll();
+            JLabel title = new JLabel("📊 รายชื่อผู้เล่น");
+            title.setFont(new Font("Tahoma", Font.BOLD, 16));
+            title.setForeground(new Color(255, 200, 220));
+            scoreboardPanel.add(title);
+
+            for (String name : players) {
+                JLabel lbl = new JLabel("👤 " + name);
+                lbl.setFont(new Font("Tahoma", Font.PLAIN, 14));
+                lbl.setForeground(name.equals(client.getPlayerName()) ? Color.YELLOW : Color.WHITE);
+                scoreboardPanel.add(lbl);
+            }
+            scoreboardPanel.revalidate();
+            scoreboardPanel.repaint();
+        });
     }
 
     @Override
     public void onGameStart() {
-        SwingUtilities.invokeLater(() -> appendLog("[ระบบ] เกมเริ่มแล้ว!"));
+        SwingUtilities.invokeLater(() -> {
+            appendLog("[ระบบ] เกมกำลังเริ่ม...");
+            this.setVisible(false);
+            this.dispose();
+
+            // ✅ บรรทัดนี้จะไม่แดงแล้ว เพราะ MultiplayerScreen ถือ controller ไว้แล้ว
+            new MultiDatingScreen(client, controller);
+        });
     }
 
     @Override
     public void onFinalScore() {
-        SwingUtilities.invokeLater(() -> logArea.append("\n🏁 ทุกคนเล่นเสร็จแล้ว! กำลังสรุปคะแนน...\n"));
     }
 
     @Override
-    public void onFinalScoreItem(String playerName, int score) {
-        SwingUtilities.invokeLater(() -> logArea.append("🏆 " + playerName + " ได้ " + score + " คะแนน\n"));
-    }
-
-    // ======================================================
-    // Helper — อัปเดต Scoreboard
-    // ======================================================
-    private void updateScoreBoard(String message) {
-        // Format: "NAME ทำคะแนนได้ SCORE"
-        try {
-            String[] parts = message.split(" ทำคะแนนได้ ");
-            if (parts.length == 2) {
-                String name = parts[0].trim();
-                String score = parts[1].trim();
-
-                if (scoreLabels.containsKey(name)) {
-                    scoreLabels.get(name).setText(name + "  →  " + score + " คะแนน");
-                } else {
-                    JLabel lbl = new JLabel(name + "  →  " + score + " คะแนน");
-                    lbl.setFont(new Font("Tahoma", Font.PLAIN, 14));
-                    lbl.setForeground(name.equals(client.getPlayerName())
-                            ? new Color(255, 220, 80) // ไฮไลต์ชื่อตัวเอง
-                            : new Color(220, 190, 210));
-                    lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
-                    lbl.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-                    scoreLabels.put(name, lbl);
-                    scoreboardPanel.add(lbl);
-                    scoreboardPanel.revalidate();
-                    scoreboardPanel.repaint();
-                }
-            }
-        } catch (Exception ignored) {
-        }
+    public void onFinalScoreItem(String p, int s) {
     }
 
     private void appendLog(String text) {
@@ -246,21 +206,14 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         logArea.setCaretPosition(logArea.getDocument().getLength());
     }
 
-    // ======================================================
-    // Helper — styled action button
-    // ======================================================
     private JButton makeActionButton(String text, Color accent) {
         JButton b = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                Color base = isEnabled()
-                        ? (getModel().isPressed() ? accent.darker()
-                                : getModel().isRollover() ? accent.brighter() : accent)
-                        : new Color(80, 60, 80);
-                g2.setColor(base);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
+                g2.setColor(isEnabled() ? accent : Color.GRAY);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
                 super.paintComponent(g);
             }
         };
@@ -270,7 +223,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         b.setFocusPainted(false);
         b.setBorderPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.setPreferredSize(new Dimension(220, 48));
+        b.setPreferredSize(new Dimension(200, 45));
         return b;
     }
 }
