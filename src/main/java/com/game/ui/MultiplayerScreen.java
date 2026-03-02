@@ -189,7 +189,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
             this.dispose();
 
             // ✅ บรรทัดนี้จะไม่แดงแล้ว เพราะ MultiplayerScreen ถือ controller ไว้แล้ว
-            new MultiDatingScreen(client, controller);
+            new MultiDatingScreen(client, controller, this);
         });
     }
 
