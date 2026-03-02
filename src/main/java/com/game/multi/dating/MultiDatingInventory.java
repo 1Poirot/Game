@@ -215,4 +215,16 @@ public class MultiDatingInventory extends JDialog {
         }
         return null;
     }
+
+    /**
+     * เมธอดสำหรับอัปเดตข้อมูลใน List
+     */
+    private void updateListModel(DefaultListModel<String> model, Map<String, Integer> items) {
+        model.clear();
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+            if (entry.getValue() > 0) {
+                model.addElement(entry.getKey() + " (มี " + entry.getValue() + " ชิ้น)");
+            }
+        }
+    }
 }
