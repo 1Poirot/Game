@@ -598,8 +598,7 @@ public class MultiDatingScreen extends JFrame {
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(thaiFont.deriveFont(Font.BOLD, 22f));
-        nameLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.WHITE, 2, true),
+        nameLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.WHITE, 2, true),
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)));
     }
 
