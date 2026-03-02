@@ -276,7 +276,6 @@ public class Day6 {
 
         SCENES.put("Q3_A", new SCENE("Narrator", "Day6", "คุณปล่อยให้มือแตะกันแบบนั้น", null, null, null, "Q3_A1", null, null, null));
         SCENES.put("Q3_A1", new SCENE("Kim Jae-hyun", "Day6", "“อยู่ใกล้ ๆ แบบนี้…มันดีจังเลยนะ”", null, null, null, "S38", null, null, null));
-
         SCENES.put("Q3_B", new SCENE("Narrator", "Day6", "คุณรีบชักมือกลับ แล้วทำเป็นมองวิวข้างนอก", null, null, null, "S38", null, null, null));
         SCENES.put("Q3_C", new SCENE("Narrator", "Day6", "คุณหัวเราะกลบเกลื่อน เหมือนทำให้ทุกอย่างเบาลง", null, null, null, "S38", null, null, null));
 
