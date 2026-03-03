@@ -147,22 +147,26 @@ public class MultiDatingScreen extends JFrame {
             int bonus = 0;
             String exp = "ผู้หญิง ตัวเอก.png";
             String msg = "";
-            switch (item) {
-                case "ดอกไม้":
-                case "ช็อกโกแลต":
+            // แก้ไขใน MultiDatingScreen.java
+            switch (item.trim()) {
+                case "ดอกไม้": // ต้องตรงกับใน Shop
+                case "สร้อยคอ":
                     bonus = 15;
                     exp = "ผู้หญิง เขิน.png";
                     msg = "ขอบคุณน้าาาา 😊";
                     break;
-                case "กาแฟ":
-                case "ทิวลิป":
+
+                case "กาแฟ": // ใน Shop คุณใช้ชื่อ "กาแฟ"
+                case "ช็อกโกแลต": // ใน Shop คุณใช้ ต เต่า (ช็อกโกแลต)
+                case "โดนัท":
                     bonus = 10;
                     exp = "ผู้หญิง ยิ้ม.png";
                     msg = "ขอบใจน้า ❤";
                     break;
+
                 default:
                     bonus = 1;
-                    msg = "อืม ขอบคุณ";
+                    msg = "อืม ขอบคุณ"; // ถ้าชื่อไม่ตรงกันเลย มันจะมาตกที่นี่
                     break;
             }
             score += bonus;
@@ -285,14 +289,180 @@ public class MultiDatingScreen extends JFrame {
         });
     }
 
+    // ✅ แก้ไข: ลอจิกจบเกม (แยกขาดระหว่างเล่นคนเดียว กับ เล่นหลายคน)
+    // ✅ แก้ไข: ลอจิกจบเกม (เล่นคนเดียวจบเลย / เล่นหลายคน "ต้อง" ค้างหน้ารอ Server
+    // เท่านั้น)
+    // ✅ แก้ไข: ลอจิกจบเกม (ล็อกจำนวนคนตามจริงในห้อง 2 หรือ 3 คน)
+    // ✅ ใน MultiDatingScreen.java
     private void finishGame() {
-        if (client != null)
-            client.sendAction("FINISH:" + score);
-        Map<String, Integer> res = new HashMap<>();
-        String n = (client != null) ? client.getPlayerName() : "Player";
-        res.put(n, score);
-        MultiDatingResultDialog.showResult(res, n);
-        exitAndGoToMain();
+        if (timer != null)
+            timer.stop();
+        sound.stopBGM();
+
+        int playerCount = (client != null) ? client.getPlayerList().size() : 1;
+
+        if (playerCount > 1) {
+            // 🌐 ส่งคะแนนบอก Server (รอบเดียวพอ)
+            if (client != null) {
+                client.sendAction("FINISH:" + score);
+            }
+
+            // ล็อกหน้าจอรอ ห้ามโชว์ผลเอง
+            btnA.setVisible(false);
+            btnB.setVisible(false);
+            btnC.setVisible(false);
+            // ✅ แก้ไขบรรทัดเดิมให้เป็นแบบนี้ครับ
+            dialogLabel.setText(
+                    "<html><center><font face='Tahoma'>✨ บันทึกคะแนนสำเร็จ! ✨<br>กรุณารอเพื่อนสักครู่...</font></center></html>");
+
+        } else {
+            // 👤 เล่นคนเดียว สรุปทันที
+            Map<String, Integer> solo = new HashMap<>();
+            solo.put(client != null ? client.getPlayerName() : "คุณ", score);
+            showFinalResults(solo);
+        }
+    }
+
+    // ✅ เมธอดแสดงหน้าสรุปผล (Ranking 1, 2, 3 + ลอจิกแฟนคู่)
+    // ✅ เมธอดแสดงหน้าสรุปผล (แก้ลอจิก Ranking ให้แม่นยำ ไม่เป็นที่ 1 กันทุกคน)
+    public void showFinalResults(Map<String, Integer> allScores) {
+        // ✅ 1. เพิ่มเกราะป้องกัน: ถ้าไม่มีข้อมูลคะแนนเลย
+        // ให้ใส่คะแนนเราคนเดียวป้องกันโปรแกรมพัง
+        if (allScores == null || allScores.isEmpty()) {
+            allScores = new HashMap<>();
+            String name = (client != null) ? client.getPlayerName() : "คุณ";
+            allScores.put(name, score);
+        }
+
+        String myName = (client != null) ? client.getPlayerName() : "คุณ";
+
+        // --- ส่วนวาด Dialog เหมือนเดิม ---
+        JDialog resultDlg = new JDialog(this, "บทสรุปความรัก", true);
+        resultDlg.setUndecorated(true);
+        resultDlg.setSize(500, 650);
+        resultDlg.setLocationRelativeTo(this);
+
+        JPanel p = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 192, 203), 0, getHeight(), Color.WHITE);
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+                g2.setColor(new Color(255, 20, 147));
+                g2.setStroke(new BasicStroke(6));
+                g2.drawRoundRect(3, 3, getWidth() - 7, getHeight() - 7, 40, 40);
+                g2.dispose();
+            }
+        };
+        p.setOpaque(false);
+        p.setBorder(new EmptyBorder(35, 40, 35, 40));
+
+        // ✅ 2. จัดลำดับคะแนน
+        java.util.List<Map.Entry<String, Integer>> sortedList = allScores.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .collect(java.util.stream.Collectors.toList());
+
+        // ✅ 3. คำนวณอันดับด้วยความปลอดภัย (เช็ค Size ก่อน Get)
+        int myScore = allScores.getOrDefault(myName, 0);
+        int myRank = 1;
+        int maxScore = sortedList.isEmpty() ? 0 : sortedList.get(0).getValue();
+
+        for (Map.Entry<String, Integer> entry : sortedList) {
+            if (entry.getValue() > myScore)
+                myRank++;
+        }
+
+        long winnersCount = sortedList.stream().filter(e -> e.getValue() == maxScore).count();
+        boolean isTieAtFirst = (winnersCount > 1);
+
+        // --- ลอจิกข้อความเดิม ---
+        String statusMsg;
+        Color statusColor;
+        if (isTieAtFirst && myScore == maxScore && allScores.size() > 1) {
+            statusMsg = "💖 เสมอกัน! งั้นเป็นแฟนคู่ไปเลย 💖";
+            statusColor = new Color(255, 105, 180);
+        } else if (myRank == 1) {
+            statusMsg = "👑 ยินดีด้วยคุณชนะใจเธอ";
+            statusColor = new Color(50, 205, 50);
+        } else if (myRank == 2) {
+            statusMsg = "😐 ว้ายยย...เกือบชนะแต่เป็นได้แค่เพื่อน";
+            statusColor = Color.ORANGE;
+        } else {
+            statusMsg = "💀 สมน้ำหน้า เขาไม่คิดแม้แต่จะมองไปฝึกมาใหม่";
+            statusColor = Color.RED;
+        }
+
+        JLabel lbStatus = new JLabel("<html><center>" + statusMsg + "</center></html>", SwingConstants.CENTER);
+        lbStatus.setFont(new Font("Tahoma", Font.BOLD, 22));
+        lbStatus.setForeground(statusColor);
+        lbStatus.setBorder(new EmptyBorder(0, 0, 20, 0));
+        p.add(lbStatus, BorderLayout.NORTH);
+
+        // --- 📊 4. รายการ Leaderboard ---
+        JPanel listP = new JPanel();
+        listP.setLayout(new BoxLayout(listP, BoxLayout.Y_AXIS));
+        listP.setOpaque(false);
+
+        int displayRank = 1;
+        int lastScore = -1;
+        int actualRank = 0;
+
+        for (int i = 0; i < sortedList.size(); i++) {
+            Map.Entry<String, Integer> entry = sortedList.get(i);
+
+            // ลอจิกแสดงเลขลำดับ (ถ้าคะแนนเท่ากัน ให้ลำดับเลขเดียวกัน)
+            if (entry.getValue() != lastScore) {
+                actualRank = i + 1;
+            }
+            lastScore = entry.getValue();
+
+            JPanel item = new JPanel(new BorderLayout());
+            item.setOpaque(true);
+            boolean isMe = entry.getKey().equals(myName);
+            item.setBackground(isMe ? new Color(255, 20, 147, 40) : Color.WHITE);
+            item.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(255, 182, 193), 2, true),
+                    new EmptyBorder(12, 25, 12, 25)));
+
+            JLabel nameLbl = new JLabel(actualRank + ". " + entry.getKey() + (isMe ? " (YOU)" : ""));
+            nameLbl.setFont(new Font("Tahoma", Font.BOLD, 18));
+
+            JLabel scoreLbl = new JLabel(entry.getValue() + " แต้ม");
+            scoreLbl.setFont(new Font("Tahoma", Font.BOLD, 20));
+            scoreLbl.setForeground(new Color(255, 20, 147));
+
+            item.add(nameLbl, BorderLayout.WEST);
+            item.add(scoreLbl, BorderLayout.EAST);
+            item.setMaximumSize(new Dimension(420, 60));
+            listP.add(item);
+            listP.add(Box.createRigidArea(new Dimension(0, 12)));
+        }
+
+        JScrollPane scroll = new JScrollPane(listP);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+        p.add(scroll, BorderLayout.CENTER);
+
+        JButton btnClose = new JButton("ตกลง");
+        btnClose.setFont(new Font("Tahoma", Font.BOLD, 20));
+        btnClose.setBackground(new Color(255, 20, 147));
+        btnClose.setForeground(Color.WHITE);
+        btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnClose.addActionListener(e -> {
+            resultDlg.dispose();
+            exitAndGoToMain();
+        });
+
+        JPanel btnP = new JPanel(new FlowLayout());
+        btnP.setOpaque(false);
+        btnP.add(btnClose);
+        p.add(btnP, BorderLayout.SOUTH);
+
+        resultDlg.add(p);
+        resultDlg.setVisible(true);
     }
 
     private void loadEvent() {

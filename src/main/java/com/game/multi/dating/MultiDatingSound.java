@@ -8,7 +8,7 @@ public class MultiDatingSound {
     private static MultiDatingSound instance;
     private static Clip bgmClip;
     private boolean isMuted = false;
-    private float currentVolume = 0.8f; // ค่าเริ่มต้น 80%
+    private float currentVolume = 0.20f; // ค่าเริ่มต้น 80%
 
     private MultiDatingSound() {
     }
