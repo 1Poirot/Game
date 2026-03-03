@@ -71,7 +71,7 @@ public class MultiDatingScreen extends JFrame {
 
         try {
             sound.stopBGM();
-            sound.playBGM("audiotest2.wav");
+            sound.playBGM("multihome.wav");
         } catch (Exception e) {
             System.err.println("Sound error");
         }
@@ -83,7 +83,7 @@ public class MultiDatingScreen extends JFrame {
             }
         });
 
-        timer = new MultiDatingTimer(600, timerLabel, this::finishGame);
+        timer = new MultiDatingTimer(10, timerLabel, this::finishGame);
         timer.start();
 
         setVisible(true);
@@ -176,58 +176,96 @@ public class MultiDatingScreen extends JFrame {
     private void showSettingsDialog() {
         JDialog settings = new JDialog(this, "Settings", true);
 
-        // ✅ 1. เอาแถบหัวออกเพื่อให้ลากขยับไม่ได้ และล็อก Resizable
+        // ✅ 1. ล็อกสเปค: ห้ามขยับ ห้ามปรับขนาด และเอาแถบหัวออก
         settings.setUndecorated(true);
         settings.setResizable(false);
-        settings.setSize(380, 420);
-        settings.setLocationRelativeTo(this); // Flex ไว้ตรงกลางหน้าจอเกม
+        settings.setSize(420, 520);
+        settings.setLocationRelativeTo(this); // Flex ไว้ตรงกลางเสมอ
 
-        // ✅ 2. ดักจับการปิดหน้าต่างผ่านกากบาท (ถ้ามีแถบ) ให้ไม่ทำอะไร
+        // ✅ 2. ดักจับกากบาท (JFrame หลัก) ให้หน้าต่างนี้ยังคงอยู่
         settings.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-        JPanel content = new JPanel(new GridLayout(4, 1, 10, 15));
-        content.setBackground(new Color(255, 245, 250));
-
-        // ✅ 3. เพิ่มเส้นขอบหนาๆ แทนแถบ Windows ที่หายไป
-        content.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(255, 20, 147), 3),
-                new EmptyBorder(30, 50, 30, 50)));
+        JPanel content = new JPanel(new BorderLayout());
+        content.setBackground(new Color(255, 250, 252));
+        content.setBorder(BorderFactory.createLineBorder(new Color(255, 105, 180), 4, true));
         settings.setContentPane(content);
 
-        Font forceFont = new Font("Tahoma", Font.BOLD, 16);
-        JLabel lbTitle = new JLabel("เมนูตั้งค่า", SwingConstants.CENTER);
-        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 22));
+        // --- ส่วนหัว ---
+        JLabel lbTitle = new JLabel("SETTINGS", SwingConstants.CENTER);
+        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
         lbTitle.setForeground(new Color(255, 20, 147));
+        lbTitle.setBorder(new EmptyBorder(30, 0, 10, 0));
+        content.add(lbTitle, BorderLayout.NORTH);
 
-        JButton btnResume = new JButton("กลับไปเล่นต่อ");
-        JButton btnMute = new JButton(sound.isMuted() ? "เปิดเสียงเพลง" : "ปิดเสียงเพลง");
-        JButton btnLeave = new JButton("ออกจากห้องแข่ง");
-        btnLeave.setForeground(Color.RED);
+        // --- ส่วนกลาง (Slider + Buttons) ---
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setOpaque(false);
+        mainPanel.setBorder(new EmptyBorder(10, 50, 30, 50));
 
-        JButton[] allBtns = { btnResume, btnMute, btnLeave };
-        for (JButton b : allBtns) {
-            b.setFont(forceFont);
-            b.setFocusPainted(false);
-            b.setBackground(Color.WHITE);
-        }
+        // ✅ ส่วนควบคุมเสียงแบบ Slider
+        JLabel lbVolume = new JLabel("ระดับเสียงเพลง");
+        lbVolume.setFont(new Font("Tahoma", Font.BOLD, 16));
+        lbVolume.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        btnResume.addActionListener(e -> settings.dispose());
-        btnMute.addActionListener(e -> {
-            sound.toggleMute();
-            btnMute.setText(sound.isMuted() ? "เปิดเสียงเพลง" : "ปิดเสียงเพลง");
+        JSlider volSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (sound.getVolume() * 100));
+        volSlider.setOpaque(false);
+        volSlider.setMajorTickSpacing(25);
+        volSlider.setPaintTicks(false);
+        volSlider.addChangeListener(e -> {
+            float volume = volSlider.getValue() / 100f;
+            sound.setVolume(volume);
+            lbVolume.setText(volume == 0 ? "ปิดเสียง" : "ระดับเสียง: " + volSlider.getValue() + "%");
         });
+
+        // ปุ่มรายการ
+        Font btnFont = new Font("Tahoma", Font.BOLD, 17);
+        JButton btnResume = createStyledMenuBtn("กลับไปเล่นต่อ", new Color(255, 182, 193), btnFont);
+        btnResume.addActionListener(e -> settings.dispose());
+
+        JButton btnLeave = createStyledMenuBtn("ออกจากห้องแข่ง", new Color(255, 99, 71), btnFont);
+        btnLeave.setForeground(Color.WHITE);
         btnLeave.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(settings, "ออกจากเกมใช่หรือไม่?", "ยืนยัน", 0) == 0) {
+            int res = JOptionPane.showConfirmDialog(settings, "คุณแน่ใจนะว่าจะทิ้งเกมนี้ไป?", "ยืนยัน",
+                    JOptionPane.YES_NO_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
                 settings.dispose();
                 exitAndGoToMain();
             }
         });
 
-        content.add(lbTitle);
-        content.add(btnResume);
-        content.add(btnMute);
-        content.add(btnLeave);
+        // เพิ่มคอมโพเนนต์ลงแผง
+        mainPanel.add(lbVolume);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(volSlider);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        mainPanel.add(btnResume);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(btnLeave);
+
+        content.add(mainPanel, BorderLayout.CENTER);
         settings.setVisible(true);
+    }
+
+    // Helper สำหรับสร้างปุ่มสวยๆ (ห้ามลบ)
+    private JButton createStyledMenuBtn(String text, Color bg, Font font) {
+        JButton b = new JButton(text);
+        b.setFont(font);
+        b.setBackground(bg);
+        b.setFocusPainted(false);
+        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        b.setAlignmentX(Component.CENTER_ALIGNMENT);
+        b.setMaximumSize(new Dimension(300, 50));
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                b.setBackground(bg.brighter());
+            }
+
+            public void mouseExited(MouseEvent e) {
+                b.setBackground(bg);
+            }
+        });
+        return b;
     }
 
     private void exitAndGoToMain() {
@@ -267,16 +305,30 @@ public class MultiDatingScreen extends JFrame {
         this.currentExpressionFile = ev.getDefaultExpression();
         currentBG = ev.getBackground();
 
-        // ✅ แก้ไข: เปลี่ยน %name% เป็นชื่อผู้เล่นจริง
         String pName = (client != null && client.getPlayerName() != null) ? client.getPlayerName() : "ผู้เล่น";
-        String dialog = ev.getDialog().replace("%name%", pName).replace("...", pName);
+        String dialog, choiceA, choiceB, choiceC;
+
+        // ✅ เช็คว่าเป็นเหตุการณ์แรก (Index 0) หรือไม่
+        if (manager.getCurrentIndex() == 0) {
+            // เหตุการณ์แรก: ใช้คำกลางๆ แทนชื่อ (ยังไม่รู้จักกัน)
+            dialog = ev.getDialog().replace("%name%", "..").replace("...", "..");
+            choiceA = ev.getChoiceA().replace("%name%", "เรา");
+            choiceB = ev.getChoiceB().replace("%name%", "เรา");
+            choiceC = ev.getChoiceC().replace("%name%", "เรา");
+        } else {
+            // เหตุการณ์ต่อๆ ไป: ใช้ชื่อผู้เล่นจริงตามปกติ
+            dialog = ev.getDialog().replace("%name%", pName).replace("...", pName);
+            choiceA = ev.getChoiceA().replace("%name%", pName);
+            choiceB = ev.getChoiceB().replace("%name%", pName);
+            choiceC = ev.getChoiceC().replace("%name%", pName);
+        }
 
         dialogLabel.setText("<html><body style='width: 450px; color: #222222; font-family: Tahoma; font-size: 18px;'>“"
                 + dialog + "”</body></html>");
 
-        btnA.setText("<html><center>" + ev.getChoiceA().replace("%name%", pName) + "</center></html>");
-        btnB.setText("<html><center>" + ev.getChoiceB().replace("%name%", pName) + "</center></html>");
-        btnC.setText("<html><center>" + ev.getChoiceC().replace("%name%", pName) + "</center></html>");
+        btnA.setText("<html><center>" + choiceA + "</center></html>");
+        btnB.setText("<html><center>" + choiceB + "</center></html>");
+        btnC.setText("<html><center>" + choiceC + "</center></html>");
         relayoutUI();
     }
 
@@ -352,31 +404,52 @@ public class MultiDatingScreen extends JFrame {
     }
 
     private void styleComponents() {
+        // --- ปรับแต่ง Heart Bar (หลอดหัวใจ) ---
         heartBar.setUI(new BasicProgressBarUI() {
             @Override
             protected void paintDeterminate(Graphics g, JComponent c) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
                 int w = c.getWidth(), h = c.getHeight();
                 int mw = (int) (w * heartBar.getPercentComplete());
-                g2d.setColor(new Color(255, 255, 255, 150));
-                g2d.fillRoundRect(0, 0, w, h, 15, 15);
-                g2d.setPaint(new GradientPaint(0, 0, new Color(255, 20, 147), mw, 0, new Color(255, 105, 180)));
-                g2d.fillRoundRect(0, 0, mw, h, 15, 15);
+
+                // วาดพื้นหลังหลอด (สีขาวจางๆ)
+                g2d.setColor(new Color(255, 255, 255, 180));
+                g2d.fillRoundRect(0, 0, w, h, 20, 20);
+
+                // วาดส่วนที่มีคะแนน (ไล่เฉดสีชมพู)
+                if (mw > 0) {
+                    g2d.setPaint(new GradientPaint(0, 0, new Color(255, 20, 147), mw, 0, new Color(255, 105, 180)));
+                    g2d.fillRoundRect(0, 0, mw, h, 20, 20);
+                }
+
+                // วาดเส้นขอบหลอดให้คมชัด
+                g2d.setColor(new Color(255, 20, 147));
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawRoundRect(1, 1, w - 2, h - 2, 20, 20);
             }
         });
-        heartBar.setFont(new Font("Tahoma", Font.BOLD, 16));
-        heartBar.setForeground(Color.RED);
-        heartBar.setStringPainted(true);
-        timerLabel.setFont(thaiFont.deriveFont(24f));
-        timerLabel.setForeground(Color.WHITE);
 
+        heartBar.setFont(new Font("Tahoma", Font.BOLD, 18));
+        heartBar.setForeground(Color.WHITE); // ✅ เปลี่ยนสีตัวเลขเป็นสีขาวเพื่อให้ตัดกับหลอดสีชมพู
+        heartBar.setStringPainted(true);
+
+        // --- ✅ แก้ปัญหา Emoji สี่เหลี่ยมที่ Timer ---
+        // ใช้ฟอนต์ Segoe UI Emoji เพื่อให้รูปนาฬิกาแสดงผลได้
+        timerLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 26));
+        timerLabel.setForeground(Color.WHITE);
+        // ใส่เงาให้ตัวเลขเวลาหน่อยจะได้อ่านง่ายบนพื้นหลังสว่าง
+        timerLabel.setUI(new javax.swing.plaf.basic.BasicLabelUI());
+
+        // --- ปรับแต่งป้ายชื่อ ---
         nameLabel.setOpaque(true);
         nameLabel.setBackground(new Color(255, 20, 147));
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(thaiFont.deriveFont(Font.BOLD, 22f));
-        nameLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.WHITE, 2, true),
+        nameLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 2, true),
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)));
     }
 
