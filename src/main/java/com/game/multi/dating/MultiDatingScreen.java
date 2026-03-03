@@ -16,7 +16,6 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 public class MultiDatingScreen extends JFrame {
     private final MultiDatingEventManager manager = new MultiDatingEventManager();
     private final MultiDatingSound sound = MultiDatingSound.getInstance();
-    
 
     private int score = 0, money = 1000;
     private Map<String, Integer> inventory = new HashMap<>();
@@ -34,7 +33,7 @@ public class MultiDatingScreen extends JFrame {
     private JLabel timerLabel = new JLabel();
 
     private JButton btnA, btnB, btnC;
-    private JButton btnBag, btnShop, btnSettings, btnResume, btnLeave;
+    private JButton btnBag, btnShop, btnSettings;
     private MultiDatingTimer timer;
 
     private String currentBG = "";
@@ -62,7 +61,6 @@ public class MultiDatingScreen extends JFrame {
         btnBag = createIconBtn("🎒");
         btnShop = createIconBtn("🛒");
         btnSettings = createIconBtn("⚙️");
-        btnResume = createIconBtn("▶️");
 
         setContentPane(layeredPane);
         styleComponents();
@@ -201,6 +199,7 @@ public class MultiDatingScreen extends JFrame {
         lbTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
         lbTitle.setForeground(new Color(255, 20, 147));
         lbTitle.setBorder(new EmptyBorder(30, 0, 10, 0));
+        content.add(lbTitle, BorderLayout.NORTH);
 
         // --- ส่วนกลาง (Slider + Buttons) ---
         JPanel mainPanel = new JPanel();
@@ -222,6 +221,27 @@ public class MultiDatingScreen extends JFrame {
             sound.setVolume(volume);
             lbVolume.setText(volume == 0 ? "ปิดเสียง" : "ระดับเสียง: " + volSlider.getValue() + "%");
         });
+
+        // ปุ่มรายการ
+        Font btnFont = new Font("Tahoma", Font.BOLD, 17);
+        JButton btnResume = createStyledMenuBtn("กลับไปเล่นต่อ", new Color(255, 182, 193), btnFont);
+        btnResume.addActionListener(e -> settings.dispose());
+
+        JButton btnLeave = createStyledMenuBtn("ออกจากห้องแข่ง", new Color(255, 99, 71), btnFont);
+        btnLeave.setForeground(Color.WHITE);
+        btnLeave.addActionListener(e -> {
+            int res = JOptionPane.showConfirmDialog(settings, "คุณแน่ใจนะว่าจะทิ้งเกมนี้ไป?", "ยืนยัน",
+                    JOptionPane.YES_NO_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
+                settings.dispose();
+                exitAndGoToMain();
+            }
+        });
+
+        // เพิ่มคอมโพเนนต์ลงแผง
+        mainPanel.add(lbVolume);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(volSlider);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         mainPanel.add(btnResume);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -598,7 +618,8 @@ public class MultiDatingScreen extends JFrame {
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(thaiFont.deriveFont(Font.BOLD, 22f));
-        nameLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.WHITE, 2, true),
+        nameLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 2, true),
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)));
     }
 
