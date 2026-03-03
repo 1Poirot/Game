@@ -398,23 +398,23 @@ public class Day5 {
 
     // Q2
     if (CURRENT_ID.equals("Q2")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 15);
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 7);
     }
 
     // Q3
     if (CURRENT_ID.equals("Q3")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 20);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 0);
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
     }
 
     // Q4
     if (CURRENT_ID.equals("Q4")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 25);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 15);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, -5);
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
     }
 
     // รีเฟรชแถบ
