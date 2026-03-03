@@ -50,9 +50,6 @@ public class MultiDatingShop extends JDialog {
 
         JButton btnBack = new JButton(
                 "<html><font color='#FF1493' size='6'>◀</font> <font color='#FF1493' size='5'> BACK</font></html>");
-        btnBack.setContentAreaFilled(false);
-        btnBack.setBorderPainted(false);
-        btnBack.setFocusPainted(false);
         btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnBack.addActionListener(e -> dispose());
 
