@@ -1,10 +1,10 @@
 package com.game.systems.choice;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import javax.swing.*;
+import javax.swing.*;
 
 public class Day7 {
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
@@ -78,7 +78,7 @@ public class Day7 {
             @Override
             public void componentResized(ComponentEvent E) {
                 LAYOUT_UI();
-                BG_VIEW.REPAINT_BG();
+            
             }
         });
 
@@ -90,7 +90,7 @@ public class Day7 {
 
         SHOW_SCENE(CURRENT_ID);
         LAYOUT_UI();
-        BG_VIEW.REPAINT_BG();
+        
     }
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
@@ -125,34 +125,16 @@ public class Day7 {
         int BTN_H = 56;
         int BTN_X = (W - BTN_W) / 2;
 
-        int GAP = 18;
+        int STACK_H = (BTN_H * 3) + 18 + 18;
+        int TOP_Y = (H / 2) - (STACK_H / 2);
 
-        int V = 0;
-        if (BTN_CHOICE1.isVisible()) V++;
-        if (BTN_CHOICE2.isVisible()) V++;
-        if (BTN_CHOICE3.isVisible()) V++;
+        int BTN_Y1 = TOP_Y;
+        int BTN_Y2 = BTN_Y1 + BTN_H + 18;
+        int BTN_Y3 = BTN_Y2 + BTN_H + 18;
 
-        if (V <= 0) {
-            BTN_CHOICE1.setBounds(BTN_X, (H / 2) - 70, BTN_W, BTN_H);
-            BTN_CHOICE2.setBounds(BTN_X, (H / 2), BTN_W, BTN_H);
-            BTN_CHOICE3.setBounds(BTN_X, (H / 2) + 70, BTN_W, BTN_H);
-        } else {
-            int STACK_H = (BTN_H * V) + (GAP * (V - 1));
-            int TOP_Y = (H / 2) - (STACK_H / 2);
-
-            int Y = TOP_Y;
-            if (BTN_CHOICE1.isVisible()) {
-                BTN_CHOICE1.setBounds(BTN_X, Y, BTN_W, BTN_H);
-                Y += BTN_H + GAP;
-            }
-            if (BTN_CHOICE2.isVisible()) {
-                BTN_CHOICE2.setBounds(BTN_X, Y, BTN_W, BTN_H);
-                Y += BTN_H + GAP;
-            }
-            if (BTN_CHOICE3.isVisible()) {
-                BTN_CHOICE3.setBounds(BTN_X, Y, BTN_W, BTN_H);
-            }
-        }
+        BTN_CHOICE1.setBounds(BTN_X, BTN_Y1, BTN_W, BTN_H);
+        BTN_CHOICE2.setBounds(BTN_X, BTN_Y2, BTN_W, BTN_H);
+        BTN_CHOICE3.setBounds(BTN_X, BTN_Y3, BTN_W, BTN_H);
 
         int CHAR_TARGET_H = (int) (H * 0.78);
         CHAR_TARGET_H = Math.min(720, Math.max(420, CHAR_TARGET_H));
@@ -223,107 +205,193 @@ public class Day7 {
     }
 
     private void BUILD_STORY() {
-        SCENES.clear();
+    SCENES.clear();
 
-        SCENES.put("S1", new SCENE("Narrator", "Day7", "DAY 7 — วันที่คำตอบชัดกว่าความเงียบ", null, null, null, "S2", null, null, null));
-        SCENES.put("S2", new SCENE("Narrator", "Day7", "เมื่อคืนคุณนอนไม่หลับเลย", null, null, null, "S3", null, null, null));
-        SCENES.put("S3", new SCENE("Narrator", "Day7", "ทุกภาพย้อนกลับมาในหัว", null, null, null, "S4", null, null, null));
-        SCENES.put("S4", new SCENE("Narrator", "Day7", "วันที่เจอกันครั้งแรก", null, null, null, "S5", null, null, null));
-        SCENES.put("S5", new SCENE("Narrator", "Day7", "วันที่มือแตะกันบนชิงช้าสวรรค์", null, null, null, "S6", null, null, null));
-        SCENES.put("S6", new SCENE("Narrator", "Day7", "วันที่เขาถามว่า “เรากำลังจีบกันอยู่ใช่ไหม”", null, null, null, "S7", null, null, null));
-        SCENES.put("S7", new SCENE("Narrator", "Day7", "และคำพูดล่าสุด “ให้เราได้จีบเธอแบบจริงจังได้ไหม”", null, null, null, "S8", null, null, null));
+    SCENES.put("S1", new SCENE("Narrator", "Day7", "DAY 7 — วันที่คำตอบชัดกว่าความเงียบ", null, null, null, "S2", null, null, null));
+    SCENES.put("S2", new SCENE("Narrator", "Day7", "เมื่อคืนคุณนอนไม่หลับเลย", null, null, null, "S3", null, null, null));
+    SCENES.put("S3", new SCENE("Narrator", "Day7", "ทุกภาพย้อนกลับมาในหัว", null, null, null, "S4", null, null, null));
+    SCENES.put("S4", new SCENE("Narrator", "Day7", "วันที่เจอกันครั้งแรก", null, null, null, "S5", null, null, null));
+    SCENES.put("S5", new SCENE("Narrator", "Day7", "วันที่เขาถามว่า “เรากำลังจีบกันอยู่ใช่ไหม” และคำพูดล่าสุด", null, null, null, "S6", null, null, null));
+    SCENES.put("S6", new SCENE("Kim Jae-hyun", "Day7", "““ให้เราได้จีบเธอแบบจริงจังได้ไหม””", null, null, null, "S7", null, null, null));
+    SCENES.put("S7", new SCENE("Kim Jae-hyun", "Day7", "วันนี้เขานัดคุณที่เดิม", null, null, null, "S8", null, null, null));
+    SCENES.put("S8", new SCENE("Kim Jae-hyun", "Day7", "“อยากชวนไปเที่ยวด้วยกันหน่อย”", null, null, null, "S9", null, null, null));
+    SCENES.put("S9", new SCENE("Narrator", "Day7", "คุณอ่านวนซ้ำสองรอบ ใจเต้นเร็วขึ้นโดยไม่รู้ตัว", null, null, null, "S10", null, null, null));
+    SCENES.put("S10", new SCENE("Narrator", "Day7", "คำว่า “ไปเที่ยวด้วยกัน” มันไม่ใช่แค่คำธรรมดา", null, null, null, "S11", null, null, null));
+    SCENES.put("S11", new SCENE("Narrator", "Day7", "คุณพิมพ์ตอบตกลง แม้มือจะสั่นเล็กน้อย", null, null, null, "S12", null, null, null));
+    SCENES.put("S12", new SCENE("Kim Jae-hyun", "Day7", "“งั้นบ่ายสอง เจอกันหน้าสถานีรถไฟนะ :)”", null, null, null, "S13", null, null, null));
+    SCENES.put("S13", new SCENE("Narrator", "Day7", "คุณเผลอยิ้มให้หน้าจอ", null, null, null, "S14", null, null, null));
 
-        SCENES.put("S8", new SCENE("Narrator", "Day7", "วันนี้เขานัดคุณที่เดิม ริมแม่น้ำที่พระอาทิตย์ตกสวยที่สุด", null, null, null, "S9", null, null, null));
-        SCENES.put("S9", new SCENE("Narrator", "Day7", "คุณมาถึงก่อน ลมพัดเบา ๆ กลิ่นน้ำลอยอ่อน ๆ", null, null, null, "S10", null, null, null));
-        SCENES.put("S10", new SCENE("Narrator", "Day7", "หัวใจเต้นแรงอย่างควบคุมไม่ได้", null, null, null, "S11", null, null, null));
-        SCENES.put("S11", new SCENE("Narrator", "Day7", "ไม่นานเขาก็เดินมา", null, null, null, "S12", null, null, null));
-        SCENES.put("S12", new SCENE("Narrator", "Day7", "วันนี้เขาไม่ได้แต่งตัวพิเศษ แต่ดูตั้งใจมากกว่าทุกวัน", null, null, null, "S13", null, null, null));
-        SCENES.put("S13", new SCENE("Narrator", "Day7", "สายตาที่มองคุณ…ต่างออกไป มันไม่ใช่สายตาเล่น ๆ แล้ว", null, null, null, "S14", null, null, null));
-        SCENES.put("S14", new SCENE("Narrator", "Day7", "เขาหยุดตรงหน้าคุณ", null, null, null, "S15", null, null, null));
-        SCENES.put("S15", new SCENE("Kim Jae-hyun", "Day7", "“ขอบคุณนะที่มา”", null, null, null, "S16", null, null, null));
-        SCENES.put("S16", new SCENE("Narrator", "Day7", "เสียงเบา แต่จริงจัง", null, null, null, "S17", null, null, null));
+    SCENES.put("S14", new SCENE("Narrator", "Day7", "ฉากที่ 1 — เจอกันครั้งแรกของวันนี้", null, null, null, "S15", null, null, null));
+    SCENES.put("S15", new SCENE("Narrator", "Day7", "ตอนคุณเดินไปถึง เขายืนพิงเสาอยู่ก่อนแล้ว", null, null, null, "S16", null, null, null));
+    SCENES.put("S16", new SCENE("Narrator", "Day7", "ใส่เสื้อที่คุณเคยชมว่าสีนี้เหมาะกับเขา", null, null, null, "S17", null, null, null));
+    SCENES.put("S17", new SCENE("Narrator", "Day7", "พอเขาเห็นคุณ รอยยิ้มก็ปรากฏทันที", null, null, null, "S18", null, null, null));
+    SCENES.put("S18", new SCENE("Kim Jae-hyun", "Day7", "“วันนี้…ดูดีนะ”", null, null, null, "S19", null, null, null));
+    SCENES.put("S19", new SCENE("Narrator", "Day7", "หัวใจคุณสะดุด", null, null, null, "Q1", null, null, null));
 
-        SCENES.put("S17", new SCENE("Narrator", "Day7", "ฉากที่ 1 — ก่อนคำตอบ", null, null, null, "S18", null, null, null));
-        SCENES.put("S18", new SCENE("Narrator", "Day7", "คุณสองคนนั่งลงที่ม้านั่งไม้ตัวเดิม ท้องฟ้าเริ่มเปลี่ยนเป็นสีส้มทอง", null, null, null, "S19", null, null, null));
-        SCENES.put("S19", new SCENE("Narrator", "Day7", "เขานิ่งไปครู่หนึ่ง เหมือนกำลังรวบรวมความกล้า", null, null, null, "S20", null, null, null));
-        SCENES.put("S20", new SCENE("Kim Jae-hyun", "Day7", "“เราคิดมาทั้งคืนเลยนะ”", null, null, null, "S21", null, null, null));
-        SCENES.put("S21", new SCENE("Narrator", "Day7", "คุณเงียบ ฟังทุกคำ", null, null, null, "S22", null, null, null));
-        SCENES.put("S22", new SCENE("Kim Jae-hyun", "Day7", "“ตลอดอาทิตย์ที่ผ่านมา เราไม่เคยมองเธอเป็นแค่เพื่อนเลย”", null, null, null, "S23", null, null, null));
-        SCENES.put("S23", new SCENE("Narrator", "Day7", "ลมหายใจคุณสะดุด", null, null, null, "S24", null, null, null));
-        SCENES.put("S24", new SCENE("Kim Jae-hyun", "Day7", "“เราชอบเธอจริง ๆ”", null, null, null, "S25", null, null, null));
-        SCENES.put("S25", new SCENE("Narrator", "Day7", "คำพูดนั้นชัดเจน ไม่มีหลบ ไม่มีเลี่ยง", null, null, null, "S26", null, null, null));
-        SCENES.put("S26", new SCENE("Narrator", "Day7", "เขาหันมามองตรง ๆ", null, null, null, "S27", null, null, null));
-        SCENES.put("S27", new SCENE("Kim Jae-hyun", "Day7", "“เราอยากรู้ว่าเธอรู้สึกยังไง”", null, null, null, "S28", null, null, null));
-        SCENES.put("S28", new SCENE("Narrator", "Day7", "บรรยากาศเงียบจนได้ยินเสียงคลื่นกระทบฝั่ง", null, null, null, "S29", null, null, null));
-        SCENES.put("S29", new SCENE("Narrator", "Day7", "นี่คือช่วงเวลาที่ทุกอย่างจะเปลี่ยน", null, null, null, "Q1", null, null, null));
+    SCENES.put("Q1", new SCENE("คุณ", "Day7", "คำถามที่ 1 — จะตอบยังไง",
+            "A) “ก็ต้องดูดีหน่อยสิ มากับเธอนี่นา”",
+            "B) “จริงเหรอ ขอบคุณนะ”",
+            "C) “ปกติแหละ”",
+            null, "Q1_A", "Q1_B", "Q1_C"));
 
-        SCENES.put("Q1", new SCENE("คุณ", "Day7", "คำตอบของคุณ",
-                "A) “เราก็ชอบเธอ… มากกว่าเพื่อนเหมือนกัน”",
-                "B) “เรารู้สึกดีนะ… แต่เรายังไม่พร้อมเป็นแฟน”",
-                null,
-                null, "HE1", "FE1", null));
+    SCENES.put("Q1_A", new SCENE("คุณ", "Day7", "“ก็ต้องดูดีหน่อยสิ มากับเธอนี่นา”", null, null, null, "S20", null, null, null));
+    SCENES.put("Q1_B", new SCENE("คุณ", "Day7", "“จริงเหรอ ขอบคุณนะ”", null, null, null, "S20", null, null, null));
+    SCENES.put("Q1_C", new SCENE("คุณ", "Day7", "“ปกติแหละ”", null, null, null, "S20", null, null, null));
 
-        SCENES.put("HE1", new SCENE("Narrator", "Day7", "ฉากจบที่ 1 — Happy Ending (เป็นแฟนกัน)", null, null, null, "HE2", null, null, null));
-        SCENES.put("HE2", new SCENE("Narrator", "Day7", "คุณสูดหายใจลึก ก่อนจะพูดออกไป", null, null, null, "HE3", null, null, null));
-        SCENES.put("HE3", new SCENE("คุณ", "Day7", "“เราชอบเธอ”", null, null, null, "HE4", null, null, null));
-        SCENES.put("HE4", new SCENE("Narrator", "Day7", "เสียงคุณสั่นเล็กน้อย แต่ชัดเจนที่สุด", null, null, null, "HE5", null, null, null));
-        SCENES.put("HE5", new SCENE("Narrator", "Day7", "เขานิ่งไปหนึ่งวินาที ก่อนรอยยิ้มจะค่อย ๆ ปรากฏ", null, null, null, "HE6", null, null, null));
-        SCENES.put("HE6", new SCENE("Narrator", "Day7", "รอยยิ้มแบบที่เก็บไว้ไม่อยู่", null, null, null, "HE7", null, null, null));
-        SCENES.put("HE7", new SCENE("Kim Jae-hyun", "Day7", "“จริงนะ…”", null, null, null, "HE8", null, null, null));
-        SCENES.put("HE8", new SCENE("Narrator", "Day7", "ดวงตาเขาเป็นประกาย", null, null, null, "HE9", null, null, null));
-        SCENES.put("HE9", new SCENE("Narrator", "Day7", "เขาหัวเราะเบา ๆ อย่างโล่งใจ", null, null, null, "HE10", null, null, null));
-        SCENES.put("HE10", new SCENE("Kim Jae-hyun", "Day7", "“งั้น…เราขอเป็นแฟนเธอได้ไหม”", null, null, null, "HE11", null, null, null));
-        SCENES.put("HE11", new SCENE("คุณ", "Day7", "“ได้สิ”", null, null, null, "HE12", null, null, null));
-        SCENES.put("HE12", new SCENE("Narrator", "Day7", "มือเขาจับมือคุณอย่างมั่นคง", null, null, null, "SUM", null, null, null));
+    SCENES.put("S20", new SCENE("Narrator", "Day7", "ฉากที่ 2 — เดินเล่นในสวนสนุก", null, null, null, "S21", null, null, null));
+    SCENES.put("S21", new SCENE("Narrator", "Day7", "เสียงเพลงสดใสลอยตามลม กลิ่นขนมหวานลอยมาแตะปลายจมูก", null, null, null, "S22", null, null, null));
+    SCENES.put("S22", new SCENE("Narrator", "Day7", "คุณสองคนเดินช้า ๆ ไหล่แทบจะชนกัน", null, null, null, "S23", null, null, null));
+    SCENES.put("S23", new SCENE("Narrator", "Day7", "บางจังหวะมือเกือบแตะ แต่ก็ไม่มีใครกล้าขยับ", null, null, null, "S24", null, null, null));
+    SCENES.put("S24", new SCENE("Kim Jae-hyun", "Day7", "“อยากเล่นอะไรไหม”", null, null, null, "S25", null, null, null));
+    SCENES.put("S25", new SCENE("Narrator", "Day7", "คุณชี้ไปที่ชิงช้าสวรรค์ มันสูงมาก แต่ก็โรแมนติกมากเหมือนกัน", null, null, null, "S26", null, null, null));
+    SCENES.put("S26", new SCENE("Kim Jae-hyun", "Day7", "เขายิ้มบาง ๆ “กลัวความสูงไหม”", null, null, null, "Q2", null, null, null));
 
-        SCENES.put("FE1", new SCENE("Narrator", "Day7", "ฉากจบที่ 2 — Friend Ending (คนสำคัญที่ไม่ใช่แฟน)", null, null, null, "FE2", null, null, null));
-        SCENES.put("FE2", new SCENE("คุณ", "Day7", "“เรารู้สึกดีมากนะ แต่เรายังไม่พร้อมเป็นแฟนใครตอนนี้”", null, null, null, "FE3", null, null, null));
-        SCENES.put("FE3", new SCENE("Kim Jae-hyun", "Day7", "“ขอบคุณนะที่พูดตรง ๆ อย่างน้อยเราก็ไม่ได้เสียเธอไป”", null, null, null, "SUM", null, null, null));
+    SCENES.put("Q2", new SCENE("คุณ", "Day7", "คำถามที่ 2 — ก่อนขึ้นชิงช้า",
+            "A) “กลัวนิดหน่อย… แต่ถ้ามีเธออยู่ก็โอเค”",
+            "B) “ไม่กลัวเลย”",
+            "C) “งั้นไปอย่างอื่นแทนไหม”",
+            null, "Q2_A", "Q2_B", "Q2_C"));
 
-        SCENES.put("SUM", new SCENE("Narrator", "Day7", "บทสรุป DAY 7 | 7 วัน ที่เปลี่ยนหัวใจของคุณ", null, null, null, "END", null, null, null));
-        SCENES.put("END", new SCENE("Narrator", "Day7", "จบตอน", null, null, null, null, null, null, null));
-    }
+    SCENES.put("Q2_A", new SCENE("คุณ", "Day7", "“กลัวนิดหน่อย… แต่ถ้ามีเธออยู่ก็โอเค”", null, null, null, "S27", null, null, null));
+    SCENES.put("Q2_B", new SCENE("คุณ", "Day7", "“ไม่กลัวเลย”", null, null, null, "S27", null, null, null));
+    SCENES.put("Q2_C", new SCENE("คุณ", "Day7", "“งั้นไปอย่างอื่นแทนไหม”", null, null, null, "S27", null, null, null));
+
+    SCENES.put("S27", new SCENE("Narrator", "Day7", "บนชิงช้าสวรรค์", null, null, null, "S28", null, null, null));
+    SCENES.put("S28", new SCENE("Narrator", "Day7", "กระเช้าค่อย ๆ ลอยสูงขึ้น เมืองทั้งเมืองค่อย ๆ เล็กลง", null, null, null, "S29", null, null, null));
+    SCENES.put("S29", new SCENE("Narrator", "Day7", "ภายในเงียบลงทันที มีแค่เสียงลมหายใจของคุณสองคน", null, null, null, "S30", null, null, null));
+    SCENES.put("S30", new SCENE("Narrator", "Day7", "ระยะห่างแค่เอื้อมมือก็ถึง", null, null, null, "S31", null, null, null));
+    SCENES.put("S31", new SCENE("Narrator", "Day7", "ตอนกระเช้าหยุดอยู่จุดสูงสุด ลมพัดแรงเล็กน้อย", null, null, null, "S32", null, null, null));
+    SCENES.put("S32", new SCENE("Narrator", "Day7", "ตัวคุณเอนนิดหนึ่งโดยไม่ตั้งใจ", null, null, null, "S33", null, null, null));
+    SCENES.put("S33", new SCENE("Narrator", "Day7", "เขาขยับเข้ามาใกล้ทันที", null, null, null, "S34", null, null, null));
+    SCENES.put("S34", new SCENE("Kim Jae-hyun", "Day7", "“ระวังนะ”", null, null, null, "S35", null, null, null));
+    SCENES.put("S35", new SCENE("Narrator", "Day7", "มือเขาแตะหลังมือคุณ แค่เบา ๆ แต่ไฟฟ้าเหมือนแล่นผ่านหัวใจ", null, null, null, "S36", null, null, null));
+    SCENES.put("S36", new SCENE("Narrator", "Day7", "คุณเงยหน้าขึ้น สายตาสบกันพอดี", null, null, null, "S37", null, null, null));
+    SCENES.put("S37", new SCENE("Narrator", "Day7", "โลกเหมือนเงียบไปหมด", null, null, null, "Q3", null, null, null));
+
+    SCENES.put("Q3", new SCENE("คุณ", "Day7", "คำถามที่ 3 — จะทำยังไง",
+            "A) ปล่อยให้มือแตะกันแบบนั้น",
+            "B) รีบชักมือกลับ",
+            "C) หัวเราะกลบเกลื่อน",
+            null, "Q3_A", "Q3_B", "Q3_C"));
+
+    SCENES.put("Q3_A", new SCENE("Narrator", "Day7", "คุณปล่อยให้มือแตะกันแบบนั้น", null, null, null, "Q3_A1", null, null, null));
+    SCENES.put("Q3_A1", new SCENE("Kim Jae-hyun", "Day7", "“อยู่ใกล้ ๆ แบบนี้…มันดีจังเลยนะ”", null, null, null, "S38", null, null, null));
+    SCENES.put("Q3_B", new SCENE("Narrator", "Day7", "คุณรีบชักมือกลับ แล้วทำเป็นมองวิวข้างนอก", null, null, null, "S38", null, null, null));
+    SCENES.put("Q3_C", new SCENE("Narrator", "Day7", "คุณหัวเราะกลบเกลื่อน เหมือนทำให้ทุกอย่างเบาลง", null, null, null, "S38", null, null, null));
+
+    SCENES.put("S38", new SCENE("Narrator", "Day7", "ฉากที่ 3 — ช่วงเย็นริมแม่น้ำ", null, null, null, "S39", null, null, null));
+    SCENES.put("S39", new SCENE("Narrator", "Day7", "หลังจากเดินเล่นมาทั้งวัน คุณสองคนไปนั่งที่ริมแม่น้ำ", null, null, null, "S40", null, null, null));
+    SCENES.put("S40", new SCENE("Narrator", "Day7", "พระอาทิตย์กำลังตก ท้องฟ้าเปลี่ยนเป็นสีส้มชมพู", null, null, null, "S41", null, null, null));
+    SCENES.put("S41", new SCENE("Narrator", "Day7", "ลมเย็นพัดผมคุณปลิว", null, null, null, "S42", null, null, null));
+    SCENES.put("S42", new SCENE("Narrator", "Day7", "เขาเอื้อมมือมาจัดผมให้เบา ๆ", null, null, null, "S43", null, null, null));
+    SCENES.put("S43", new SCENE("Kim Jae-hyun", "Day7", "“เดี๋ยวเข้าตา”", null, null, null, "S44", null, null, null));
+    SCENES.put("S44", new SCENE("Narrator", "Day7", "สัมผัสนั้นนุ่มนวลมาก ใกล้จนคุณได้ยินเสียงหัวใจเขา", null, null, null, "S45", null, null, null));
+    SCENES.put("S45", new SCENE("Narrator", "Day7", "เงียบไปครู่หนึ่ง", null, null, null, "S46", null, null, null));
+    SCENES.put("S46", new SCENE("Kim Jae-hyun", "Day7", "“เราดีใจนะที่วันนี้เธอมาด้วย”", null, null, null, "S47", null, null, null));
+    SCENES.put("S47", new SCENE("Narrator", "Day7", "เสียงเขาจริงใจกว่าทุกครั้ง", null, null, null, "S48", null, null, null));
+    SCENES.put("S48", new SCENE("Kim Jae-hyun", "Day7", "“ช่วงนี้…เราคิดถึงเธอบ่อยมากเลย”", null, null, null, "S49", null, null, null));
+    SCENES.put("S49", new SCENE("Narrator", "Day7", "หัวใจคุณเต้นแรงจนแทบควบคุมไม่อยู่", null, null, null, "Q4", null, null, null));
+
+    SCENES.put("Q4", new SCENE("คุณ", "Day7", "คำถามที่ 4 — จะตอบยังไง",
+            "A) “เราก็คิดถึงเธอเหมือนกัน”",
+            "B) “เหรอ” (เขินจนพูดไม่ออก)",
+            "C) “อย่าพูดแบบนั้นสิ”",
+            null, "Q4_A", "Q4_B", "Q4_C"));
+
+    SCENES.put("Q4_A", new SCENE("คุณ", "Day7", "“เราก็คิดถึงเธอเหมือนกัน”", null, null, null, "S50", null, null, null));
+    SCENES.put("Q4_B", new SCENE("คุณ", "Day7", "“เหรอ”", null, null, null, "S50", null, null, null));
+    SCENES.put("Q4_C", new SCENE("คุณ", "Day7", "“อย่าพูดแบบนั้นสิ”", null, null, null, "S50", null, null, null));
+
+    SCENES.put("S50", new SCENE("Narrator", "Day7", "ฉากที่ 4 — เดินกลับตอนกลางคืน", null, null, null, "S51", null, null, null));
+    SCENES.put("S51", new SCENE("Narrator", "Day7", "ไฟถนนเปิดสว่าง ผู้คนบางตาลง", null, null, null, "S52", null, null, null));
+    SCENES.put("S52", new SCENE("Narrator", "Day7", "มือของคุณกับเขาแกว่งไปมาใกล้กัน ใกล้จนแทบจะประสานกันได้", null, null, null, "S53", null, null, null));
+    SCENES.put("S53", new SCENE("Narrator", "Day7", "จังหวะหนึ่ง มือชนกันจริง ๆ ไม่มีใครชักออก", null, null, null, "S54", null, null, null));
+    SCENES.put("S54", new SCENE("Narrator", "Day7", "นิ้วก้อยแตะกัน ก่อนที่เขาจะกระซิบ", null, null, null, "S55", null, null, null));
+    SCENES.put("S55", new SCENE("Kim Jae-hyun", "Day7", "“เราถามอะไรหน่อยได้ไหม”", null, null, null, "S56", null, null, null));
+    SCENES.put("S56", new SCENE("Narrator", "Day7", "คุณหันไปมอง", null, null, null, "S57", null, null, null));
+    SCENES.put("S57", new SCENE("Kim Jae-hyun", "Day7", "“ตอนนี้…เรากำลังจีบกันอยู่ใช่ไหม”", null, null, null, "Q5", null, null, null));
+
+    SCENES.put("Q5", new SCENE("คุณ", "Day7", "คำถามที่ 5 — สถานะ",
+            "A) “ใช่…แล้วเธอล่ะคิดว่าไง”",
+            "B) “ก็…มั้ง”",
+            "C) “ไม่รู้สิ”",
+            null, "Q5_A", "Q5_B", "Q5_C"));
+
+    SCENES.put("Q5_A", new SCENE("คุณ", "Day7", "“ใช่…แล้วเธอล่ะคิดว่าไง”", null, null, null, "S58", null, null, null));
+    SCENES.put("Q5_B", new SCENE("คุณ", "Day7", "“ก็…มั้ง”", null, null, null, "S58", null, null, null));
+    SCENES.put("Q5_C", new SCENE("คุณ", "Day7", "“ไม่รู้สิ”", null, null, null, "S58", null, null, null));
+
+    SCENES.put("S58", new SCENE("Narrator", "Day7", "เขาจะหยุดเดิน หันมาหาคุณตรง ๆ", null, null, null, "S59", null, null, null));
+    SCENES.put("S59", new SCENE("Narrator", "Day7", "แสงไฟสะท้อนดวงตาเขา", null, null, null, "S60", null, null, null));
+    SCENES.put("S60", new SCENE("Kim Jae-hyun", "Day7", "“งั้น…ให้เราได้จีบเธอแบบจริงจังเลยได้ไหม”", null, null, null, "S61", null, null, null));
+    SCENES.put("S61", new SCENE("Narrator", "Day7", "มือเขายังจับมือคุณอยู่ อุ่นมาก มั่นคงมาก", null, null, null, "S62", null, null, null));
+    SCENES.put("S62", new SCENE("Narrator", "Day7", "แต่ยังไม่เรียกว่าแฟน", null, null, null, "S63", null, null, null));
+    SCENES.put("S63", new SCENE("Narrator", "Day7", "ทุกอย่างจะถูกตัดสิน ในวันพรุ่งนี้", null, null, null, "S64", null, null, null));
+    SCENES.put("S64", new SCENE("Narrator", "Day7", "จบ DAY 7", null, null, null, "S65", null, null, null));
+    SCENES.put("S65", new SCENE("Narrator", "Day7", "คืนนี้คุณนอนพร้อมรอยยิ้ม และคำถามในหัว", null, null, null, "S66", null, null, null));
+    SCENES.put("S66", new SCENE("Narrator", "Day7", "พรุ่งนี้… ความสัมพันธ์นี้จะกลายเป็นอะไร", null, null, null, "END", null, null, null));
+}
+
 
     private void SHOW_SCENE(String ID) {
-        CURRENT_ID = ID;
-        SCENE S = SCENES.get(ID);
-        if (S == null) return;
+    CURRENT_ID = ID;
+    SCENE S = SCENES.get(ID);
+    if (S == null) return;
 
-        DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
-        DIALOG.repaint();
-
-        int COUNT = 0;
-        if (S.C1 != null) COUNT++;
-        if (S.C2 != null) COUNT++;
-        if (S.C3 != null) COUNT++;
-
-        boolean HAS_CHOICES = COUNT >= 2;
-
-        CHOICE_PANEL.setVisible(HAS_CHOICES);
-
-        BTN_CHOICE1.setVisible(HAS_CHOICES && S.C1 != null);
-        BTN_CHOICE2.setVisible(HAS_CHOICES && S.C2 != null);
-        BTN_CHOICE3.setVisible(HAS_CHOICES && S.C3 != null);
-
-        if (HAS_CHOICES) {
-            if (S.C1 != null) BTN_CHOICE1.setText(S.C1);
-            if (S.C2 != null) BTN_CHOICE2.setText(S.C2);
-            if (S.C3 != null) BTN_CHOICE3.setText(S.C3);
-        }
-
-        LAYOUT_UI();
+    // 🔥 ดึงเลขฉากออกมา
+    int sceneNumber = -1;
+    if (ID.startsWith("S")) {
+        try {
+            sceneNumber = Integer.parseInt(ID.substring(1));
+        } catch (Exception ignored) {}
     }
+
+    // ห้องนอน (S1 - S10)
+    if (sceneNumber >= 1 && sceneNumber <= 13) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องนอน.jpg");
+    }
+
+    // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
+    else if ((sceneNumber >= 14 && sceneNumber <= 19) || ID.startsWith("Q1")) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สถานีรถไฟฟ้า.jpg");
+    }
+    // ห้องเรียน (S21 - S30)
+    else if (sceneNumber >= 20 && sceneNumber <= 26) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สวนสนุก.jpg");
+    }
+    // พักกลางวัน (S27 - S44)
+    else if (sceneNumber >= 27 && sceneNumber <= 37) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/บนชิงช้า.png");
+    }
+    // ทางเดิน/เย็น (S45 - S50)
+    else if (sceneNumber >= 38 && sceneNumber <= 49) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ตอนเย็น.png");
+    }
+    else if (sceneNumber >= 50 && sceneNumber <= 64) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ทางเดินตอนกลางคืน.jpg");
+    }
+
+    DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
+    DIALOG.repaint();
+
+    boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
+    CHOICE_PANEL.setVisible(HAS_CHOICES);
+    BTN_CHOICE1.setVisible(HAS_CHOICES);
+    BTN_CHOICE2.setVisible(HAS_CHOICES);
+
+
+    if (HAS_CHOICES) {
+        BTN_CHOICE1.setText(S.C1);
+        BTN_CHOICE2.setText(S.C2);
+        BTN_CHOICE3.setText(S.C3);
+    }
+}
 
     private void GOTO_NEXT_BY_CLICK() {
         SCENE S = SCENES.get(CURRENT_ID);
         if (S == null) return;
-
-        int COUNT = 0;
-        if (S.C1 != null) COUNT++;
-        if (S.C2 != null) COUNT++;
-        if (S.C3 != null) COUNT++;
-
-        if (COUNT >= 2) return;
+        boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
+        if (HAS_CHOICES) return;
         if (S.NEXT != null) SHOW_SCENE(S.NEXT);
     }
 
@@ -366,26 +434,26 @@ public class Day7 {
     }
 
     static class BGVIEW extends JPanel {
-        private final Image ORIG;
-        private Image SCALED;
+    private Image ORIG;
 
-        BGVIEW(String PATH) {
-            ORIG = new ImageIcon(PATH).getImage();
-        }
+    BGVIEW(String PATH) {
+        SET_BG(PATH);
+    }
 
-        void REPAINT_BG() {
-            if (getWidth() <= 0 || getHeight() <= 0) return;
-            SCALED = ORIG.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-            repaint();
-        }
+    void SET_BG(String PATH) {
+        ORIG = new ImageIcon(PATH).getImage();
+        repaint();   // เรียกครั้งเดียวพอ
+    }
 
-        @Override
-        protected void paintComponent(Graphics G) {
-            super.paintComponent(G);
-            if (SCALED == null) REPAINT_BG();
-            if (SCALED != null) G.drawImage(SCALED, 0, 0, getWidth(), getHeight(), this);
+    @Override
+    protected void paintComponent(Graphics G) {
+        super.paintComponent(G);
+
+        if (ORIG != null) {
+            G.drawImage(ORIG, 0, 0, getWidth(), getHeight(), this);
         }
     }
+}
 
     static class DIALOGPANEL extends JPanel {
         private String NAME;
