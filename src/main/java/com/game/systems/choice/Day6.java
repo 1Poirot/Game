@@ -363,8 +363,8 @@ public class Day6 {
         BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สวนสนุก.jpg");
     }
     // พักกลางวัน (S27 - S44)
-    else if (sceneNumber >= 27 && sceneNumber <= 44) {
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงอาหาร.jpg");
+    else if (sceneNumber >= 27 && sceneNumber <= 37) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/บนชิงช้า.png");
     }
     // ทางเดิน/เย็น (S45 - S50)
     else if (sceneNumber >= 45 && sceneNumber <= 50) {
