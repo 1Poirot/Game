@@ -1,18 +1,25 @@
 package com.game.systems.choice;
 
+<<<<<<< HEAD
 import com.game.systems.affection.AffectionManager;
 import com.game.systems.affection.CharacterRoute;
 import com.game.ui.AffectionBar;
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 
+<<<<<<< HEAD
 
 public class Day2 {
 
     private AffectionBar affectionBar;
+=======
+public class Day2 {
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
     private static final Font NAME_FONT = new Font("Leelawadee UI", Font.BOLD, 20);
     private static final Font DAY_FONT = new Font("Leelawadee UI", Font.PLAIN, 16);
@@ -52,9 +59,12 @@ public class Day2 {
 
         CHAR_ORIG = LOAD_IMAGE_SAFE("char.png");
 
+<<<<<<< HEAD
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
 
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
         CHOICE_PANEL = new JPanel(null);
         CHOICE_PANEL.setOpaque(false);
         BG_VIEW.add(CHOICE_PANEL);
@@ -100,11 +110,14 @@ public class Day2 {
         SHOW_SCENE(CURRENT_ID);
         LAYOUT_UI();
         
+<<<<<<< HEAD
        if (affectionBar != null) {
     int barW = 320;   // ขนาดกำลังดี
     int barH = 85;    // เตี้ยลง
     affectionBar.setBounds(40, 25, barW, barH);
 }
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
     }
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
@@ -174,8 +187,11 @@ public class Day2 {
         BG_VIEW.setComponentZOrder(DIALOG, 0);
         BG_VIEW.setComponentZOrder(LABEL_CHARACTER, 2);
 
+<<<<<<< HEAD
         BG_VIEW.setComponentZOrder(affectionBar, 0);
 
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
         BG_VIEW.revalidate();
         BG_VIEW.repaint();
     }
@@ -220,7 +236,11 @@ public class Day2 {
         });
     }
 
+<<<<<<< HEAD
        private void BUILD_STORY() {
+=======
+    private void BUILD_STORY() {
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
         SCENES.clear();
 
         SCENES.put("S1", new SCENE("ผู้บรรยาย", "Day2", "DAY 2 — ระยะห่างที่เริ่มเปลี่ยน", null, null, null, "S2", null, null, null));
@@ -451,7 +471,10 @@ public class Day2 {
         BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ฝนตก.png");
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
     DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
     DIALOG.repaint();
 
@@ -459,7 +482,10 @@ public class Day2 {
     CHOICE_PANEL.setVisible(HAS_CHOICES);
     BTN_CHOICE1.setVisible(HAS_CHOICES);
     BTN_CHOICE2.setVisible(HAS_CHOICES);
+<<<<<<< HEAD
     BTN_CHOICE3.setVisible(HAS_CHOICES);    
+=======
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
 
 
     if (HAS_CHOICES) {
@@ -477,6 +503,7 @@ public class Day2 {
         if (S.NEXT != null) SHOW_SCENE(S.NEXT);
     }
 
+<<<<<<< HEAD
    private void PICK(int INDEX) {
     SCENE S = SCENES.get(CURRENT_ID);
     if (S == null) return;
@@ -528,6 +555,16 @@ public class Day2 {
     if (INDEX == 3 && S.NEXT3 != null) SHOW_SCENE(S.NEXT3);
 }
 
+=======
+    private void PICK(int INDEX) {
+        SCENE S = SCENES.get(CURRENT_ID);
+        if (S == null) return;
+        if (INDEX == 1 && S.NEXT1 != null) SHOW_SCENE(S.NEXT1);
+        if (INDEX == 2 && S.NEXT2 != null) SHOW_SCENE(S.NEXT2);
+        if (INDEX == 3 && S.NEXT3 != null) SHOW_SCENE(S.NEXT3);
+    }
+
+>>>>>>> 5e8955589ff8da3fc95ac1206d204e00285dd87f
     public static void main(String[] ARGS) {
         SwingUtilities.invokeLater(() -> new Day2().CREATEANDSHOWGUI());
     }
