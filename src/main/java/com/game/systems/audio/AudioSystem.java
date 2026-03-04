@@ -6,15 +6,9 @@ import javax.sound.sampled.*;
 
 public class AudioSystem {
     private Clip bgmClip;
-<<<<<<< HEAD
-    private String currentBGMPath ="";
-    private String lastFileName = "Dream.wav"; // ✅ แทรก: เก็บชื่อไฟล์ล่าสุดที่ส่งเข้ามา (เช่น "audiotest.wav")
-    private float currentVolume = 0.8f; 
-=======
     private String currentBGMPath = "";
     private String lastFileName = ""; // ✅ แทรก: เก็บชื่อไฟล์ล่าสุดที่ส่งเข้ามา (เช่น "audiotest.wav")
     private float currentVolume = 0.8f;
->>>>>>> c9083940bf6486e9ed4a371c14605321fe80f71b
 
     // ================== ระบบปรับระดับเสียง ==================
 
