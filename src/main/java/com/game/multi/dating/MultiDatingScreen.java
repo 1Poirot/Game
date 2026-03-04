@@ -8,7 +8,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map; // ✅ เพิ่ม import สำหรับ MenuGame (ตรวจสอบชื่อและแพ็กเกจให้ตรงกับไฟล์ในโปรเจกต์ของคุณ)
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -47,6 +47,10 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
         this.client = client;
         this.controller = controller;
         this.parentScreen = parent;
+
+        if (this.client != null) {
+            this.client.setMessageListener(this);
+        }
 
         setTitle("💕 ศึกชิงนาง Online - ห้องแข่งจริง");
         setSize(1100, 750);
@@ -153,7 +157,7 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
                 case "สร้อยคอ":
                     bonus = 3;
                     exp = "ผู้หญิง เขิน.png";
-                    msg = "ขอบคุณน้าาาา 😊";
+                    msg = "ขอบคุณน้าาาา เธอนี้น่ารักสุดๆๆ ไปเลยย😊";
                     break;
 
                 case "กาแฟ": // ใน Shop คุณใช้ชื่อ "กาแฟ"
@@ -161,7 +165,7 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
                 case "โดนัท":
                     bonus = 2;
                     exp = "ผู้หญิง ยิ้ม.png";
-                    msg = "ขอบใจน้า ❤";
+                    msg = "ขอบใจน้า เธอใจดีจังงง ❤";
                     break;
 
                 default:
@@ -191,12 +195,12 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 // พื้นหลังไล่เฉดสีขาวนวลไปชมพูอ่อน
                 GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 240, 245));
                 g2d.setPaint(gp);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
-                
+
                 // เส้นขอบสีชมพูเข้มแบบหนาพรีเมียม
                 g2d.setColor(new Color(255, 105, 180));
                 g2d.setStroke(new BasicStroke(5));
@@ -237,11 +241,12 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
         });
 
         // ข้อความแสดงสถานะเสียงปัจจุบัน
-        lbVolume.setText(sound.getVolume() == 0 ? "Muted 🔇" : "Music Volume: " + (int)(sound.getVolume()*100) + "%");
+        lbVolume.setText(
+                sound.getVolume() == 0 ? "Muted 🔇" : "Music Volume: " + (int) (sound.getVolume() * 100) + "%");
 
         // ปุ่มคำสั่ง
         Font btnFont = new Font("Tahoma", Font.BOLD, 18);
-        
+
         JButton btnResume = createStyledMenuBtn("กลับเข้าสู่เกม", new Color(255, 182, 193), btnFont);
         btnResume.setForeground(new Color(150, 20, 80));
         btnResume.addActionListener(e -> settings.dispose());
@@ -249,9 +254,9 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
         JButton btnLeave = createStyledMenuBtn("ออกจากเกม", new Color(255, 99, 71), btnFont);
         btnLeave.setForeground(Color.WHITE);
         btnLeave.addActionListener(e -> {
-            int res = JOptionPane.showConfirmDialog(settings, 
-                "คุณแน่ใจนะว่าจะออก ?", "Confirm Exit",
-                JOptionPane.YES_NO_OPTION);
+            int res = JOptionPane.showConfirmDialog(settings,
+                    "คุณแน่ใจนะว่าจะออก ?", "Confirm Exit",
+                    JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION) {
                 settings.dispose();
                 exitAndGoToMain();
@@ -312,44 +317,84 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
     // ======================================================
     // ✅ GameClient.MessageListener Implementation
     // ======================================================
+    // ======================================================
+    // ✅ GameClient.MessageListener Implementation
+    // ======================================================
     @Override
     public void onRejected(String reason) {
+        // 1. หยุดลอจิกเกมทันที
+        if (timer != null)
+            timer.stop();
+        sound.stopBGM();
+
         SwingUtilities.invokeLater(() -> {
-            // 1. หยุดเสียงและไทม์เมอร์
-            sound.stopBGM();
-            if (timer != null) timer.stop();
+            // 2. ปิดหน้าจอนี้ทิ้งทันที (หายวับไปจากสายตา)
+            this.setVisible(false);
 
-            // 2. แสดงแจ้งเตือน
-            JOptionPane.showMessageDialog(null, 
-                "<html><font face='Tahoma'>⚠️ <b>การเชื่อมต่อสิ้นสุด</b><br>" + reason + "</font></html>", 
-                "แจ้งเตือนจากเซิร์ฟเวอร์", 
-                JOptionPane.ERROR_MESSAGE);
+            // 3. แจ้งเตือน (ใส่ null เพื่อให้ลอยอิสระ ไม่โดนดึงปิดตามหน้าจอ)
+            JOptionPane.showMessageDialog(null,
+                    "<html><font face='Tahoma'>⚠️ <b>การเชื่อมต่อสิ้นสุด</b><br>" + reason + "</font></html>",
+                    "แจ้งเตือนระบบ",
+                    JOptionPane.ERROR_MESSAGE);
 
-            // 3. ตัดการเชื่อมต่อและล้างหน้าจอ
-            if (client != null) client.disconnect();
-            
-            // ปิดหน้า Lobby เดิม (ถ้ามี)
-            if (parentScreen != null) parentScreen.dispose();
-            
-            // ปิดหน้าจอการเล่นปัจจุบัน
-            this.dispose();
+            // 4. ตัดเน็ตเวิร์ก
+            if (client != null)
+                client.disconnect();
 
-            // 4. กลับหน้าเมนูผ่าน Controller
+            // 5. ✅ กวาดล้างทุกหน้าต่าง (กวาดหน้า Lobby และ Settings ให้เกลี้ยง)
+            for (Window window : Window.getWindows()) {
+                if (window != null) {
+                    window.setVisible(false);
+                    window.dispose();
+                }
+            }
+
+            // 6. กลับหน้าเมนู
             if (controller != null) {
                 controller.showMainMenu();
             }
         });
     }
 
-    // เมธอดเหล่านี้ต้องใส่ไว้ให้ครบตาม Interface แม้ไม่ได้ใช้งานในหน้านี้
-    @Override public void onPlayerListUpdate(java.util.List<String> players) {}
-    @Override public void onGameStart() {}
-    @Override public void onSystemMessage(String message) {}
-    @Override public void onConnectionFailed(String ip) {}
-    @Override public void onScoreUpdate(String message) {}
-    @Override public void onWinner(String winnerName) {}
-    @Override public void onFinalScore() {}
-    @Override public void onFinalScoreItem(String playerName, int score) {}
+    // เมธอด Listener อื่นๆ คงเดิมตามโครงสร้าง Interface
+    @Override
+    public void onPlayerListUpdate(java.util.List<String> players) {
+    }
+
+    @Override
+    public void onGameStart() {
+    }
+
+    @Override
+    public void onSystemMessage(String message) {
+    }
+
+    @Override
+    public void onConnectionFailed(String ip) {
+    }
+
+    @Override
+    public void onScoreUpdate(String message) {
+    }
+
+    @Override
+    public void onWinner(String winnerName) {
+    }
+
+    @Override 
+    public void onFinalScore() {
+        // เมื่อ Server บอกว่าสรุปคะแนน ให้ส่งคำสั่งนี้ไปให้หน้า Lobby ทำงานต่อ
+        if (parentScreen != null) {
+            parentScreen.onFinalScore();
+        }
+    }
+
+    @Override
+    public void onFinalScoreItem(String playerName, int score) {
+        if (parentScreen != null) {
+            parentScreen.onFinalScoreItem(playerName, score);
+        }
+    }
 
     // ✅ แก้ไข: ลอจิกจบเกม (แยกขาดระหว่างเล่นคนเดียว กับ เล่นหลายคน)
     // ✅ แก้ไข: ลอจิกจบเกม (เล่นคนเดียวจบเลย / เล่นหลายคน "ต้อง" ค้างหน้ารอ Server
