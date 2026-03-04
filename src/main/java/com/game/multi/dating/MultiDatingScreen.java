@@ -155,7 +155,7 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
             switch (item.trim()) {
                 case "ดอกไม้": // ต้องตรงกับใน Shop
                 case "สร้อยคอ":
-                    bonus = 3;
+                    bonus = 20;
                     exp = "ผู้หญิง เขิน.png";
                     msg = "ขอบคุณน้าาาา เธอนี้น่ารักสุดๆๆ ไปเลยย😊";
                     break;
@@ -163,13 +163,13 @@ public class MultiDatingScreen extends JFrame implements GameClient.MessageListe
                 case "กาแฟ": // ใน Shop คุณใช้ชื่อ "กาแฟ"
                 case "ช็อกโกแลต": // ใน Shop คุณใช้ ต เต่า (ช็อกโกแลต)
                 case "โดนัท":
-                    bonus = 2;
+                    bonus = 15;
                     exp = "ผู้หญิง ยิ้ม.png";
                     msg = "ขอบใจน้า เธอใจดีจังงง ❤";
                     break;
 
                 default:
-                    bonus = 1;
+                    bonus = 10;
                     msg = "อืม ขอบคุณ"; // ถ้าชื่อไม่ตรงกันเลย มันจะมาตกที่นี่
                     break;
             }
