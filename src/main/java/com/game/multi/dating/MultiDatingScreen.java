@@ -326,49 +326,44 @@ public class MultiDatingScreen extends JFrame {
     // ✅ เมธอดแสดงหน้าสรุปผล (Ranking 1, 2, 3 + ลอจิกแฟนคู่)
     // ✅ เมธอดแสดงหน้าสรุปผล (แก้ลอจิก Ranking ให้แม่นยำ ไม่เป็นที่ 1 กันทุกคน)
     public void showFinalResults(Map<String, Integer> allScores) {
-        // ✅ 1. เพิ่มเกราะป้องกัน: ถ้าไม่มีข้อมูลคะแนนเลย
-        // ให้ใส่คะแนนเราคนเดียวป้องกันโปรแกรมพัง
         if (allScores == null || allScores.isEmpty()) {
             allScores = new HashMap<>();
-            String name = (client != null) ? client.getPlayerName() : "คุณ";
-            allScores.put(name, score);
+            allScores.put((client != null) ? client.getPlayerName() : "คุณ", score);
         }
 
         String myName = (client != null) ? client.getPlayerName() : "คุณ";
 
-        // --- ส่วนวาด Dialog เหมือนเดิม ---
         JDialog resultDlg = new JDialog(this, "บทสรุปความรัก", true);
         resultDlg.setUndecorated(true);
-        resultDlg.setSize(500, 650);
+        resultDlg.setSize(480, 620);
         resultDlg.setLocationRelativeTo(this);
+        resultDlg.setBackground(new Color(0, 0, 0, 0));
 
-        JPanel p = new JPanel(new BorderLayout()) {
+        JPanel root = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 192, 203), 0, getHeight(), Color.WHITE);
+                GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 240, 245));
                 g2.setPaint(gp);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
                 g2.setColor(new Color(255, 20, 147));
-                g2.setStroke(new BasicStroke(6));
-                g2.drawRoundRect(3, 3, getWidth() - 7, getHeight() - 7, 40, 40);
+                g2.setStroke(new BasicStroke(5));
+                g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 50, 50);
                 g2.dispose();
             }
         };
-        p.setOpaque(false);
-        p.setBorder(new EmptyBorder(35, 40, 35, 40));
+        root.setOpaque(false);
+        root.setBorder(new EmptyBorder(30, 35, 30, 35));
 
-        // ✅ 2. จัดลำดับคะแนน
+        // --- 🏆 จัดลำดับและคำนวณ Rank ---
         java.util.List<Map.Entry<String, Integer>> sortedList = allScores.entrySet().stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .collect(java.util.stream.Collectors.toList());
 
-        // ✅ 3. คำนวณอันดับด้วยความปลอดภัย (เช็ค Size ก่อน Get)
         int myScore = allScores.getOrDefault(myName, 0);
-        int myRank = 1;
         int maxScore = sortedList.isEmpty() ? 0 : sortedList.get(0).getValue();
-
+        int myRank = 1;
         for (Map.Entry<String, Integer> entry : sortedList) {
             if (entry.getValue() > myScore)
                 myRank++;
@@ -377,7 +372,7 @@ public class MultiDatingScreen extends JFrame {
         long winnersCount = sortedList.stream().filter(e -> e.getValue() == maxScore).count();
         boolean isTieAtFirst = (winnersCount > 1);
 
-        // --- ลอจิกข้อความเดิม ---
+        // --- 💬 คืนค่าลอจิกข้อความกวนๆ (ต้นฉบับ) ---
         String statusMsg;
         Color statusColor;
         if (isTieAtFirst && myScore == maxScore && allScores.size() > 1) {
@@ -394,74 +389,90 @@ public class MultiDatingScreen extends JFrame {
             statusColor = Color.RED;
         }
 
+        // ปรับ JLabel ให้รองรับ HTML เพื่อให้ข้อความยาวๆ ตัดบรรทัดได้
         JLabel lbStatus = new JLabel("<html><center>" + statusMsg + "</center></html>", SwingConstants.CENTER);
         lbStatus.setFont(new Font("Tahoma", Font.BOLD, 22));
         lbStatus.setForeground(statusColor);
-        lbStatus.setBorder(new EmptyBorder(0, 0, 20, 0));
-        p.add(lbStatus, BorderLayout.NORTH);
+        lbStatus.setPreferredSize(new Dimension(400, 80)); // จองที่ให้ข้อความ 2 บรรทัด
+        lbStatus.setBorder(new EmptyBorder(0, 0, 15, 0));
+        root.add(lbStatus, BorderLayout.NORTH);
 
-        // --- 📊 4. รายการ Leaderboard ---
-        JPanel listP = new JPanel();
-        listP.setLayout(new BoxLayout(listP, BoxLayout.Y_AXIS));
-        listP.setOpaque(false);
-
-        int displayRank = 1;
-        int lastScore = -1;
-        int actualRank = 0;
+        // --- 📊 ส่วนรายการคะแนน (Leaderboard) ---
+        JPanel listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+        listPanel.setOpaque(false);
 
         for (int i = 0; i < sortedList.size(); i++) {
             Map.Entry<String, Integer> entry = sortedList.get(i);
-
-            // ลอจิกแสดงเลขลำดับ (ถ้าคะแนนเท่ากัน ให้ลำดับเลขเดียวกัน)
-            if (entry.getValue() != lastScore) {
-                actualRank = i + 1;
-            }
-            lastScore = entry.getValue();
-
-            JPanel item = new JPanel(new BorderLayout());
-            item.setOpaque(true);
             boolean isMe = entry.getKey().equals(myName);
-            item.setBackground(isMe ? new Color(255, 20, 147, 40) : Color.WHITE);
-            item.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(255, 182, 193), 2, true),
-                    new EmptyBorder(12, 25, 12, 25)));
 
-            JLabel nameLbl = new JLabel(actualRank + ". " + entry.getKey() + (isMe ? " (YOU)" : ""));
-            nameLbl.setFont(new Font("Tahoma", Font.BOLD, 18));
+            JPanel itemCard = new JPanel(new BorderLayout()) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setColor(isMe ? new Color(255, 182, 193, 150) : Color.WHITE);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                    g2.setColor(new Color(255, 20, 147, 50));
+                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                    g2.dispose();
+                }
+            };
+            itemCard.setOpaque(false);
+            itemCard.setBorder(new EmptyBorder(12, 25, 12, 25));
+            itemCard.setMaximumSize(new Dimension(420, 60));
 
-            JLabel scoreLbl = new JLabel(entry.getValue() + " แต้ม");
-            scoreLbl.setFont(new Font("Tahoma", Font.BOLD, 20));
-            scoreLbl.setForeground(new Color(255, 20, 147));
+            JLabel nameLabel = new JLabel((i + 1) + ". " + entry.getKey() + (isMe ? " (YOU)" : ""));
+            nameLabel.setFont(new Font("Tahoma", isMe ? Font.BOLD : Font.PLAIN, 18));
 
-            item.add(nameLbl, BorderLayout.WEST);
-            item.add(scoreLbl, BorderLayout.EAST);
-            item.setMaximumSize(new Dimension(420, 60));
-            listP.add(item);
-            listP.add(Box.createRigidArea(new Dimension(0, 12)));
+            JLabel scoreLabel = new JLabel(entry.getValue() + " แต้ม");
+            scoreLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
+            scoreLabel.setForeground(new Color(255, 20, 147));
+
+            itemCard.add(nameLabel, BorderLayout.WEST);
+            itemCard.add(scoreLabel, BorderLayout.EAST);
+
+            listPanel.add(itemCard);
+            listPanel.add(Box.createRigidArea(new Dimension(0, 12)));
         }
 
-        JScrollPane scroll = new JScrollPane(listP);
+        JScrollPane scroll = new JScrollPane(listPanel);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
-        p.add(scroll, BorderLayout.CENTER);
+        root.add(scroll, BorderLayout.CENTER);
 
-        JButton btnClose = new JButton("ตกลง");
-        btnClose.setFont(new Font("Tahoma", Font.BOLD, 20));
-        btnClose.setBackground(new Color(255, 20, 147));
+        // --- 🔘 ส่วนปุ่มปิด (Footer) ---
+        JButton btnClose = new JButton("ตกลง") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(255, 20, 147));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        btnClose.setFont(new Font("Tahoma", Font.BOLD, 18));
         btnClose.setForeground(Color.WHITE);
+        btnClose.setContentAreaFilled(false);
+        btnClose.setBorderPainted(false);
+        btnClose.setFocusPainted(false);
         btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnClose.setPreferredSize(new Dimension(160, 45));
         btnClose.addActionListener(e -> {
             resultDlg.dispose();
             exitAndGoToMain();
         });
 
-        JPanel btnP = new JPanel(new FlowLayout());
-        btnP.setOpaque(false);
-        btnP.add(btnClose);
-        p.add(btnP, BorderLayout.SOUTH);
+        JPanel btnWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnWrapper.setOpaque(false);
+        btnWrapper.setBorder(new EmptyBorder(20, 0, 0, 0));
+        btnWrapper.add(btnClose);
+        root.add(btnWrapper, BorderLayout.SOUTH);
 
-        resultDlg.add(p);
+        resultDlg.add(root);
         resultDlg.setVisible(true);
     }
 
@@ -575,35 +586,79 @@ public class MultiDatingScreen extends JFrame {
 
     private void styleComponents() {
         // --- ปรับแต่ง Heart Bar (หลอดหัวใจ) ---
+        heartBar.setPreferredSize(new Dimension(300, 42));
         heartBar.setUI(new BasicProgressBarUI() {
             @Override
             protected void paintDeterminate(Graphics g, JComponent c) {
-                Graphics2D g2d = (Graphics2D) g;
+                Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                int w = c.getWidth(), h = c.getHeight();
-                int mw = (int) (w * heartBar.getPercentComplete());
+                int w = c.getWidth();
+                int h = c.getHeight();
 
-                // วาดพื้นหลังหลอด (สีขาวจางๆ)
-                g2d.setColor(new Color(255, 255, 255, 180));
-                g2d.fillRoundRect(0, 0, w, h, 20, 20);
+                // --- 1. การคำนวณตำแหน่ง (Dynamic Positioning) ---
+                int circleSize = h; // วงกลมสูงเท่าหลอด
+                int barH = (int) (h * 0.55); // ตัวหลอดบางลงเพื่อให้ดูแพง
+                int barY = (h - barH) / 2;
+                int barX = circleSize / 2; // หลอดเริ่มจากกลางวงกลม
+                int barW = w - barX - 5;
 
-                // วาดส่วนที่มีคะแนน (ไล่เฉดสีชมพู)
-                if (mw > 0) {
-                    g2d.setPaint(new GradientPaint(0, 0, new Color(255, 20, 147), mw, 0, new Color(255, 105, 180)));
-                    g2d.fillRoundRect(0, 0, mw, h, 20, 20);
+                // --- 2. วาดตัวหลอด (Bar Background) ---
+                // ขอบชมพูเข้มบางๆ
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.fillRoundRect(barX, barY, barW, barH, 20, 20);
+                // พื้นในขาวนวล
+                g2d.setColor(new Color(255, 245, 250));
+                g2d.fillRoundRect(barX + 2, barY + 2, barW - 4, barH - 4, 18, 18);
+
+                // --- 3. วาดแถบพลัง (Progress Fill) ---
+                int progressW = (int) ((barW - 6) * heartBar.getPercentComplete());
+                if (progressW > 0) {
+                    // ใช้ Gradient ชมพูขาวตามที่ขอ
+                    GradientPaint pinkGrad = new GradientPaint(barX + 3, 0, new Color(255, 20, 147),
+                            barX + 3 + progressW, 0, new Color(255, 182, 193));
+                    g2d.setPaint(pinkGrad);
+                    g2d.fillRoundRect(barX + 3, barY + 3, progressW, barH - 6, 15, 15);
                 }
 
-                // วาดเส้นขอบหลอดให้คมชัด
+                // --- 4. ✅ วาดวงกลมไอคอน (Layered Circle) ---
+                // วงนอกสีชมพู (ขอบบางๆ)
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.fillOval(0, 0, circleSize, circleSize);
+                // วงในสีขาว (เด่นขึ้นมา)
+                g2d.setColor(Color.WHITE);
+                g2d.fillOval(2, 2, circleSize - 4, circleSize - 4);
+                // วงในสุดสีชมพูจางๆ
+                g2d.setColor(new Color(255, 240, 245));
+                g2d.fillOval(4, 4, circleSize - 8, circleSize - 8);
+
+                // --- 5. ✅ วาดหัวใจแบบใช้สมการ (Vector Heart) เพื่อให้อยู่ตรงกลางเป๊ะ! ---
                 g2d.setColor(new Color(255, 20, 147));
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawRoundRect(1, 1, w - 2, h - 2, 20, 20);
+                drawPerfectHeart(g2d, circleSize / 2, circleSize / 2, circleSize / 3);
+
+                g2d.dispose();
+            }
+
+            // ✅ ฟังก์ชันวาดหัวใจให้กึ่งกลางพิกัด x, y
+            private void drawPerfectHeart(Graphics2D g2, int x, int y, int size) {
+                int width = size;
+                int height = size;
+                g2.translate(x, y + 2); // ปรับตำแหน่ง y ลงมานิดหน่อยให้ดูสมดุลสายตา
+
+                // วาดหัวใจโดยใช้สมการปีกสองข้าง
+                g2.fillArc(-width / 2, -height / 2, width / 2, height / 2, 0, 180);
+                g2.fillArc(0, -height / 2, width / 2, height / 2, 0, 180);
+                int[] xPoints = { -width / 2, 0, width / 2 };
+                int[] yPoints = { -height / 8, height / 2, -height / 8 };
+                g2.fillPolygon(xPoints, yPoints, 3);
+
+                g2.translate(-x, -(y + 2)); // คืนค่าแกน
             }
         });
 
-        heartBar.setFont(new Font("Tahoma", Font.BOLD, 18));
-        heartBar.setForeground(Color.WHITE); // ✅ เปลี่ยนสีตัวเลขเป็นสีขาวเพื่อให้ตัดกับหลอดสีชมพู
-        heartBar.setStringPainted(true);
+        heartBar.setOpaque(false);
+        heartBar.setBorderPainted(false);
+        heartBar.setStringPainted(false); // เอาเปอร์เซ็นต์ออก
 
         // --- ✅ แก้ปัญหา Emoji สี่เหลี่ยมที่ Timer ---
         // ใช้ฟอนต์ Segoe UI Emoji เพื่อให้รูปนาฬิกาแสดงผลได้

@@ -58,7 +58,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         setContentPane(root);
 
         // ===== TOP — Title =====
-        JLabel title = new JLabel("💖 ศึกชิงนาง — Lobby", SwingConstants.CENTER);
+        JLabel title = new JLabel("ศึกชิงนาง — Lobby", SwingConstants.CENTER);
         title.setFont(new Font("Tahoma", Font.BOLD, 22));
         title.setForeground(new Color(255, 180, 210));
         root.add(title, BorderLayout.NORTH);
@@ -77,7 +77,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         scoreboardPanel.setPreferredSize(new Dimension(220, 0));
 
-        JLabel sbTitle = new JLabel("📊 รายชื่อผู้เล่น");
+        JLabel sbTitle = new JLabel("รายชื่อผู้เล่น");
         sbTitle.setFont(new Font("Tahoma", Font.BOLD, 16));
         sbTitle.setForeground(new Color(255, 200, 220));
         sbTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -102,7 +102,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         btnPanel.setOpaque(false);
 
         // ✅ ใช้ตัวแปรคลาส btnTalk มาทำเป็นปุ่มเริ่มเกม
-        btnTalk = makeActionButton("🚀 เริ่มเกม", new Color(50, 200, 100));
+        btnTalk = makeActionButton("เริ่มเกม", new Color(50, 200, 100));
         btnTalk.setEnabled(true);
         btnTalk.addActionListener(e -> {
             client.sendAction("START_GAME");
@@ -110,7 +110,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         });
 
         // ✅ ใช้ตัวแปรคลาส btnGift มาทำเป็นปุ่มออกจากห้อง
-        btnGift = makeActionButton("❌ ออกจากห้อง", new Color(220, 50, 50));
+        btnGift = makeActionButton("ออกจากห้อง", new Color(220, 50, 50));
         btnGift.addActionListener(e -> exitRoom());
 
         btnPanel.add(btnTalk);
@@ -167,7 +167,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
     public void onPlayerListUpdate(java.util.List<String> players) {
         SwingUtilities.invokeLater(() -> {
             scoreboardPanel.removeAll();
-            JLabel title = new JLabel("📊 รายชื่อผู้เล่น");
+            JLabel title = new JLabel("รายชื่อผู้เล่น");
             title.setFont(new Font("Tahoma", Font.BOLD, 16));
             title.setForeground(new Color(255, 200, 220));
             scoreboardPanel.add(title);

@@ -142,7 +142,7 @@ public class MultiDatingEventManager {
                                 "ผู้หญิง ตัวเอก.png"));
 
                 // 20. ตัดสินใจ
-                events.add(new MultiDatingEvent("คาเฟ่.jpg", "คือว่า... %name% วันนี้เรารู้สึกดีกับเธอมากนะ",
+                events.add(new MultiDatingEvent("คาเฟ่.jpg", "คือว่า.. %name% วันนี้เรารู้สึกดีกับเธอมากนะ",
                                 "เราเองก็รู้สึกพิเศษกับเธอเหมือนกันนะ", 10,
                                 "ดีใจมากเลยที่ได้ยินแบบนั้น", 5,
                                 "อืม.. ขอบใจนะ %name%", 1,
