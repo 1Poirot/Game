@@ -8,7 +8,7 @@ public class AudioSystem {
     private Clip bgmClip;
     private String currentBGMPath = "";
     private String lastFileName = ""; // ✅ แทรก: เก็บชื่อไฟล์ล่าสุดที่ส่งเข้ามา (เช่น "audiotest.wav")
-    private float currentVolume = 0.8f;
+    private float currentVolume = 0.2f;
 
     // ================== ระบบปรับระดับเสียง ==================
 
