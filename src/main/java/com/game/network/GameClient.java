@@ -127,6 +127,8 @@ public class GameClient {
         else if (msg.startsWith("PLAYER_LIST:")) {
             String data = msg.substring(12);
             List<String> players = Arrays.asList(data.split(","));
+            // ✅ จุดสำคัญที่ต้องเพิ่ม: เก็บรายชื่อลงในตัวแปรของ Class เพื่อให้ getPlayerList() เรียกไปใช้ได้
+            this.playerList = new ArrayList<>(players);
             listener.onPlayerListUpdate(players);
         }
 
@@ -183,4 +185,16 @@ public class GameClient {
     public String getServerIP() {
         return serverIP;
     }
+
+    // ตรวจสอบว่าใน GameClient มีการประกาศ List เก็บชื่อผู้เล่นไว้ไหม
+    // (ปกติมักชื่อล่าสุดที่ update)
+    private List<String> playerList = new ArrayList<>();
+
+    // ✅ เพิ่มเมธอดนี้เพื่อให้ MultiDatingScreen เรียกใช้เพื่อเช็คจำนวนคนในห้อง
+    public List<String> getPlayerList() {
+        return playerList;
+    }
+
+    // และในส่วนที่รับข้อความ PLAYER_LIST จาก Server อย่าลืมอัปเดตตัวแปรนี้ด้วย
+    // เช่น: this.playerList = Arrays.asList(names.split(","));
 }
