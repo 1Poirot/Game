@@ -233,7 +233,6 @@ public class Day1 {
         SCENES.put("S8", new SCENE("ผู้บรรยาย", "Day1", "คุณยืนมอง ป้ายชื่อโรงเรียนที่พรุ่งนี้ต้องเข้าไปเรียน", null, null, null, "S9", null, null, null));
         SCENES.put("S9", new SCENE("คุณ", "Day1", "“โรงเรียนมัธยม เอเวอร์บลู (Everblue High School)”",	null,null,null,"S10" ,null,null,null));
         SCENES.put("S10", new SCENE("คุณ", "Day1", "ชื่อดูสงบ…แต่หัวใจคุณกลับไม่สงบเลยสักนิด", null, null, null, "S11", null, null, null));
-
         SCENES.put("S11", new SCENE("คุณ", "Day1", "เมืองนี้เงียบกว่าที่คิด", null, null, null, "S12", null, null, null));
         SCENES.put("S12", new SCENE("คุณ", "Day1", "ผู้คนดูสุภาพ แต่ก็เหมือนมีระยะห่างบางอย่าง", null, null, null, "S13", null, null, null));
         SCENES.put("S13", new SCENE("ผู้บรรยาย", "Day1", "เหมือนทุกคนรู้จักกันหมดแล้ว ยกเว้น “คุณ”", null, null, null, "S14", null, null, null));
@@ -260,8 +259,8 @@ public class Day1 {
         SCENES.put("S34", new SCENE("ผู้บรรยาย", "Day1", "แต่ก็ไม่ได้เป็นมิตร", null, null, null, "S35", null, null, null));
         SCENES.put("S35", new SCENE("ผู้บรรยาย", "Day1", "วินาทีนั้นเอง", null, null, null, "S36", null, null, null));
         SCENES.put("S36", new SCENE("ผู้บรรยาย", "Day1", "คุณยังไม่รู้เลยว่า การชนกันเพียงครั้งเดียว",null,null,null,"S37" ,null,null,null));
-        SCENES.put("S37", new SCENE("ผู้บรรยาย","Day1","จะเปลี่ยน “7 วันแรก” ของคุณไปตลอดกาล"	,null,null,null,"S38" ,null,null,null));
-        SCENES.put("S38", new SCENE("ผู้บรรยาย","Day1","“หนังสือยังคงกระจายอยู่บนพื้น"	,null,null,null,"S39" ,null,null,null));
+        SCENES.put("S37", new SCENE("ผู้บรรยาย", "Day1", "จะเปลี่ยน “7 วันแรก” ของคุณไปตลอดกาล"	,null,null,null,"S38" ,null,null,null));
+        SCENES.put("S38", new SCENE("ผู้บรรยาย", "Day1", "“หนังสือยังคงกระจายอยู่บนพื้น"	,null,null,null,"S39" ,null,null,null));
         SCENES.put("S39", new SCENE("ผู้บรรยาย", "Day1", "คุณรีบก้มลงเก็บทันที", null, null, null, "S40", null, null, null));
         SCENES.put("S40", new SCENE("ผู้บรรยาย", "Day1", "อีกฝ่ายก็ก้มลงพร้อมกันพอดี", null, null, null, "S41", null, null, null));
         SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day1", "ปลายนิ้วของคุณแตะโดนมือเขาโดยบังเอิญ", null, null, null, "S42", null, null, null));
