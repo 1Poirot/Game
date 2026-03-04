@@ -1,25 +1,41 @@
 package com.game.multi.dating;
 
-public class MultiDatingEvent {
-    private String background, dialog;
-    private String choiceA, choiceB, choiceC;
-    private int scoreA, scoreB, scoreC;
-    private String defaultExpression;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    public MultiDatingEvent(String bg, String dialog, String cA, int sA, String cB, int sB, String cC, int sC,
-            String exp) {
-        this.background = bg;
-        this.dialog = dialog;
-        this.choiceA = cA;
-        this.scoreA = sA;
-        this.choiceB = cB;
-        this.scoreB = sB;
-        this.choiceC = cC;
-        this.scoreC = sC;
-        this.defaultExpression = exp;
+public class MultiDatingEvent {
+    private String background;
+    private String dialog;
+    private String defaultExpression;
+    // ✅ เก็บเป็น List ของ Choice แทนตัวแปรแยก
+    private List<Choice> choices = new ArrayList<>();
+
+    // ✅ คลาสภายในเพื่อเก็บข้อความคู่กับคะแนน
+    public static class Choice {
+        String text;
+        int score;
+
+        public Choice(String text, int score) {
+            this.text = text;
+            this.score = score;
+        }
     }
 
-    // Getters
+    public MultiDatingEvent(String bg, String dlg, String cA, int sA, String cB, int sB, String cC, int sC,
+            String exp) {
+        this.background = bg;
+        this.dialog = dlg;
+        this.defaultExpression = exp;
+        // เพิ่มคำตอบลง List
+        this.choices.add(new Choice(cA, sA));
+        this.choices.add(new Choice(cB, sB));
+        this.choices.add(new Choice(cC, sC));
+
+        // ✅ สลับตำแหน่งทันทีที่สร้าง Event
+        Collections.shuffle(this.choices);
+    }
+
     public String getBackground() {
         return background;
     }
@@ -28,31 +44,16 @@ public class MultiDatingEvent {
         return dialog;
     }
 
-    public String getChoiceA() {
-        return choiceA;
-    }
-
-    public String getChoiceB() {
-        return choiceB;
-    }
-
-    public String getChoiceC() {
-        return choiceC;
-    }
-
-    public int getScoreA() {
-        return scoreA;
-    }
-
-    public int getScoreB() {
-        return scoreB;
-    }
-
-    public int getScoreC() {
-        return scoreC;
-    }
-
     public String getDefaultExpression() {
         return defaultExpression;
+    }
+
+    // ✅ เพิ่มเมธอดสำหรับดึงข้อมูลตามลำดับที่สลับแล้ว
+    public String getChoiceText(int i) {
+        return choices.get(i).text;
+    }
+
+    public int getChoiceScore(int i) {
+        return choices.get(i).score;
     }
 }

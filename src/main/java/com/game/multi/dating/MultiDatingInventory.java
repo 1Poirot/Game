@@ -111,8 +111,21 @@ public class MultiDatingInventory extends JDialog {
 
         useBtn.addActionListener(e -> {
             if (selectedItem != null) {
-                onUse.accept(selectedItem);
-                dispose();
+                // ✅ ดึงจำนวนปัจจุบันมาตรวจสอบ
+                int currentQty = items.getOrDefault(selectedItem, 0);
+
+                if (currentQty > 0) {
+                    // ✅ หักลบจำนวนออก 1 ชิ้น
+                    items.put(selectedItem, currentQty - 1);
+
+                    // ✅ ส่งค่าไปยัง Consumer เพื่อใช้งานลอจิกในหน้าจอหลัก
+                    onUse.accept(selectedItem);
+
+                    // ปิดหน้าต่างกระเป๋า
+                    dispose();
+                } else {
+                    showToast("You don't have this item anymore! 💔");
+                }
             } else {
                 showToast("Please select a gift 💖");
             }

@@ -130,9 +130,9 @@ public class MultiDatingScreen extends JFrame {
     }
 
     private void setupActions() {
-        btnA.addActionListener(e -> nextStep(manager.getCurrent().getScoreA()));
-        btnB.addActionListener(e -> nextStep(manager.getCurrent().getScoreB()));
-        btnC.addActionListener(e -> nextStep(manager.getCurrent().getScoreC()));
+        btnA.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(0)));
+        btnB.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(1)));
+        btnC.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(2)));
 
         btnShop.addActionListener(e -> new MultiDatingShop(this, money, (item, price) -> {
             if (this.money >= price) {
@@ -151,7 +151,7 @@ public class MultiDatingScreen extends JFrame {
             switch (item.trim()) {
                 case "ดอกไม้": // ต้องตรงกับใน Shop
                 case "สร้อยคอ":
-                    bonus = 15;
+                    bonus = 3;
                     exp = "ผู้หญิง เขิน.png";
                     msg = "ขอบคุณน้าาาา 😊";
                     break;
@@ -159,7 +159,7 @@ public class MultiDatingScreen extends JFrame {
                 case "กาแฟ": // ใน Shop คุณใช้ชื่อ "กาแฟ"
                 case "ช็อกโกแลต": // ใน Shop คุณใช้ ต เต่า (ช็อกโกแลต)
                 case "โดนัท":
-                    bonus = 10;
+                    bonus = 2;
                     exp = "ผู้หญิง ยิ้ม.png";
                     msg = "ขอบใจน้า ❤";
                     break;
@@ -482,34 +482,43 @@ public class MultiDatingScreen extends JFrame {
                 finishGame();
             return;
         }
+
         MultiDatingEvent ev = manager.getCurrent();
         this.currentExpressionFile = ev.getDefaultExpression();
         currentBG = ev.getBackground();
 
         String pName = (client != null && client.getPlayerName() != null) ? client.getPlayerName() : "ผู้เล่น";
-        String dialog, choiceA, choiceB, choiceC;
+        String dialog, cA, cB, cC;
 
-        // ✅ เช็คว่าเป็นเหตุการณ์แรก (Index 0) หรือไม่
+        // 1. ดึงข้อความดิบจาก Choice ที่ถูก Shuffle ไว้แล้ว (0, 1, 2)
+        dialog = ev.getDialog();
+        cA = ev.getChoiceText(0);
+        cB = ev.getChoiceText(1);
+        cC = ev.getChoiceText(2);
+
+        // 2. จัดการเรื่องการแทนที่ชื่อ (%name%)
         if (manager.getCurrentIndex() == 0) {
-            // เหตุการณ์แรก: ใช้คำกลางๆ แทนชื่อ (ยังไม่รู้จักกัน)
-            dialog = ev.getDialog().replace("%name%", "..").replace("...", "..");
-            choiceA = ev.getChoiceA().replace("%name%", "เรา");
-            choiceB = ev.getChoiceB().replace("%name%", "เรา");
-            choiceC = ev.getChoiceC().replace("%name%", "เรา");
+            // เหตุการณ์แรก: ยังไม่รู้จักชื่อกัน
+            dialog = dialog.replace("%name%", "..").replace("...", "..");
+            cA = cA.replace("%name%", "เรา");
+            cB = cB.replace("%name%", "เรา");
+            cC = cC.replace("%name%", "เรา");
         } else {
-            // เหตุการณ์ต่อๆ ไป: ใช้ชื่อผู้เล่นจริงตามปกติ
-            dialog = ev.getDialog().replace("%name%", pName).replace("...", pName);
-            choiceA = ev.getChoiceA().replace("%name%", pName);
-            choiceB = ev.getChoiceB().replace("%name%", pName);
-            choiceC = ev.getChoiceC().replace("%name%", pName);
+            // เหตุการณ์ต่อๆ ไป: ใช้ชื่อผู้เล่นจริง
+            dialog = dialog.replace("%name%", pName).replace("...", pName);
+            cA = cA.replace("%name%", pName);
+            cB = cB.replace("%name%", pName);
+            cC = cC.replace("%name%", pName);
         }
 
+        // 3. แสดงผลบน UI
         dialogLabel.setText("<html><body style='width: 450px; color: #222222; font-family: Tahoma; font-size: 18px;'>“"
                 + dialog + "”</body></html>");
 
-        btnA.setText("<html><center>" + choiceA + "</center></html>");
-        btnB.setText("<html><center>" + choiceB + "</center></html>");
-        btnC.setText("<html><center>" + choiceC + "</center></html>");
+        btnA.setText("<html><center>" + cA + "</center></html>");
+        btnB.setText("<html><center>" + cB + "</center></html>");
+        btnC.setText("<html><center>" + cC + "</center></html>");
+
         relayoutUI();
     }
 
