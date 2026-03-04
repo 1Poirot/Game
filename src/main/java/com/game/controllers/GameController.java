@@ -239,6 +239,11 @@ private int currentDialogueIndex = 0;
     public GameController getDialogueManager() { return this; }
     public int getCurrentIndex() { return getCurrentDialogueIndex(); }
 
+    public void showShop() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'showShop'");
+    }
+
     
 }
 
