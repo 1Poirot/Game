@@ -1,5 +1,6 @@
 package com.game.controllers;
 
+
 import com.game.models.Player;
 import com.game.multi.dating.MultiDatingSound;
 import com.game.network.GameClient;
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+
 
 public class GameController {
 
@@ -200,4 +202,43 @@ public class GameController {
     public JFrame getMainFrame() {
         return mainFrame;
     }
+    
+
+// ================== ระบบ Save/Load (เวอร์ชันทำงานจริง) ==================
+// เพิ่มไว้ใต้พวก private Player player; หรือ private JFrame mainFrame;
+private int currentDialogueIndex = 0;
+
+    /**
+     * ดึงตำแหน่งบทสนทนาปัจจุบันที่บันทึกไว้ในตัวแปรออกมาเพื่อเขียนลงไฟล์
+     */
+    
+    public int getCurrentDialogueIndex() {
+        return this.currentDialogueIndex; // คืนค่าตัวแปรที่เราสร้างไว้ด้านบน แทนเลข 0
+    }
+
+    /**
+     * ใช้สำหรับอัปเดตเลขหน้า (สำคัญ: ต้องเรียกใช้ในหน้าเนื้อเรื่องเวลาบทสนทนาเปลี่ยน)
+     */
+    public void setCurrentDialogueIndex(int index) {
+        this.currentDialogueIndex = index;
+    }
+
+    /**
+     * เมื่อกดโหลด ระบบจะส่งเลขหน้าจากไฟล์มาให้
+     * เราต้องจดค่าลงตัวแปร แล้วสั่งเปิดหน้าเนื้อเรื่องทันที
+     */
+    public void loadGameAt(int index) {
+        this.currentDialogueIndex = index; // จดเลขหน้าที่โหลดมาได้ลงในระบบ
+        
+        showGameScene(); // เปลี่ยนหน้าจอไปที่หน้าเล่นเกม (Changescene)
+        
+        System.out.println("ระบบ: โหลดสำเร็จ! กำลังวาร์ปไปบทสนทนาหน้า: " + index);
+    }
+
+    // ส่วนเชื่อมต่อเพื่อให้ SaveScreen.java หายตัวแดง
+    public GameController getDialogueManager() { return this; }
+    public int getCurrentIndex() { return getCurrentDialogueIndex(); }
+
+    
 }
+
