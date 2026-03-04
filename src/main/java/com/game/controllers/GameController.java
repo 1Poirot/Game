@@ -66,15 +66,6 @@ public class GameController {
     public void start() {
         showMainMenu();
         mainFrame.setVisible(true);
-<<<<<<< HEAD
-
-        SwingUtilities.invokeLater(() -> {
-    if (audioSystem != null) {
-        audioSystem.playBGM("Dream.wav");
-    }
-});
-=======
->>>>>>> c9083940bf6486e9ed4a371c14605321fe80f71b
     }
 
     private void applyThaiFontGlobal() {
