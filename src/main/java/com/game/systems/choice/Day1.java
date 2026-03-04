@@ -9,9 +9,9 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 
-
 public class Day1 {
 
+    private JButton BTN_SETTINGS;
     private AffectionBar affectionBar;
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
     private static final Font NAME_FONT = new Font("Leelawadee UI", Font.BOLD, 20);
@@ -54,6 +54,32 @@ public class Day1 {
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
+
+        // ===== ปุ่มตั้งค่า =====
+        BTN_SETTINGS = new JButton("⚙");
+        BTN_SETTINGS.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+        BTN_SETTINGS.setFocusPainted(false);
+        BTN_SETTINGS.setContentAreaFilled(false);
+        BTN_SETTINGS.setBorderPainted(false);
+        BTN_SETTINGS.setOpaque(false);
+        BTN_SETTINGS.setForeground(new Color(80, 80, 80));
+        BTN_SETTINGS.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        BTN_SETTINGS.putClientProperty("BTN_BG", new Color(255, 255, 255, 200));
+        BTN_SETTINGS.putClientProperty("BTN_BORDER", new Color(255, 180, 220, 220));
+        BTN_SETTINGS.putClientProperty("BTN_HOVER", new Color(255, 220, 240, 220));
+        BTN_SETTINGS.putClientProperty("BTN_PRESS", new Color(255, 200, 230, 220));
+        BTN_SETTINGS.setUI(new PINKBUTTONUI());
+
+BTN_SETTINGS.setPreferredSize(new Dimension(50, 50));
+
+BTN_SETTINGS.addActionListener(e -> {
+    FRAME.setContentPane(new com.game.ui.SettingsScreen(null));
+    FRAME.revalidate();
+    FRAME.repaint();
+});
+
+BG_VIEW.add(BTN_SETTINGS);
 
         CHOICE_PANEL = new JPanel(null);
         CHOICE_PANEL.setOpaque(false);
@@ -175,9 +201,18 @@ public class Day1 {
         BG_VIEW.setComponentZOrder(LABEL_CHARACTER, 2);
 
         BG_VIEW.setComponentZOrder(affectionBar, 0);
+        BG_VIEW.setComponentZOrder(BTN_SETTINGS, 0);
 
         BG_VIEW.revalidate();
         BG_VIEW.repaint();
+
+        // ===== จัดตำแหน่งปุ่มตั้งค่า =====
+if (BTN_SETTINGS != null) {
+    int size = 50;
+    int x = W - size - 25;
+    int y = 25;
+    BTN_SETTINGS.setBounds(x, y, size, size);
+}
     }
 
     private void STYLE_CHOICE_BUTTON(JButton B) {

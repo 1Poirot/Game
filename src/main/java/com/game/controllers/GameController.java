@@ -67,10 +67,10 @@ public class GameController {
         mainFrame.setVisible(true);
 
         SwingUtilities.invokeLater(() -> {
-            if (audioSystem != null) {
-                audioSystem.playBGM("audiotest.wav");
-            }
-        });
+    if (audioSystem != null) {
+        audioSystem.playBGM("Dream.wav");
+    }
+});
     }
 
     private void applyThaiFontGlobal() {
