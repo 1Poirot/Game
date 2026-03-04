@@ -7,6 +7,7 @@ import java.awt.*; // ✅ เพิ่ม import
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
 
 /**
  * MultiplayerScreen — หน้า Lobby และจัดการการเริ่มเกม
@@ -15,14 +16,15 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
 
     private final GameClient client;
     private final GameController controller; // ✅ เพิ่มตัวแปรเก็บ Controller
+    private MultiDatingScreen gameUI; // ✅ เพิ่มตัวแปรสำหรับอ้างอิงหน้าจอเกม
+    private final Map<String, Integer> finalScoresMap = new HashMap<>(); // ✅ ตัวเก็บคะแนนที่รับจาก Server
+    private int expectedPlayers = 0;
 
     // ===== UI Components =====
     private JTextArea logArea;
     private JPanel scoreboardPanel;
     private JButton btnTalk; // ใช้เป็นปุ่มเริ่มเกม
     private JButton btnGift; // ใช้เป็นปุ่มออกจากห้อง
-
-    private final Map<String, JLabel> scoreLabels = new LinkedHashMap<>();
 
     // ======================================================
     // Constructor (รับ 3 พารามิเตอร์เพื่อให้หายแดงใน GameController)
@@ -169,6 +171,7 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
             title.setFont(new Font("Tahoma", Font.BOLD, 16));
             title.setForeground(new Color(255, 200, 220));
             scoreboardPanel.add(title);
+            this.expectedPlayers = players.size();
 
             for (String name : players) {
                 JLabel lbl = new JLabel("👤 " + name);
@@ -186,19 +189,46 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
         SwingUtilities.invokeLater(() -> {
             appendLog("[ระบบ] เกมกำลังเริ่ม...");
             this.setVisible(false);
-            this.dispose();
-
-            // ✅ บรรทัดนี้จะไม่แดงแล้ว เพราะ MultiplayerScreen ถือ controller ไว้แล้ว
-            new MultiDatingScreen(client, controller);
+            // ✅ เก็บหน้าจอที่สร้างใหม่ไว้ในตัวแปร gameUI
+            this.gameUI = new MultiDatingScreen(client, controller, this);
         });
     }
 
     @Override
     public void onFinalScore() {
+        // 2. เมื่อได้รับสัญญาณ "FINAL_SCORE" จาก Server (แปลว่า Server
+        // ส่งคะแนนครบทุกคนแล้ว)
+        // ให้รอเสี้ยววินาทีเพื่อให้ Packet สุดท้ายเข้าที่
+        Timer delayTimer = new Timer(300, e -> {
+            synchronized (finalScoresMap) {
+                // เช็คว่าใน Map มีข้อมูลครบตามจำนวนคนจริงๆ ไหม
+                if (finalScoresMap.size() >= expectedPlayers) {
+                    Map<String, Integer> resultData = new HashMap<>(finalScoresMap);
+
+                    SwingUtilities.invokeLater(() -> {
+                        if (gameUI != null && gameUI.isVisible()) {
+                            // 🚀 สั่งเปิดหน้าสรุปผลด้วยข้อมูลที่สมบูรณ์ที่สุด
+                            gameUI.showFinalResults(resultData);
+
+                            // ล้างเพื่อเล่นรอบใหม่
+                            finalScoresMap.clear();
+                        }
+                    });
+                }
+            }
+        });
+        delayTimer.setRepeats(false);
+        delayTimer.start();
     }
 
+    // ✅ ตรวจสอบเมธอดนี้ใน MultiplayerScreen.java
     @Override
     public void onFinalScoreItem(String p, int s) {
+        // 1. เก็บชื่อและคะแนนสะสมไว้เรื่อยๆ
+        synchronized (finalScoresMap) {
+            finalScoresMap.put(p, s);
+            System.out.println("DEBUG >>> รับคะแนนของ [" + p + "] : " + s + " แต้ม");
+        }
     }
 
     private void appendLog(String text) {
