@@ -11,50 +11,56 @@ import javax.swing.border.EmptyBorder;
 
 public class MultiDatingInventory extends JDialog {
     private String selectedItem = null;
-    private final Color THEME_PINK = new Color(255, 20, 147);
+    private final Color THEME_PINK = new Color(255, 105, 180);
     private final Color SOFT_PINK = new Color(255, 245, 250);
-    private final Color GRID_EMPTY = new Color(255, 255, 255, 140); // ปรับให้ชัดขึ้นนิดนึง
+    private final Color ACCENT_PINK = new Color(255, 182, 193, 180);
 
     public MultiDatingInventory(JFrame parent, Map<String, Integer> items, Consumer<String> onUse) {
-        super(parent, "Storage", true);
-        setSize(520, 680);
+        super(parent, "Inventory", true);
+        // ✅ ปรับขนาดให้กะทัดรัดลง (Small & Sleek)
+        setSize(480, 580);
         setLocationRelativeTo(parent);
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 0));
 
-        JPanel root = new JPanel(new BorderLayout(0, 15)) {
+        JPanel root = new JPanel(new BorderLayout(0, 10)) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // ✅ วาดพื้นหลัง Gradient นวลตา (White to Soft Pink)
                 GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), SOFT_PINK);
                 g2d.setPaint(gp);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
-                g2d.setColor(THEME_PINK);
-                g2d.setStroke(new BasicStroke(6)); // เพิ่มความหนาเส้นขอบ
-                g2d.drawRoundRect(3, 3, getWidth() - 7, getHeight() - 7, 40, 40);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 60, 60);
+
+                // ✅ วาดเส้นขอบนอกแบบบางเฉียบแต่ดูหรู
+                g2d.setColor(new Color(255, 105, 180, 60));
+                g2d.setStroke(new BasicStroke(3f));
+                g2d.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 60, 60);
+
                 g2d.dispose();
             }
         };
-        root.setBorder(new EmptyBorder(25, 30, 25, 30));
+        root.setBorder(new EmptyBorder(25, 30, 20, 30));
+        root.setOpaque(false);
         setContentPane(root);
 
-        // --- Header ---
+        // --- Header Section ---
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
 
-        // ✅ แก้สี่เหลี่ยม: ใช้ฟอนต์ Segoe UI Emoji หรือใส่เป็นข้อความธรรมดาแต่เน้นฟอนต์
-        JLabel title = new JLabel("STORAGE", SwingConstants.CENTER);
-        title.setFont(new Font("Tahoma", Font.BOLD, 32));
+        JLabel title = new JLabel("MY GIFTS", SwingConstants.CENTER);
+        title.setFont(new Font("Tahoma", Font.BOLD, 28));
         title.setForeground(THEME_PINK);
-        // เพิ่มไอคอนกระเป๋าจากรูปภาพ (ถ้าไม่มีจะโชว์แค่ข้อความ)
-        title.setIcon(loadFixedIcon("flower", 40));
+        // ใช้ไอคอนขนาดพอดีกับตัวหนังสือ
+        title.setIcon(loadFixedIcon("ชอดอกไม้", 35));
+        title.setIconTextGap(10);
         header.add(title, BorderLayout.CENTER);
 
-        // ✅ แก้สี่เหลี่ยมปุ่มปิด: ใช้ตัว "X" แทนสัญลักษณ์พิเศษ
-        JButton closeBtn = new JButton("X");
-        closeBtn.setFont(new Font("Arial", Font.BOLD, 24));
-        closeBtn.setForeground(THEME_PINK);
+        JButton closeBtn = new JButton("×");
+        closeBtn.setFont(new Font("Arial", Font.PLAIN, 36));
+        closeBtn.setForeground(new Color(255, 105, 180, 150));
         closeBtn.setBorderPainted(false);
         closeBtn.setContentAreaFilled(false);
         closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -62,42 +68,66 @@ public class MultiDatingInventory extends JDialog {
         header.add(closeBtn, BorderLayout.EAST);
         root.add(header, BorderLayout.NORTH);
 
-        // --- Center: Grid 3x3 ---
-        JPanel gridPanel = new JPanel(new GridLayout(3, 3, 15, 15));
-        gridPanel.setOpaque(false);
+        // --- Center: Grid Layout (3x2 หรือ 3x3) ---
+        JPanel gridContainer = new JPanel(new GridLayout(2, 3, 15, 15));
+        gridContainer.setOpaque(false);
 
         String[] keys = items.entrySet().stream()
                 .filter(e -> e.getValue() > 0)
                 .map(Map.Entry::getKey)
                 .toArray(String[]::new);
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 6; i++) { // ลดเหลือ 6 ช่องเพื่อให้ดู compact
             if (i < keys.length) {
-                gridPanel.add(createItemCard(keys[i], items.get(keys[i])));
+                gridContainer.add(createModernCard(keys[i], items.get(keys[i])));
             } else {
-                gridPanel.add(createEmptySlot());
+                gridContainer.add(createElegantEmptySlot());
             }
         }
-        root.add(gridPanel, BorderLayout.CENTER);
+        root.add(gridContainer, BorderLayout.CENTER);
 
-        // --- Footer ---
-        // ✅ แก้สี่เหลี่ยมปุ่มให้ของ: ใช้ข้อความเน้นๆ และรูปประกอบ
-        JButton useBtn = new JButton("GIVE GIFT");
-        useBtn.setFont(new Font("Tahoma", Font.BOLD, 28));
-        useBtn.setBackground(THEME_PINK);
+        // --- Footer Section ---
+        JButton useBtn = new JButton("GIVE 🎁");
+        useBtn.setFont(new Font("Segoe UI Emoji", Font.BOLD, 22));
         useBtn.setForeground(Color.WHITE);
         useBtn.setFocusPainted(false);
         useBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        useBtn.setPreferredSize(new Dimension(0, 85));
+        useBtn.setPreferredSize(new Dimension(0, 65));
+
+        useBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // ไล่สีปุ่มให้ดูแพง
+                GradientPaint btnGp = new GradientPaint(0, 0, new Color(255, 150, 200), 0, c.getHeight(), THEME_PINK);
+                g2.setPaint(btnGp);
+                g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 30, 30);
+                super.paint(g2, c);
+                g2.dispose();
+            }
+        });
 
         useBtn.addActionListener(e -> {
             if (selectedItem != null) {
-                int currentQty = items.get(selectedItem);
-                items.put(selectedItem, currentQty - 1);
-                onUse.accept(selectedItem);
-                dispose();
+                // ✅ ดึงจำนวนปัจจุบันมาตรวจสอบ
+                int currentQty = items.getOrDefault(selectedItem, 0);
+
+                if (currentQty > 0) {
+                    // ✅ หักลบจำนวนออก 1 ชิ้น
+                    items.put(selectedItem, currentQty - 1);
+
+                    // ✅ ส่งค่าไปยัง Consumer เพื่อใช้งานลอจิกในหน้าจอหลัก
+                    onUse.accept(selectedItem);
+
+                    // ปิดหน้าต่างกระเป๋า
+                    dispose();
+                } else {
+                    showToast("You don't have this item anymore! 💔");
+                }
             } else {
-                JOptionPane.showMessageDialog(this, "เลือกของขวัญก่อนนะจ๊ะ! 💖");
+                showToast("Please select a gift 💖");
             }
         });
         root.add(useBtn, BorderLayout.SOUTH);
@@ -105,42 +135,55 @@ public class MultiDatingInventory extends JDialog {
         setVisible(true);
     }
 
-    private JPanel createItemCard(String name, int qty) {
+    private JPanel createModernCard(String name, int qty) {
         JPanel card = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if (name.equals(selectedItem)) {
+
+                boolean isSelected = name.equals(selectedItem);
+                if (isSelected) {
+                    // เอฟเฟกต์ตอนเลือก (Glow)
+                    g2.setColor(new Color(255, 105, 180, 30));
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 35, 35);
                     g2.setColor(THEME_PINK);
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                    g2.setStroke(new BasicStroke(3f));
                 } else {
                     g2.setColor(Color.WHITE);
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-                    g2.setColor(new Color(255, 182, 193, 150));
-                    g2.setStroke(new BasicStroke(2));
-                    g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 25, 25);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 35, 35);
+                    g2.setColor(new Color(255, 182, 193, 80));
+                    g2.setStroke(new BasicStroke(1.5f));
                 }
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 35, 35);
                 g2.dispose();
             }
         };
+        card.setOpaque(false);
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JLabel lbQty = new JLabel("x" + qty);
-        lbQty.setFont(new Font("Arial", Font.BOLD, 15));
-        lbQty.setForeground(name.equals(selectedItem) ? Color.WHITE : THEME_PINK);
-        lbQty.setHorizontalAlignment(SwingConstants.RIGHT);
-        lbQty.setBorder(new EmptyBorder(8, 0, 0, 10));
-        card.add(lbQty, BorderLayout.NORTH);
+        // Badge จำนวนไอเทม (Circle Style)
+        JLabel lbQty = new JLabel(String.valueOf(qty));
+        lbQty.setFont(new Font("Arial", Font.BOLD, 12));
+        lbQty.setForeground(THEME_PINK);
+        lbQty.setHorizontalAlignment(SwingConstants.CENTER);
+        lbQty.setBorder(new EmptyBorder(2, 5, 2, 5));
 
-        JLabel lbName = new JLabel(name, SwingConstants.CENTER);
-        lbName.setFont(new Font("Tahoma", Font.BOLD, 14));
-        lbName.setForeground(name.equals(selectedItem) ? Color.WHITE : Color.DARK_GRAY);
-        lbName.setBorder(new EmptyBorder(0, 0, 10, 0));
-        card.add(lbName, BorderLayout.SOUTH);
+        JPanel badgeWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 8));
+        badgeWrapper.setOpaque(false);
+        badgeWrapper.add(lbQty);
+        card.add(badgeWrapper, BorderLayout.NORTH);
 
-        JLabel imgLabel = new JLabel(loadItemIcon(name), SwingConstants.CENTER);
+        // ไอคอนตรงกลาง
+        JLabel imgLabel = new JLabel(loadItemIcon(name, 75), SwingConstants.CENTER);
         card.add(imgLabel, BorderLayout.CENTER);
+
+        // ชื่อด้านล่าง
+        JLabel lbName = new JLabel(name, SwingConstants.CENTER);
+        lbName.setFont(new Font("Tahoma", Font.BOLD, 13));
+        lbName.setForeground(name.equals(selectedItem) ? THEME_PINK : new Color(120, 120, 120));
+        lbName.setBorder(new EmptyBorder(0, 0, 12, 0));
+        card.add(lbName, BorderLayout.SOUTH);
 
         card.addMouseListener(new MouseAdapter() {
             @Override
@@ -152,66 +195,57 @@ public class MultiDatingInventory extends JDialog {
         return card;
     }
 
-    private JPanel createEmptySlot() {
+    private JPanel createElegantEmptySlot() {
         return new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(GRID_EMPTY);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-                // วาดเส้นประจางๆ ให้ดูเป็นช่องเก็บของ
-                g2.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 5 }, 0));
-                g2.setColor(new Color(255, 20, 147, 50));
-                g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 25, 25);
+                g2.setColor(new Color(255, 255, 255, 80));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 35, 35);
+                g2.setStroke(
+                        new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 6 }, 0));
+                g2.setColor(new Color(255, 182, 193, 100));
+                g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 35, 35);
                 g2.dispose();
             }
         };
     }
 
-    // Helper สำหรับโหลดไอคอนพรีเมียม (แก้ปัญหาสี่เหลี่ยม)
-    private ImageIcon loadFixedIcon(String name, int size) {
-        ImageIcon icon = loadItemIcon(name);
-        if (icon != null) {
-            return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
-        }
-        return null;
+    private void showToast(String msg) {
+        JOptionPane.showMessageDialog(this, "<html><font face='Tahoma' color='#FF69B4'>" + msg + "</font></html>", "💖",
+                JOptionPane.PLAIN_MESSAGE);
     }
 
-    private ImageIcon loadItemIcon(String itemName) {
+    private ImageIcon loadFixedIcon(String name, int size) {
+        ImageIcon icon = loadItemIcon(name, size);
+        return (icon != null) ? icon : null;
+    }
+
+    private ImageIcon loadItemIcon(String itemName, int size) {
         String fileName = itemName.toLowerCase();
         if (fileName.contains("ดอกไม้"))
             fileName = "ชอดอกไม้";
-        if (fileName.contains("สร้อยคอ"))
+        else if (fileName.contains("สร้อยคอ"))
             fileName = "สร้อยคอ";
-        if (fileName.contains("กาแฟ"))
+        else if (fileName.contains("กาแฟ"))
             fileName = "cofe";
-        if (fileName.contains("ช็อกโกแลต"))
+        else if (fileName.contains("ช็อกโกแลต"))
             fileName = "ช็อกโกแลท";
-        if (fileName.contains("เค้ก"))
+        else if (fileName.contains("เค้ก"))
             fileName = "เค็ก";
-        if (fileName.contains("โดนัท"))
+        else if (fileName.contains("โดนัท"))
             fileName = "โดนัท";
 
-        try {
-            Image img = null;
-            String[] exts = { ".png", ".jpg", ".jpeg" };
-            for (String ext : exts) {
-                URL url = getClass().getResource("/images/icon/" + fileName + ext);
-                if (url != null) {
-                    img = new ImageIcon(url).getImage();
-                    break;
-                }
-                File f = new File("src/main/resources/images/icon/" + fileName + ext);
-                if (f.exists()) {
-                    img = new ImageIcon(f.getAbsolutePath()).getImage();
-                    break;
-                }
-            }
-            if (img != null) {
-                return new ImageIcon(img.getScaledInstance(85, 85, Image.SCALE_SMOOTH));
-            }
-        } catch (Exception e) {
+        String[] exts = { ".png", ".jpg", ".jpeg" };
+        for (String ext : exts) {
+            URL url = getClass().getResource("/images/icon/" + fileName + ext);
+            if (url != null)
+                return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+            File f = new File("src/main/resources/images/icon/" + fileName + ext);
+            if (f.exists())
+                return new ImageIcon(new ImageIcon(f.getAbsolutePath()).getImage().getScaledInstance(size, size,
+                        Image.SCALE_SMOOTH));
         }
         return null;
     }

@@ -8,12 +8,12 @@ import java.awt.event.*;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map; // ✅ เพิ่ม import สำหรับ MenuGame (ตรวจสอบชื่อและแพ็กเกจให้ตรงกับไฟล์ในโปรเจกต์ของคุณ)
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-public class MultiDatingScreen extends JFrame {
+public class MultiDatingScreen extends JFrame implements GameClient.MessageListener {
     private final MultiDatingEventManager manager = new MultiDatingEventManager();
     private final MultiDatingSound sound = MultiDatingSound.getInstance();
 
@@ -47,6 +47,10 @@ public class MultiDatingScreen extends JFrame {
         this.client = client;
         this.controller = controller;
         this.parentScreen = parent;
+
+        if (this.client != null) {
+            this.client.setMessageListener(this);
+        }
 
         setTitle("💕 ศึกชิงนาง Online - ห้องแข่งจริง");
         setSize(1100, 750);
@@ -130,9 +134,9 @@ public class MultiDatingScreen extends JFrame {
     }
 
     private void setupActions() {
-        btnA.addActionListener(e -> nextStep(manager.getCurrent().getScoreA()));
-        btnB.addActionListener(e -> nextStep(manager.getCurrent().getScoreB()));
-        btnC.addActionListener(e -> nextStep(manager.getCurrent().getScoreC()));
+        btnA.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(0)));
+        btnB.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(1)));
+        btnC.addActionListener(e -> nextStep(manager.getCurrent().getChoiceScore(2)));
 
         btnShop.addActionListener(e -> new MultiDatingShop(this, money, (item, price) -> {
             if (this.money >= price) {
@@ -151,17 +155,17 @@ public class MultiDatingScreen extends JFrame {
             switch (item.trim()) {
                 case "ดอกไม้": // ต้องตรงกับใน Shop
                 case "สร้อยคอ":
-                    bonus = 15;
+                    bonus = 3;
                     exp = "ผู้หญิง เขิน.png";
-                    msg = "ขอบคุณน้าาาา 😊";
+                    msg = "ขอบคุณน้าาาา เธอนี้น่ารักสุดๆๆ ไปเลยย😊";
                     break;
 
                 case "กาแฟ": // ใน Shop คุณใช้ชื่อ "กาแฟ"
                 case "ช็อกโกแลต": // ใน Shop คุณใช้ ต เต่า (ช็อกโกแลต)
                 case "โดนัท":
-                    bonus = 10;
+                    bonus = 2;
                     exp = "ผู้หญิง ยิ้ม.png";
-                    msg = "ขอบใจน้า ❤";
+                    msg = "ขอบใจน้า เธอใจดีจังงง ❤";
                     break;
 
                 default:
@@ -179,58 +183,79 @@ public class MultiDatingScreen extends JFrame {
 
     private void showSettingsDialog() {
         JDialog settings = new JDialog(this, "Settings", true);
-
-        // ✅ 1. ล็อกสเปค: ห้ามขยับ ห้ามปรับขนาด และเอาแถบหัวออก
         settings.setUndecorated(true);
         settings.setResizable(false);
-        settings.setSize(420, 520);
-        settings.setLocationRelativeTo(this); // Flex ไว้ตรงกลางเสมอ
+        settings.setSize(450, 550); // ปรับขนาดให้กว้างขวางขึ้นเล็กน้อย
+        settings.setLocationRelativeTo(this);
+        settings.setBackground(new Color(0, 0, 0, 0)); // ทำให้พื้นหลัง Dialog โปร่งใสเพื่อขอบมนที่แท้จริง
 
-        // ✅ 2. ดักจับกากบาท (JFrame หลัก) ให้หน้าต่างนี้ยังคงอยู่
-        settings.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        // แผงเนื้อหาหลักพร้อมการวาด Gradient และขอบมน
+        JPanel content = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(new Color(255, 250, 252));
-        content.setBorder(BorderFactory.createLineBorder(new Color(255, 105, 180), 4, true));
+                // พื้นหลังไล่เฉดสีขาวนวลไปชมพูอ่อน
+                GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 240, 245));
+                g2d.setPaint(gp);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+
+                // เส้นขอบสีชมพูเข้มแบบหนาพรีเมียม
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.setStroke(new BasicStroke(5));
+                g2d.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 50, 50);
+                g2d.dispose();
+            }
+        };
+        content.setOpaque(false);
         settings.setContentPane(content);
 
-        // --- ส่วนหัว ---
+        // --- ส่วนหัว (Title) ---
         JLabel lbTitle = new JLabel("SETTINGS", SwingConstants.CENTER);
-        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
+        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 32));
         lbTitle.setForeground(new Color(255, 20, 147));
-        lbTitle.setBorder(new EmptyBorder(30, 0, 10, 0));
+        lbTitle.setBorder(new EmptyBorder(40, 0, 20, 0));
         content.add(lbTitle, BorderLayout.NORTH);
 
-        // --- ส่วนกลาง (Slider + Buttons) ---
+        // --- ส่วนกลาง (Controls) ---
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setOpaque(false);
-        mainPanel.setBorder(new EmptyBorder(10, 50, 30, 50));
+        mainPanel.setBorder(new EmptyBorder(10, 50, 40, 50));
 
-        // ✅ ส่วนควบคุมเสียงแบบ Slider
-        JLabel lbVolume = new JLabel("ระดับเสียงเพลง");
-        lbVolume.setFont(new Font("Tahoma", Font.BOLD, 16));
+        // หัวข้อเสียง
+        JLabel lbVolume = new JLabel("Music Volume");
+        lbVolume.setFont(new Font("Tahoma", Font.BOLD, 18));
+        lbVolume.setForeground(new Color(150, 50, 80));
         lbVolume.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // ปรับแต่ง Slider
         JSlider volSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (sound.getVolume() * 100));
         volSlider.setOpaque(false);
-        volSlider.setMajorTickSpacing(25);
-        volSlider.setPaintTicks(false);
+        volSlider.setPreferredSize(new Dimension(300, 50));
         volSlider.addChangeListener(e -> {
             float volume = volSlider.getValue() / 100f;
             sound.setVolume(volume);
-            lbVolume.setText(volume == 0 ? "ปิดเสียง" : "ระดับเสียง: " + volSlider.getValue() + "%");
+            lbVolume.setText(volume == 0 ? "Muted 🔇" : "Music Volume: " + volSlider.getValue() + "%");
         });
 
-        // ปุ่มรายการ
-        Font btnFont = new Font("Tahoma", Font.BOLD, 17);
-        JButton btnResume = createStyledMenuBtn("กลับไปเล่นต่อ", new Color(255, 182, 193), btnFont);
+        // ข้อความแสดงสถานะเสียงปัจจุบัน
+        lbVolume.setText(
+                sound.getVolume() == 0 ? "Muted 🔇" : "Music Volume: " + (int) (sound.getVolume() * 100) + "%");
+
+        // ปุ่มคำสั่ง
+        Font btnFont = new Font("Tahoma", Font.BOLD, 18);
+
+        JButton btnResume = createStyledMenuBtn("กลับเข้าสู่เกม", new Color(255, 182, 193), btnFont);
+        btnResume.setForeground(new Color(150, 20, 80));
         btnResume.addActionListener(e -> settings.dispose());
 
-        JButton btnLeave = createStyledMenuBtn("ออกจากห้องแข่ง", new Color(255, 99, 71), btnFont);
+        JButton btnLeave = createStyledMenuBtn("ออกจากเกม", new Color(255, 99, 71), btnFont);
         btnLeave.setForeground(Color.WHITE);
         btnLeave.addActionListener(e -> {
-            int res = JOptionPane.showConfirmDialog(settings, "คุณแน่ใจนะว่าจะทิ้งเกมนี้ไป?", "ยืนยัน",
+            int res = JOptionPane.showConfirmDialog(settings,
+                    "คุณแน่ใจนะว่าจะออก ?", "Confirm Exit",
                     JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION) {
                 settings.dispose();
@@ -238,13 +263,13 @@ public class MultiDatingScreen extends JFrame {
             }
         });
 
-        // เพิ่มคอมโพเนนต์ลงแผง
+        // ประกอบร่าง
         mainPanel.add(lbVolume);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainPanel.add(volSlider);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        mainPanel.add(btnResume);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(volSlider);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        mainPanel.add(btnResume);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(btnLeave);
 
         content.add(mainPanel, BorderLayout.CENTER);
@@ -289,6 +314,88 @@ public class MultiDatingScreen extends JFrame {
         });
     }
 
+    // ======================================================
+    // ✅ GameClient.MessageListener Implementation
+    // ======================================================
+    // ======================================================
+    // ✅ GameClient.MessageListener Implementation
+    // ======================================================
+    @Override
+    public void onRejected(String reason) {
+        // 1. หยุดลอจิกเกมทันที
+        if (timer != null)
+            timer.stop();
+        sound.stopBGM();
+
+        SwingUtilities.invokeLater(() -> {
+            // 2. ปิดหน้าจอนี้ทิ้งทันที (หายวับไปจากสายตา)
+            this.setVisible(false);
+
+            // 3. แจ้งเตือน (ใส่ null เพื่อให้ลอยอิสระ ไม่โดนดึงปิดตามหน้าจอ)
+            JOptionPane.showMessageDialog(null,
+                    "<html><font face='Tahoma'>⚠️ <b>การเชื่อมต่อสิ้นสุด</b><br>" + reason + "</font></html>",
+                    "แจ้งเตือนระบบ",
+                    JOptionPane.ERROR_MESSAGE);
+
+            // 4. ตัดเน็ตเวิร์ก
+            if (client != null)
+                client.disconnect();
+
+            // 5. ✅ กวาดล้างทุกหน้าต่าง (กวาดหน้า Lobby และ Settings ให้เกลี้ยง)
+            for (Window window : Window.getWindows()) {
+                if (window != null) {
+                    window.setVisible(false);
+                    window.dispose();
+                }
+            }
+
+            // 6. กลับหน้าเมนู
+            if (controller != null) {
+                controller.showMainMenu();
+            }
+        });
+    }
+
+    // เมธอด Listener อื่นๆ คงเดิมตามโครงสร้าง Interface
+    @Override
+    public void onPlayerListUpdate(java.util.List<String> players) {
+    }
+
+    @Override
+    public void onGameStart() {
+    }
+
+    @Override
+    public void onSystemMessage(String message) {
+    }
+
+    @Override
+    public void onConnectionFailed(String ip) {
+    }
+
+    @Override
+    public void onScoreUpdate(String message) {
+    }
+
+    @Override
+    public void onWinner(String winnerName) {
+    }
+
+    @Override 
+    public void onFinalScore() {
+        // เมื่อ Server บอกว่าสรุปคะแนน ให้ส่งคำสั่งนี้ไปให้หน้า Lobby ทำงานต่อ
+        if (parentScreen != null) {
+            parentScreen.onFinalScore();
+        }
+    }
+
+    @Override
+    public void onFinalScoreItem(String playerName, int score) {
+        if (parentScreen != null) {
+            parentScreen.onFinalScoreItem(playerName, score);
+        }
+    }
+
     // ✅ แก้ไข: ลอจิกจบเกม (แยกขาดระหว่างเล่นคนเดียว กับ เล่นหลายคน)
     // ✅ แก้ไข: ลอจิกจบเกม (เล่นคนเดียวจบเลย / เล่นหลายคน "ต้อง" ค้างหน้ารอ Server
     // เท่านั้น)
@@ -326,49 +433,44 @@ public class MultiDatingScreen extends JFrame {
     // ✅ เมธอดแสดงหน้าสรุปผล (Ranking 1, 2, 3 + ลอจิกแฟนคู่)
     // ✅ เมธอดแสดงหน้าสรุปผล (แก้ลอจิก Ranking ให้แม่นยำ ไม่เป็นที่ 1 กันทุกคน)
     public void showFinalResults(Map<String, Integer> allScores) {
-        // ✅ 1. เพิ่มเกราะป้องกัน: ถ้าไม่มีข้อมูลคะแนนเลย
-        // ให้ใส่คะแนนเราคนเดียวป้องกันโปรแกรมพัง
         if (allScores == null || allScores.isEmpty()) {
             allScores = new HashMap<>();
-            String name = (client != null) ? client.getPlayerName() : "คุณ";
-            allScores.put(name, score);
+            allScores.put((client != null) ? client.getPlayerName() : "คุณ", score);
         }
 
         String myName = (client != null) ? client.getPlayerName() : "คุณ";
 
-        // --- ส่วนวาด Dialog เหมือนเดิม ---
         JDialog resultDlg = new JDialog(this, "บทสรุปความรัก", true);
         resultDlg.setUndecorated(true);
-        resultDlg.setSize(500, 650);
+        resultDlg.setSize(480, 620);
         resultDlg.setLocationRelativeTo(this);
+        resultDlg.setBackground(new Color(0, 0, 0, 0));
 
-        JPanel p = new JPanel(new BorderLayout()) {
+        JPanel root = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 192, 203), 0, getHeight(), Color.WHITE);
+                GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 240, 245));
                 g2.setPaint(gp);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
                 g2.setColor(new Color(255, 20, 147));
-                g2.setStroke(new BasicStroke(6));
-                g2.drawRoundRect(3, 3, getWidth() - 7, getHeight() - 7, 40, 40);
+                g2.setStroke(new BasicStroke(5));
+                g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 50, 50);
                 g2.dispose();
             }
         };
-        p.setOpaque(false);
-        p.setBorder(new EmptyBorder(35, 40, 35, 40));
+        root.setOpaque(false);
+        root.setBorder(new EmptyBorder(30, 35, 30, 35));
 
-        // ✅ 2. จัดลำดับคะแนน
+        // --- 🏆 จัดลำดับและคำนวณ Rank ---
         java.util.List<Map.Entry<String, Integer>> sortedList = allScores.entrySet().stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .collect(java.util.stream.Collectors.toList());
 
-        // ✅ 3. คำนวณอันดับด้วยความปลอดภัย (เช็ค Size ก่อน Get)
         int myScore = allScores.getOrDefault(myName, 0);
-        int myRank = 1;
         int maxScore = sortedList.isEmpty() ? 0 : sortedList.get(0).getValue();
-
+        int myRank = 1;
         for (Map.Entry<String, Integer> entry : sortedList) {
             if (entry.getValue() > myScore)
                 myRank++;
@@ -377,7 +479,7 @@ public class MultiDatingScreen extends JFrame {
         long winnersCount = sortedList.stream().filter(e -> e.getValue() == maxScore).count();
         boolean isTieAtFirst = (winnersCount > 1);
 
-        // --- ลอจิกข้อความเดิม ---
+        // --- 💬 คืนค่าลอจิกข้อความกวนๆ (ต้นฉบับ) ---
         String statusMsg;
         Color statusColor;
         if (isTieAtFirst && myScore == maxScore && allScores.size() > 1) {
@@ -394,74 +496,90 @@ public class MultiDatingScreen extends JFrame {
             statusColor = Color.RED;
         }
 
+        // ปรับ JLabel ให้รองรับ HTML เพื่อให้ข้อความยาวๆ ตัดบรรทัดได้
         JLabel lbStatus = new JLabel("<html><center>" + statusMsg + "</center></html>", SwingConstants.CENTER);
         lbStatus.setFont(new Font("Tahoma", Font.BOLD, 22));
         lbStatus.setForeground(statusColor);
-        lbStatus.setBorder(new EmptyBorder(0, 0, 20, 0));
-        p.add(lbStatus, BorderLayout.NORTH);
+        lbStatus.setPreferredSize(new Dimension(400, 80)); // จองที่ให้ข้อความ 2 บรรทัด
+        lbStatus.setBorder(new EmptyBorder(0, 0, 15, 0));
+        root.add(lbStatus, BorderLayout.NORTH);
 
-        // --- 📊 4. รายการ Leaderboard ---
-        JPanel listP = new JPanel();
-        listP.setLayout(new BoxLayout(listP, BoxLayout.Y_AXIS));
-        listP.setOpaque(false);
-
-        int displayRank = 1;
-        int lastScore = -1;
-        int actualRank = 0;
+        // --- 📊 ส่วนรายการคะแนน (Leaderboard) ---
+        JPanel listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+        listPanel.setOpaque(false);
 
         for (int i = 0; i < sortedList.size(); i++) {
             Map.Entry<String, Integer> entry = sortedList.get(i);
-
-            // ลอจิกแสดงเลขลำดับ (ถ้าคะแนนเท่ากัน ให้ลำดับเลขเดียวกัน)
-            if (entry.getValue() != lastScore) {
-                actualRank = i + 1;
-            }
-            lastScore = entry.getValue();
-
-            JPanel item = new JPanel(new BorderLayout());
-            item.setOpaque(true);
             boolean isMe = entry.getKey().equals(myName);
-            item.setBackground(isMe ? new Color(255, 20, 147, 40) : Color.WHITE);
-            item.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(255, 182, 193), 2, true),
-                    new EmptyBorder(12, 25, 12, 25)));
 
-            JLabel nameLbl = new JLabel(actualRank + ". " + entry.getKey() + (isMe ? " (YOU)" : ""));
-            nameLbl.setFont(new Font("Tahoma", Font.BOLD, 18));
+            JPanel itemCard = new JPanel(new BorderLayout()) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setColor(isMe ? new Color(255, 182, 193, 150) : Color.WHITE);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                    g2.setColor(new Color(255, 20, 147, 50));
+                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                    g2.dispose();
+                }
+            };
+            itemCard.setOpaque(false);
+            itemCard.setBorder(new EmptyBorder(12, 25, 12, 25));
+            itemCard.setMaximumSize(new Dimension(420, 60));
 
-            JLabel scoreLbl = new JLabel(entry.getValue() + " แต้ม");
-            scoreLbl.setFont(new Font("Tahoma", Font.BOLD, 20));
-            scoreLbl.setForeground(new Color(255, 20, 147));
+            JLabel nameLabel = new JLabel((i + 1) + ". " + entry.getKey() + (isMe ? " (YOU)" : ""));
+            nameLabel.setFont(new Font("Tahoma", isMe ? Font.BOLD : Font.PLAIN, 18));
 
-            item.add(nameLbl, BorderLayout.WEST);
-            item.add(scoreLbl, BorderLayout.EAST);
-            item.setMaximumSize(new Dimension(420, 60));
-            listP.add(item);
-            listP.add(Box.createRigidArea(new Dimension(0, 12)));
+            JLabel scoreLabel = new JLabel(entry.getValue() + " แต้ม");
+            scoreLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
+            scoreLabel.setForeground(new Color(255, 20, 147));
+
+            itemCard.add(nameLabel, BorderLayout.WEST);
+            itemCard.add(scoreLabel, BorderLayout.EAST);
+
+            listPanel.add(itemCard);
+            listPanel.add(Box.createRigidArea(new Dimension(0, 12)));
         }
 
-        JScrollPane scroll = new JScrollPane(listP);
+        JScrollPane scroll = new JScrollPane(listPanel);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
-        p.add(scroll, BorderLayout.CENTER);
+        root.add(scroll, BorderLayout.CENTER);
 
-        JButton btnClose = new JButton("ตกลง");
-        btnClose.setFont(new Font("Tahoma", Font.BOLD, 20));
-        btnClose.setBackground(new Color(255, 20, 147));
+        // --- 🔘 ส่วนปุ่มปิด (Footer) ---
+        JButton btnClose = new JButton("ตกลง") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(255, 20, 147));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        btnClose.setFont(new Font("Tahoma", Font.BOLD, 18));
         btnClose.setForeground(Color.WHITE);
+        btnClose.setContentAreaFilled(false);
+        btnClose.setBorderPainted(false);
+        btnClose.setFocusPainted(false);
         btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnClose.setPreferredSize(new Dimension(160, 45));
         btnClose.addActionListener(e -> {
             resultDlg.dispose();
             exitAndGoToMain();
         });
 
-        JPanel btnP = new JPanel(new FlowLayout());
-        btnP.setOpaque(false);
-        btnP.add(btnClose);
-        p.add(btnP, BorderLayout.SOUTH);
+        JPanel btnWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnWrapper.setOpaque(false);
+        btnWrapper.setBorder(new EmptyBorder(20, 0, 0, 0));
+        btnWrapper.add(btnClose);
+        root.add(btnWrapper, BorderLayout.SOUTH);
 
-        resultDlg.add(p);
+        resultDlg.add(root);
         resultDlg.setVisible(true);
     }
 
@@ -471,34 +589,43 @@ public class MultiDatingScreen extends JFrame {
                 finishGame();
             return;
         }
+
         MultiDatingEvent ev = manager.getCurrent();
         this.currentExpressionFile = ev.getDefaultExpression();
         currentBG = ev.getBackground();
 
         String pName = (client != null && client.getPlayerName() != null) ? client.getPlayerName() : "ผู้เล่น";
-        String dialog, choiceA, choiceB, choiceC;
+        String dialog, cA, cB, cC;
 
-        // ✅ เช็คว่าเป็นเหตุการณ์แรก (Index 0) หรือไม่
+        // 1. ดึงข้อความดิบจาก Choice ที่ถูก Shuffle ไว้แล้ว (0, 1, 2)
+        dialog = ev.getDialog();
+        cA = ev.getChoiceText(0);
+        cB = ev.getChoiceText(1);
+        cC = ev.getChoiceText(2);
+
+        // 2. จัดการเรื่องการแทนที่ชื่อ (%name%)
         if (manager.getCurrentIndex() == 0) {
-            // เหตุการณ์แรก: ใช้คำกลางๆ แทนชื่อ (ยังไม่รู้จักกัน)
-            dialog = ev.getDialog().replace("%name%", "..").replace("...", "..");
-            choiceA = ev.getChoiceA().replace("%name%", "เรา");
-            choiceB = ev.getChoiceB().replace("%name%", "เรา");
-            choiceC = ev.getChoiceC().replace("%name%", "เรา");
+            // เหตุการณ์แรก: ยังไม่รู้จักชื่อกัน
+            dialog = dialog.replace("%name%", "..").replace("...", "..");
+            cA = cA.replace("%name%", "เรา");
+            cB = cB.replace("%name%", "เรา");
+            cC = cC.replace("%name%", "เรา");
         } else {
-            // เหตุการณ์ต่อๆ ไป: ใช้ชื่อผู้เล่นจริงตามปกติ
-            dialog = ev.getDialog().replace("%name%", pName).replace("...", pName);
-            choiceA = ev.getChoiceA().replace("%name%", pName);
-            choiceB = ev.getChoiceB().replace("%name%", pName);
-            choiceC = ev.getChoiceC().replace("%name%", pName);
+            // เหตุการณ์ต่อๆ ไป: ใช้ชื่อผู้เล่นจริง
+            dialog = dialog.replace("%name%", pName).replace("...", pName);
+            cA = cA.replace("%name%", pName);
+            cB = cB.replace("%name%", pName);
+            cC = cC.replace("%name%", pName);
         }
 
+        // 3. แสดงผลบน UI
         dialogLabel.setText("<html><body style='width: 450px; color: #222222; font-family: Tahoma; font-size: 18px;'>“"
                 + dialog + "”</body></html>");
 
-        btnA.setText("<html><center>" + choiceA + "</center></html>");
-        btnB.setText("<html><center>" + choiceB + "</center></html>");
-        btnC.setText("<html><center>" + choiceC + "</center></html>");
+        btnA.setText("<html><center>" + cA + "</center></html>");
+        btnB.setText("<html><center>" + cB + "</center></html>");
+        btnC.setText("<html><center>" + cC + "</center></html>");
+
         relayoutUI();
     }
 
@@ -575,35 +702,79 @@ public class MultiDatingScreen extends JFrame {
 
     private void styleComponents() {
         // --- ปรับแต่ง Heart Bar (หลอดหัวใจ) ---
+        heartBar.setPreferredSize(new Dimension(300, 42));
         heartBar.setUI(new BasicProgressBarUI() {
             @Override
             protected void paintDeterminate(Graphics g, JComponent c) {
-                Graphics2D g2d = (Graphics2D) g;
+                Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                int w = c.getWidth(), h = c.getHeight();
-                int mw = (int) (w * heartBar.getPercentComplete());
+                int w = c.getWidth();
+                int h = c.getHeight();
 
-                // วาดพื้นหลังหลอด (สีขาวจางๆ)
-                g2d.setColor(new Color(255, 255, 255, 180));
-                g2d.fillRoundRect(0, 0, w, h, 20, 20);
+                // --- 1. การคำนวณตำแหน่ง (Dynamic Positioning) ---
+                int circleSize = h; // วงกลมสูงเท่าหลอด
+                int barH = (int) (h * 0.55); // ตัวหลอดบางลงเพื่อให้ดูแพง
+                int barY = (h - barH) / 2;
+                int barX = circleSize / 2; // หลอดเริ่มจากกลางวงกลม
+                int barW = w - barX - 5;
 
-                // วาดส่วนที่มีคะแนน (ไล่เฉดสีชมพู)
-                if (mw > 0) {
-                    g2d.setPaint(new GradientPaint(0, 0, new Color(255, 20, 147), mw, 0, new Color(255, 105, 180)));
-                    g2d.fillRoundRect(0, 0, mw, h, 20, 20);
+                // --- 2. วาดตัวหลอด (Bar Background) ---
+                // ขอบชมพูเข้มบางๆ
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.fillRoundRect(barX, barY, barW, barH, 20, 20);
+                // พื้นในขาวนวล
+                g2d.setColor(new Color(255, 245, 250));
+                g2d.fillRoundRect(barX + 2, barY + 2, barW - 4, barH - 4, 18, 18);
+
+                // --- 3. วาดแถบพลัง (Progress Fill) ---
+                int progressW = (int) ((barW - 6) * heartBar.getPercentComplete());
+                if (progressW > 0) {
+                    // ใช้ Gradient ชมพูขาวตามที่ขอ
+                    GradientPaint pinkGrad = new GradientPaint(barX + 3, 0, new Color(255, 20, 147),
+                            barX + 3 + progressW, 0, new Color(255, 182, 193));
+                    g2d.setPaint(pinkGrad);
+                    g2d.fillRoundRect(barX + 3, barY + 3, progressW, barH - 6, 15, 15);
                 }
 
-                // วาดเส้นขอบหลอดให้คมชัด
+                // --- 4. ✅ วาดวงกลมไอคอน (Layered Circle) ---
+                // วงนอกสีชมพู (ขอบบางๆ)
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.fillOval(0, 0, circleSize, circleSize);
+                // วงในสีขาว (เด่นขึ้นมา)
+                g2d.setColor(Color.WHITE);
+                g2d.fillOval(2, 2, circleSize - 4, circleSize - 4);
+                // วงในสุดสีชมพูจางๆ
+                g2d.setColor(new Color(255, 240, 245));
+                g2d.fillOval(4, 4, circleSize - 8, circleSize - 8);
+
+                // --- 5. ✅ วาดหัวใจแบบใช้สมการ (Vector Heart) เพื่อให้อยู่ตรงกลางเป๊ะ! ---
                 g2d.setColor(new Color(255, 20, 147));
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawRoundRect(1, 1, w - 2, h - 2, 20, 20);
+                drawPerfectHeart(g2d, circleSize / 2, circleSize / 2, circleSize / 3);
+
+                g2d.dispose();
+            }
+
+            // ✅ ฟังก์ชันวาดหัวใจให้กึ่งกลางพิกัด x, y
+            private void drawPerfectHeart(Graphics2D g2, int x, int y, int size) {
+                int width = size;
+                int height = size;
+                g2.translate(x, y + 2); // ปรับตำแหน่ง y ลงมานิดหน่อยให้ดูสมดุลสายตา
+
+                // วาดหัวใจโดยใช้สมการปีกสองข้าง
+                g2.fillArc(-width / 2, -height / 2, width / 2, height / 2, 0, 180);
+                g2.fillArc(0, -height / 2, width / 2, height / 2, 0, 180);
+                int[] xPoints = { -width / 2, 0, width / 2 };
+                int[] yPoints = { -height / 8, height / 2, -height / 8 };
+                g2.fillPolygon(xPoints, yPoints, 3);
+
+                g2.translate(-x, -(y + 2)); // คืนค่าแกน
             }
         });
 
-        heartBar.setFont(new Font("Tahoma", Font.BOLD, 18));
-        heartBar.setForeground(Color.WHITE); // ✅ เปลี่ยนสีตัวเลขเป็นสีขาวเพื่อให้ตัดกับหลอดสีชมพู
-        heartBar.setStringPainted(true);
+        heartBar.setOpaque(false);
+        heartBar.setBorderPainted(false);
+        heartBar.setStringPainted(false); // เอาเปอร์เซ็นต์ออก
 
         // --- ✅ แก้ปัญหา Emoji สี่เหลี่ยมที่ Timer ---
         // ใช้ฟอนต์ Segoe UI Emoji เพื่อให้รูปนาฬิกาแสดงผลได้

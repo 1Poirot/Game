@@ -59,11 +59,8 @@ public class AudioSettingsScreen extends JPanel {
         gbc.weightx = 0;
         whiteBox.add(speakerIcon, gbc);
 
-        // ===== SLIDER =====
-        float currentVol = controller.getAudioSystem() != null
-                ? controller.getAudioSystem().getVolume()
-                : 0.8f;
-
+        // ดึงระดับเสียงปัจจุบัน
+        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.2f;
         JSlider volumeSlider = new JSlider(0, 100, (int) (currentVol * 100));
         volumeSlider.setOpaque(false);
         volumeSlider.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -95,8 +92,7 @@ public class AudioSettingsScreen extends JPanel {
 
                 GradientPaint gp = new GradientPaint(
                         0, 0, top,
-                        0, getHeight(), bottom
-                );
+                        0, getHeight(), bottom);
 
                 g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
@@ -200,8 +196,7 @@ public class AudioSettingsScreen extends JPanel {
 
         GradientPaint gp = new GradientPaint(
                 0, 0, new Color(255, 200, 220),
-                0, h, new Color(255, 240, 245)
-        );
+                0, h, new Color(255, 240, 245));
 
         g2.setPaint(gp);
         g2.fillRect(0, 0, w, h);
@@ -236,8 +231,7 @@ public class AudioSettingsScreen extends JPanel {
 
                 GradientPaint gp = new GradientPaint(
                         0, 0, new Color(170, 240, 190),
-                        0, getHeight(), new Color(60, 170, 110)
-                );
+                        0, getHeight(), new Color(60, 170, 110));
 
                 g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
@@ -274,8 +268,7 @@ public class AudioSettingsScreen extends JPanel {
 
                 GradientPaint gp = new GradientPaint(
                         0, 0, new Color(255, 120, 120),
-                        0, getHeight(), new Color(200, 40, 40)
-                );
+                        0, getHeight(), new Color(200, 40, 40));
 
                 g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);

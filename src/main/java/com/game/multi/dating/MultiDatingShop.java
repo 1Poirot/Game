@@ -1,14 +1,11 @@
 package com.game.multi.dating;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.function.BiFunction;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
 public class MultiDatingShop extends JDialog {
     private JLabel moneyLbl;
@@ -16,8 +13,10 @@ public class MultiDatingShop extends JDialog {
     private JLayeredPane layeredPane;
     private JPanel mainContent;
 
-    private final int IMG_WIDTH = 120;
-    private final int IMG_HEIGHT = 120;
+    private final Color THEME_PINK = new Color(255, 20, 147);
+    private final Color SOFT_PINK = new Color(255, 240, 245);
+    private final int IMG_WIDTH = 130;
+    private final int IMG_HEIGHT = 130;
 
     public MultiDatingShop(JFrame parent, int money, BiFunction<String, Integer, Boolean> onBuy) {
         super(parent, true);
@@ -33,137 +32,118 @@ public class MultiDatingShop extends JDialog {
         mainContent = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
+                Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 245, 250), 0, getHeight(), Color.WHITE);
+                GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 225, 240));
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
             }
         };
         mainContent.setBounds(0, 0, getWidth(), getHeight());
         layeredPane.add(mainContent, JLayeredPane.DEFAULT_LAYER);
 
-        // --- Header ---
+        // --- 🌸 Header (Back & Money) ---
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setBorder(new EmptyBorder(30, 50, 10, 50));
+        header.setBorder(new EmptyBorder(35, 60, 20, 60));
 
         JButton btnBack = new JButton(
-                "<html><font color='#FF1493' size='6'>◀</font> <font color='#FF1493' size='5'> BACK</font></html>");
+                "<html><b style='font-family:Segoe UI Emoji; font-size:20pt; color:#FF1493;'>◀ BACK</b></html>");
+        btnBack.setContentAreaFilled(false);
+        btnBack.setBorderPainted(false);
+        btnBack.setFocusPainted(false);
         btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnBack.addActionListener(e -> dispose());
 
-        // Hover Effect สำหรับปุ่ม Back
-        btnBack.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                btnBack.setText(
-                        "<html><font color='#FF69B4' size='6'>◀</font> <font color='#FF69B4' size='5'> <u>BACK</u></font></html>");
-            }
-
-            public void mouseExited(MouseEvent e) {
-                btnBack.setText(
-                        "<html><font color='#FF1493' size='6'>◀</font> <font color='#FF1493' size='5'> BACK</font></html>");
-            }
-        });
-
-        moneyLbl = new JLabel("<html><b style='font-family:Tahoma; font-size:24pt; color:#FF1493;'>👛 "
-                + String.format("%,d", currentMoney) + "</b></html>");
+        // สร้างป้ายเงินแบบดีลักซ์
+        moneyLbl = new JLabel();
+        updateMoneyDisplay();
 
         header.add(btnBack, BorderLayout.WEST);
         header.add(moneyLbl, BorderLayout.EAST);
         mainContent.add(header, BorderLayout.NORTH);
 
-        // --- Grid Items ---
-        JPanel grid = new JPanel(new GridLayout(2, 3, 30, 30));
+        // --- 🎁 Grid Items ---
+        JPanel grid = new JPanel(new GridLayout(2, 3, 45, 45));
         grid.setOpaque(false);
-        grid.setBorder(new EmptyBorder(20, 60, 40, 60));
+        grid.setBorder(new EmptyBorder(20, 100, 60, 100));
 
         String[] items = { "ดอกไม้", "สร้อยคอ", "กาแฟ", "ช็อกโกแลต", "เค้ก", "โดนัท" };
-        int[] prices = { 250, 50, 80, 100, 150, 50 };
-
-        // ชื่อไฟล์รูปภาพ (เช็ค cofe.jpg เรียบร้อย)
-        String[] itemImages = {
-                "ชอดอกไม้.png",
-                "สร้อยคอ.png",
-                "cofe.jpg",
-                "ช็อกโกแลท.png",
-                "เค็ก.png",
-                "โดนัท.png"
-        };
+        int[] prices = { 250, 500, 80, 120, 180, 60 };
+        String[] itemImages = { "ชอดอกไม้.png", "สร้อยคอ.png", "cofe.jpg", "ช็อกโกแลท.png", "เค็ก.png", "โดนัท.png" };
 
         for (int i = 0; i < items.length; i++) {
-            grid.add(createItemCard(items[i], prices[i], itemImages[i], onBuy));
+            grid.add(createPremiumCard(items[i], prices[i], itemImages[i], onBuy));
         }
 
         mainContent.add(grid, BorderLayout.CENTER);
     }
 
-    private JPanel createItemCard(String name, int price, String fileName, BiFunction<String, Integer, Boolean> onBuy) {
-        JPanel card = new JPanel(new BorderLayout(0, 10));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(255, 192, 203), 2, true),
-                new EmptyBorder(15, 15, 15, 15)));
+    private JPanel createPremiumCard(String name, int price, String fileName,
+            BiFunction<String, Integer, Boolean> onBuy) {
+        JPanel card = new JPanel(new BorderLayout(0, 15)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Shadow
+                g2d.setColor(new Color(0, 0, 0, 10));
+                g2d.fillRoundRect(6, 6, getWidth() - 6, getHeight() - 6, 50, 50);
+                // Body
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(0, 0, getWidth() - 6, getHeight() - 6, 50, 50);
+                // Soft Pink Border
+                g2d.setColor(new Color(255, 182, 193, 180));
+                g2d.setStroke(new BasicStroke(2f));
+                g2d.drawRoundRect(1, 1, getWidth() - 8, getHeight() - 8, 50, 50);
+                g2d.dispose();
+            }
+        };
+        card.setOpaque(false);
+        card.setBorder(new EmptyBorder(25, 25, 25, 25));
 
         JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
         imageLabel.setPreferredSize(new Dimension(IMG_WIDTH, IMG_HEIGHT));
-
-        // ✅ ระบบโหลดรูปภาพแบบ Double Check (Resource + File)
-        try {
-            Image img = null;
-            // ลองหาแบบ Resource ก่อน
-            URL imgURL = getClass().getResource("/images/icon/" + fileName);
-            if (imgURL != null) {
-                img = new ImageIcon(imgURL).getImage();
-            } else {
-                // ถ้าไม่เจอ ลองหาแบบ File Path ตรงๆ (สำหรับ VS Code)
-                File f = new File("src/main/resources/images/icon/" + fileName);
-                if (f.exists()) {
-                    img = new ImageIcon(f.getAbsolutePath()).getImage();
-                }
-            }
-
-            if (img != null) {
-                imageLabel.setIcon(new ImageIcon(img.getScaledInstance(IMG_WIDTH, IMG_HEIGHT, Image.SCALE_SMOOTH)));
-            } else {
-                imageLabel
-                        .setText("<html><center><font color='#FFB6C1' size='5'>🖼</font><br>No Image</center></html>");
-                System.err.println("🚨 ไม่พบรูป: " + fileName);
-            }
-        } catch (Exception e) {
-            imageLabel.setText("Error");
-        }
+        loadItemImage(imageLabel, fileName);
 
         JLabel nameLbl = new JLabel(name, SwingConstants.CENTER);
-        nameLbl.setFont(new Font("Tahoma", Font.BOLD, 18));
-        nameLbl.setForeground(new Color(150, 50, 80));
+        nameLbl.setFont(new Font("Tahoma", Font.BOLD, 22));
+        nameLbl.setForeground(new Color(110, 40, 70));
 
-        JButton buyBtn = new JButton("Buy " + price);
-        buyBtn.setBackground(new Color(255, 105, 180));
+        JButton buyBtn = new JButton("BUY - " + price) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                boolean isPressed = getModel().isPressed();
+                boolean isOver = getModel().isRollover();
+
+                GradientPaint gp = new GradientPaint(0, 0,
+                        isPressed ? THEME_PINK.darker()
+                                : (isOver ? new Color(255, 120, 190) : new Color(255, 150, 200)),
+                        0, getHeight(), THEME_PINK);
+                g2d.setPaint(gp);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 35, 35);
+                super.paintComponent(g);
+                g2d.dispose();
+            }
+        };
+        buyBtn.setFont(new Font("Tahoma", Font.BOLD, 18));
         buyBtn.setForeground(Color.WHITE);
-        buyBtn.setFont(new Font("Tahoma", Font.BOLD, 15));
+        buyBtn.setContentAreaFilled(false);
+        buyBtn.setBorderPainted(false);
         buyBtn.setFocusPainted(false);
         buyBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        buyBtn.setBorder(new EmptyBorder(10, 0, 10, 0));
-
-        // Hover Effect สำหรับปุ่ม Buy
-        buyBtn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                buyBtn.setBackground(new Color(255, 20, 147));
-            }
-
-            public void mouseExited(MouseEvent e) {
-                buyBtn.setBackground(new Color(255, 105, 180));
-            }
-        });
+        buyBtn.setPreferredSize(new Dimension(0, 55));
 
         buyBtn.addActionListener(e -> {
             if (onBuy.apply(name, price)) {
                 currentMoney -= price;
                 updateMoneyDisplay();
-                showPopupAnimation("ซื้อ " + name + " สำเร็จ!", true);
+                showCenteredHeroPopup(" ซื้อ " + name + " สำเร็จ! ", true);
             } else {
-                showPopupAnimation("เงินไม่พอจ้าา", false);
+                showCenteredHeroPopup("เงินไม่พอจ้าา", false);
             }
         });
 
@@ -175,32 +155,77 @@ public class MultiDatingShop extends JDialog {
     }
 
     private void updateMoneyDisplay() {
-        moneyLbl.setText("<html><b style='font-family:Tahoma; font-size:24pt; color:#FF1493;'>👛 "
-                + String.format("%,d", currentMoney) + "</b></html>");
+        // ใช้ฟอนต์ Segoe UI Emoji เพื่อให้รูปกระเป๋าเงินไม่เป็นสี่เหลี่ยม
+        moneyLbl.setText(
+                "<html><div style='background: white; padding: 12px 35px; border-radius: 30px; border: 3px solid #FF1493;'>"
+                        + "<span style='font-family:\"Segoe UI Emoji\"; font-size:24pt; color:#FF1493;'>👛</span> "
+                        + "<span style='font-family:Tahoma; font-size:24pt; color:#FF1493; font-weight:bold;'>"
+                        + String.format("%,d", currentMoney) + "</span>"
+                        + "</div></html>");
     }
 
-    private void showPopupAnimation(String text, boolean success) {
-        JLabel popup = new JLabel(text, SwingConstants.CENTER);
-        popup.setFont(new Font("Tahoma", Font.BOLD, 22));
-        popup.setOpaque(true);
-        popup.setBackground(success ? new Color(255, 182, 193, 240) : new Color(255, 69, 0, 240));
+    private void showCenteredHeroPopup(String text, boolean success) {
+        final JLabel popup = new JLabel(text, SwingConstants.CENTER) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(success ? new Color(255, 20, 147, 240) : new Color(230, 0, 50, 240));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(4f));
+                g2d.drawRoundRect(3, 3, getWidth() - 7, getHeight() - 7, 40, 40);
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+
+        // สำคัญ: ใช้ Segoe UI Emoji เพื่อแก้ปัญหาสี่เหลี่ยม ✨
+        popup.setFont(new Font("Tahoma", Font.BOLD, 28));
         popup.setForeground(Color.WHITE);
-        popup.setBorder(new LineBorder(Color.WHITE, 2, true));
 
-        popup.setBounds((getWidth() - 350) / 2, getHeight() / 2, 350, 70);
-        layeredPane.add(popup, JLayeredPane.POPUP_LAYER);
+        int pWidth = 500;
+        int pHeight = 110;
+        int px = (getWidth() - pWidth) / 2;
+        int py = (getHeight() - pHeight) / 2;
+        popup.setBounds(px, py, pWidth, pHeight);
 
-        Timer timer = new Timer(15, null);
-        final int[] count = { 0 };
+        layeredPane.add(popup, JLayeredPane.DRAG_LAYER);
+        layeredPane.revalidate();
+        layeredPane.repaint();
+
+        Timer timer = new Timer(25, null);
+        final int[] frame = { 0 };
         timer.addActionListener(e -> {
+            frame[0]++;
             popup.setLocation(popup.getX(), popup.getY() - 1);
-            count[0]++;
-            if (count[0] > 50) {
+            if (frame[0] > 40) {
                 layeredPane.remove(popup);
                 layeredPane.repaint();
                 timer.stop();
             }
         });
+        timer.setInitialDelay(1300);
         timer.start();
+    }
+
+    private void loadItemImage(JLabel label, String fileName) {
+        try {
+            Image img = null;
+            URL imgURL = getClass().getResource("/images/icon/" + fileName);
+            if (imgURL != null)
+                img = new ImageIcon(imgURL).getImage();
+            else {
+                File f = new File("src/main/resources/images/icon/" + fileName);
+                if (f.exists())
+                    img = new ImageIcon(f.getAbsolutePath()).getImage();
+            }
+            if (img != null)
+                label.setIcon(new ImageIcon(img.getScaledInstance(IMG_WIDTH, IMG_HEIGHT, Image.SCALE_SMOOTH)));
+            else
+                label.setText("<html><center><font color='#FFB6C1' size='6'>🖼</font></center></html>");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
