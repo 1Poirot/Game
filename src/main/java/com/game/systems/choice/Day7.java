@@ -351,27 +351,18 @@ public class Day7 {
         }
 
         // ห้องนอน (S1 - S10)
-        if (sceneNumber >= 1 && sceneNumber <= 13) {
+        if (sceneNumber >= 1 && sceneNumber <= 3) {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องนอน.jpg");
         }
 
         // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
-        else if ((sceneNumber >= 14 && sceneNumber <= 19) || ID.startsWith("Q1")) {
+        else if ((sceneNumber >= 4 && sceneNumber <= 7) || ID.startsWith("Q1")) {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สถานีรถไฟฟ้า.jpg");
         }
-        // ห้องเรียน (S21 - S30)
-        else if (sceneNumber >= 20 && sceneNumber <= 26) {
-            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สวนสนุก.jpg");
-        }
-        // พักกลางวัน (S27 - S44)
-        else if (sceneNumber >= 27 && sceneNumber <= 37) {
-            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/บนชิงช้า.png");
-        }
-        // ทางเดิน/เย็น (S45 - S50)
-        else if (sceneNumber >= 38 && sceneNumber <= 49) {
-            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ตอนเย็น.png");
-        } else if (sceneNumber >= 50 && sceneNumber <= 64) {
-            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ทางเดินตอนกลางคืน.jpg");
+
+        // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
+        else if ((sceneNumber >= 8 && sceneNumber <= 64) || ID.startsWith("Q1")) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ฉากตอบจบ.png");
         }
 
         DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);

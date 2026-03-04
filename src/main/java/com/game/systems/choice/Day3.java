@@ -475,7 +475,7 @@ public class Day3 {
         } else if ((sceneNumber >= 39 && sceneNumber <= 50) || ID.startsWith("Q3")) {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ดาดฟ้า.jpg");
         } else if ((sceneNumber >= 51 && sceneNumber <= 61) || ID.startsWith("Q4")) {
-            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สนามกีฬา.png");
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สนามบาส.jpg");
         } else if (sceneNumber >= 62 && sceneNumber <= 66) {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องเรียนตอนเย็น.png");
         } else if ((sceneNumber >= 67 && sceneNumber <= 86) || ID.startsWith("Q5")) {
