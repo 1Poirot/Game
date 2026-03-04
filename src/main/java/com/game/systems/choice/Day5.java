@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 
-
 public class Day5 {
 
     private AffectionBar affectionBar;
@@ -35,9 +34,18 @@ public class Day5 {
     private String CURRENT_ID = "S1";
 
     public void CREATEANDSHOWGUI() {
-        FRAME = new JFrame("Kim Jae-hyun Route");
-        FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        FRAME.setResizable(true);
+        CREATEANDSHOWGUI(null);
+    }
+
+    public void CREATEANDSHOWGUI(JFrame existingFrame) {
+        if (existingFrame == null) {
+            FRAME = new JFrame("Kim Jae-hyun Route");
+            FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            FRAME.setResizable(true);
+        } else {
+            FRAME = existingFrame;
+            FRAME.getContentPane().removeAll();
+        }
 
         BG_VIEW = new BGVIEW("bg.png");
         BG_VIEW.setLayout(null);
@@ -87,7 +95,7 @@ public class Day5 {
             @Override
             public void componentResized(ComponentEvent E) {
                 LAYOUT_UI();
-            
+
             }
         });
 
@@ -99,19 +107,21 @@ public class Day5 {
 
         SHOW_SCENE(CURRENT_ID);
         LAYOUT_UI();
-        
-       if (affectionBar != null) {
-    int barW = 320;   // ขนาดกำลังดี
-    int barH = 85;    // เตี้ยลง
-    affectionBar.setBounds(40, 25, barW, barH);
-}
+
+        if (affectionBar != null) {
+            int barW = 320; // ขนาดกำลังดี
+            int barH = 85; // เตี้ยลง
+            affectionBar.setBounds(40, 25, barW, barH);
+        }
     }
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
         try {
             Image IMG = new ImageIcon(PATH).getImage();
-            if (IMG == null) return MAKE_EMPTY_IMAGE();
-            if (IMG.getWidth(null) <= 0 || IMG.getHeight(null) <= 0) return MAKE_EMPTY_IMAGE();
+            if (IMG == null)
+                return MAKE_EMPTY_IMAGE();
+            if (IMG.getWidth(null) <= 0 || IMG.getHeight(null) <= 0)
+                return MAKE_EMPTY_IMAGE();
             return IMG;
         } catch (Exception EX) {
             return MAKE_EMPTY_IMAGE();
@@ -220,29 +230,41 @@ public class Day5 {
         });
     }
 
-       private void BUILD_STORY() {
+    private void BUILD_STORY() {
         SCENES.clear();
 
-        SCENES.put("S1", new SCENE("ผู้บรรยาย", "Day5", "DAY 5 — ความรู้สึกที่เริ่มปิดไม่อยู่", null, null, null, "S2", null, null, null));
+        SCENES.put("S1", new SCENE("ผู้บรรยาย", "Day5", "DAY 5 — ความรู้สึกที่เริ่มปิดไม่อยู่", null, null, null, "S2",
+                null, null, null));
         SCENES.put("S2", new SCENE("ผู้บรรยาย", "Day5", "เช้าวันที่ห้า", null, null, null, "S3", null, null, null));
-        SCENES.put("S3", new SCENE("ผู้บรรยาย", "Day5", "แสงแดดลอดผ่านผ้าม่าน", null, null, null, "S4", null, null, null));
+        SCENES.put("S3",
+                new SCENE("ผู้บรรยาย", "Day5", "แสงแดดลอดผ่านผ้าม่าน", null, null, null, "S4", null, null, null));
         SCENES.put("S4", new SCENE("ผู้บรรยาย", "Day5", "คุณลืมตาขึ้นช้า ๆ", null, null, null, "S5", null, null, null));
-        SCENES.put("S5", new SCENE("ผู้บรรยาย", "Day5", "หัวใจยังเต้นแรงเมื่อนึกถึงเมื่อวาน", null, null, null, "S6", null, null, null));
-        SCENES.put("S6", new SCENE("ผู้บรรยาย", "Day5", "คำถามที่เขาเกือบพูดจบ", null, null, null, "S7", null, null, null));
+        SCENES.put("S5", new SCENE("ผู้บรรยาย", "Day5", "หัวใจยังเต้นแรงเมื่อนึกถึงเมื่อวาน", null, null, null, "S6",
+                null, null, null));
+        SCENES.put("S6",
+                new SCENE("ผู้บรรยาย", "Day5", "คำถามที่เขาเกือบพูดจบ", null, null, null, "S7", null, null, null));
         SCENES.put("S7", new SCENE("ผู้บรรยาย", "Day5", "สายตาที่จริงจัง", null, null, null, "S8", null, null, null));
-        SCENES.put("S8", new SCENE("ผู้บรรยาย", "Day5", "ระยะห่างที่ใกล้จนแทบสัมผัสลมหายใจ", null, null, null, "S9", null, null, null));
+        SCENES.put("S8", new SCENE("ผู้บรรยาย", "Day5", "ระยะห่างที่ใกล้จนแทบสัมผัสลมหายใจ", null, null, null, "S9",
+                null, null, null));
         SCENES.put("S9", new SCENE("คุณ", "Day5", "คุณพลิกตัวนอนหงาย", null, null, null, "S10", null, null, null));
-        SCENES.put("S10", new SCENE("คุณ", "Day5", "“…เรากำลังรอคำบางคำอยู่หรือเปล่า”", null, null, null, "S11", null, null, null));
+        SCENES.put("S10", new SCENE("คุณ", "Day5", "“…เรากำลังรอคำบางคำอยู่หรือเปล่า”", null, null, null, "S11", null,
+                null, null));
         SCENES.put("S11", new SCENE("ผู้บรรยาย", "Day5", "หน้าโรงเรียน", null, null, null, "S12", null, null, null));
-        SCENES.put("S12", new SCENE("ผู้บรรยาย", "Day5", "คุณมาถึงเร็วกว่าปกติ", null, null, null, "S13", null, null, null));
-        SCENES.put("S13", new SCENE("ผู้บรรยาย", "Day5", "รถหรูคันเดิมแล่นเข้ามาจอด", null, null, null, "S14", null, null, null));
+        SCENES.put("S12",
+                new SCENE("ผู้บรรยาย", "Day5", "คุณมาถึงเร็วกว่าปกติ", null, null, null, "S13", null, null, null));
+        SCENES.put("S13",
+                new SCENE("ผู้บรรยาย", "Day5", "รถหรูคันเดิมแล่นเข้ามาจอด", null, null, null, "S14", null, null, null));
         SCENES.put("S14", new SCENE("ผู้บรรยาย", "Day5", "เขาลงจากรถ", null, null, null, "S15", null, null, null));
         SCENES.put("S15", new SCENE("ผู้บรรยาย", "Day5", "แต่วันนี้", null, null, null, "S16", null, null, null));
-        SCENES.put("S16", new SCENE("ผู้บรรยาย", "Day5", "สายตาที่มองคุณ… ต่างออกไป", null, null, null, "S17", null, null, null));
+        SCENES.put("S16",
+                new SCENE("ผู้บรรยาย", "Day5", "สายตาที่มองคุณ… ต่างออกไป", null, null, null, "S17", null, null, null));
         SCENES.put("S17", new SCENE("ผู้บรรยาย", "Day5", "ไม่ใช่แค่สนใจ", null, null, null, "S18", null, null, null));
-        SCENES.put("S18", new SCENE("ผู้บรรยาย", "Day5", "แต่เหมือนกำลังตัดสินใจบางอย่างอยู่", null, null, null, "S19", null, null, null));
-        SCENES.put("S19", new SCENE("ผู้บรรยาย", "Day5", "เขาเดินเข้ามาใกล้", null, null, null, "S20", null, null, null));
-        SCENES.put("S20", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…เมื่อคืน นอนหลับไหม”", null, null, null, "Q1", null, null, null));
+        SCENES.put("S18", new SCENE("ผู้บรรยาย", "Day5", "แต่เหมือนกำลังตัดสินใจบางอย่างอยู่", null, null, null, "S19",
+                null, null, null));
+        SCENES.put("S19",
+                new SCENE("ผู้บรรยาย", "Day5", "เขาเดินเข้ามาใกล้", null, null, null, "S20", null, null, null));
+        SCENES.put("S20", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…เมื่อคืน นอนหลับไหม”", null, null, null, "Q1",
+                null, null, null));
 
         SCENES.put("Q1", new SCENE("คุณ", "Day1", "คำถามที่ 1 — คุณตอบยังไง?",
                 "A) “หลับ…แต่คิดถึงเธอก่อนนอน”",
@@ -254,26 +276,37 @@ public class Day5 {
         SCENES.put("Q1_B", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +5", null, null, null, "S23", null, null, null));
         SCENES.put("Q1_C", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +8", null, null, null, "S23", null, null, null));
 
-        SCENES.put("S21", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายชะงักก่อนหลบสายตาเล็กน้อย", null, null, null, "S22", null, null, null));
+        SCENES.put("S21", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายชะงักก่อนหลบสายตาเล็กน้อย", null, null, null, "S22",
+                null, null, null));
         SCENES.put("S22", new SCENE("ผู้บรรยาย", "Day5", "“…เหมือนกัน”", null, null, null, "S23", null, null, null));
-        SCENES.put("S23", new SCENE("ผู้บรรยาย", "Day5", "คาบเช้า — สายตาที่ชัดเกินไป", null, null, null, "S24", null, null, null));
+        SCENES.put("S23", new SCENE("ผู้บรรยาย", "Day5", "คาบเช้า — สายตาที่ชัดเกินไป", null, null, null, "S24", null,
+                null, null));
         SCENES.put("S24", new SCENE("ผู้บรรยาย", "Day5", "ระหว่างเรียน", null, null, null, "S25", null, null, null));
-        SCENES.put("S25", new SCENE("ผู้บรรยาย", "Day5", "คุณรู้สึกถึงสายตาที่มองมาบ่อยกว่าทุกวัน", null, null, null, "S26", null, null, null));
+        SCENES.put("S25", new SCENE("ผู้บรรยาย", "Day5", "คุณรู้สึกถึงสายตาที่มองมาบ่อยกว่าทุกวัน", null, null, null,
+                "S26", null, null, null));
         SCENES.put("S26", new SCENE("ผู้บรรยาย", "Day5", "เมื่อเงยหน้า", null, null, null, "S27", null, null, null));
         SCENES.put("S27", new SCENE("ผู้บรรยาย", "Day5", "เขาไม่ได้หันหนี", null, null, null, "S28", null, null, null));
         SCENES.put("S28", new SCENE("ผู้บรรยาย", "Day5", "กลับมองตรง ๆ", null, null, null, "S29", null, null, null));
-        SCENES.put("S29", new SCENE("ผู้บรรยาย", "Day5", "เหมือนกำลังอ่านความรู้สึกคุณ", null, null, null, "S30", null, null, null));
+        SCENES.put("S29", new SCENE("ผู้บรรยาย", "Day5", "เหมือนกำลังอ่านความรู้สึกคุณ", null, null, null, "S30", null,
+                null, null));
         SCENES.put("S30", new SCENE("ผู้บรรยาย", "Day5", "ระหว่างพักคาบ", null, null, null, "S31", null, null, null));
-        SCENES.put("S31", new SCENE("ผู้บรรยาย", "Day5", "มีนักเรียนคนหนึ่งเดินมาคุยกับคุณ", null, null, null, "S32", null, null, null));
+        SCENES.put("S31", new SCENE("ผู้บรรยาย", "Day5", "มีนักเรียนคนหนึ่งเดินมาคุยกับคุณ", null, null, null, "S32",
+                null, null, null));
         SCENES.put("S32", new SCENE("ผู้บรรยาย", "Day5", "ถามเรื่องงาน", null, null, null, "S33", null, null, null));
         SCENES.put("S33", new SCENE("ผู้บรรยาย", "Day5", "หัวเราะเล็กน้อย", null, null, null, "S34", null, null, null));
-        SCENES.put("S34", new SCENE("ผู้บรรยาย", "Day5", "คุณไม่ได้คิดอะไร", null, null, null, "S35", null, null, null));
+        SCENES.put("S34",
+                new SCENE("ผู้บรรยาย", "Day5", "คุณไม่ได้คิดอะไร", null, null, null, "S35", null, null, null));
         SCENES.put("S35", new SCENE("ผู้บรรยาย", "Day5", "แต่พอหันไปอีกที", null, null, null, "S36", null, null, null));
-        SCENES.put("S36", new SCENE("ผู้บรรยาย", "Day5", "เห็นเขายืนมองอยู่", null, null, null, "S37", null, null, null));
-        SCENES.put("S37", new SCENE("ผู้บรรยาย", "Day5", "สีหน้าเรียบ แต่ดวงตาเย็นลงเล็กน้อย", null, null, null, "S38", null, null, null));
-        SCENES.put("S38", new SCENE("ผู้บรรยาย", "Day5", "หลังจากอีกคนเดินไป", null, null, null, "S39", null, null, null));
-        SCENES.put("S39", new SCENE("ผู้บรรยาย", "Day5", "เขาเดินมาหาคุณทันที", null, null, null, "S40", null, null, null));
-        SCENES.put("S40", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…สนิทกันเหรอ”",null, null,null, "Q2",null,null,null));
+        SCENES.put("S36",
+                new SCENE("ผู้บรรยาย", "Day5", "เห็นเขายืนมองอยู่", null, null, null, "S37", null, null, null));
+        SCENES.put("S37", new SCENE("ผู้บรรยาย", "Day5", "สีหน้าเรียบ แต่ดวงตาเย็นลงเล็กน้อย", null, null, null, "S38",
+                null, null, null));
+        SCENES.put("S38",
+                new SCENE("ผู้บรรยาย", "Day5", "หลังจากอีกคนเดินไป", null, null, null, "S39", null, null, null));
+        SCENES.put("S39",
+                new SCENE("ผู้บรรยาย", "Day5", "เขาเดินมาหาคุณทันที", null, null, null, "S40", null, null, null));
+        SCENES.put("S40", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…สนิทกันเหรอ”", null, null, null, "Q2", null,
+                null, null));
 
         SCENES.put("Q2", new SCENE("คุณ", "Day5", "คำถามที่ 2 — คุณตอบยังไง?",
                 "A) “ไม่เลย เราไม่ได้คิดอะไร”",
@@ -285,15 +318,24 @@ public class Day5 {
         SCENES.put("Q2_B", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +2", null, null, null, "S44", null, null, null));
         SCENES.put("Q2_C", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +7", null, null, null, "S41", null, null, null));
 
-        SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายนิ่งไปก่อนตอบช้า ๆ", null, null, null, "S42", null, null, null));
-        SCENES.put("S42", new SCENE("ผู้บรรยาย", "Day5", "“…ถ้าหึงแล้วจะทำไม”", null, null, null, "S43", null, null, null));
-        SCENES.put("S43", new SCENE("ผู้บรรยาย", "Day5", "หัวใจคุณกระตุกทันที", null, null, null, "S44", null, null, null));
-        SCENES.put("S44", new SCENE("ผู้บรรยาย", "Day5", "พักกลางวัน — บทสนทนาตรงไปตรงมา", null, null, null, "S45", null, null, null));
-        SCENES.put("S45", new SCENE("ผู้บรรยาย", "Day5", "วันนี้คุณสองคนนั่งกินข้าวกันสองคน", null, null, null, "S46", null, null, null));
-        SCENES.put("S46", new SCENE("ผู้บรรยาย", "Day5", "บรรยากาศไม่เหมือนเดิม มันเข้มข้นกว่า", null, null, null, "S47", null, null, null));
-        SCENES.put("S47", new SCENE("ผู้บรรยาย", "Day5", "เหมือนมีคำพูดบางอย่างค้างอยู่กลางโต๊ะ", null,	null,	null,	"S48",	null,	null,	null));
-        SCENES.put("S48", new SCENE("ผู้บรรยาย", "Day5", "เขาวางช้อนลง แล้วมองคุณตรง ๆ", null, null, null, "S49", null, null, null));
-        SCENES.put("S49", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…เธอคิดยังไงกับฉัน”", null, null, null, "Q3", null, null, null));
+        SCENES.put("S41",
+                new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายนิ่งไปก่อนตอบช้า ๆ", null, null, null, "S42", null, null, null));
+        SCENES.put("S42",
+                new SCENE("ผู้บรรยาย", "Day5", "“…ถ้าหึงแล้วจะทำไม”", null, null, null, "S43", null, null, null));
+        SCENES.put("S43",
+                new SCENE("ผู้บรรยาย", "Day5", "หัวใจคุณกระตุกทันที", null, null, null, "S44", null, null, null));
+        SCENES.put("S44", new SCENE("ผู้บรรยาย", "Day5", "พักกลางวัน — บทสนทนาตรงไปตรงมา", null, null, null, "S45",
+                null, null, null));
+        SCENES.put("S45", new SCENE("ผู้บรรยาย", "Day5", "วันนี้คุณสองคนนั่งกินข้าวกันสองคน", null, null, null, "S46",
+                null, null, null));
+        SCENES.put("S46", new SCENE("ผู้บรรยาย", "Day5", "บรรยากาศไม่เหมือนเดิม มันเข้มข้นกว่า", null, null, null,
+                "S47", null, null, null));
+        SCENES.put("S47", new SCENE("ผู้บรรยาย", "Day5", "เหมือนมีคำพูดบางอย่างค้างอยู่กลางโต๊ะ", null, null, null,
+                "S48", null, null, null));
+        SCENES.put("S48", new SCENE("ผู้บรรยาย", "Day5", "เขาวางช้อนลง แล้วมองคุณตรง ๆ", null, null, null, "S49", null,
+                null, null));
+        SCENES.put("S49", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…เธอคิดยังไงกับฉัน”", null, null, null, "Q3",
+                null, null, null));
 
         SCENES.put("Q3", new SCENE("คุณ", "Day5", "คำถามที่ 3 — คุณตอบยังไง?",
                 "A) “เราชอบเธอ”",
@@ -305,18 +347,29 @@ public class Day5 {
         SCENES.put("Q3_B", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +5 ", null, null, null, "S55", null, null, null));
         SCENES.put("Q3_C", new SCENE("คุณ", "Day5", "ความสัมพันธ์ -3 ", null, null, null, "S55", null, null, null));
 
-        SCENES.put("S50", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายเงียบไปหลายวินาทีก่อนสูดหายใจลึก", null, null, null, "S51", null, null, null));
+        SCENES.put("S50", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายเงียบไปหลายวินาทีก่อนสูดหายใจลึก", null, null, null,
+                "S51", null, null, null));
         SCENES.put("S51", new SCENE("ผู้บรรยาย", "Day5", "“…ดี”", null, null, null, "S52", null, null, null));
-        SCENES.put("S52", new SCENE("ผู้บรรยาย", "Day5", "“…เพราะฉันก็ชอบเธอ”", null, null, null, "S53", null, null, null));
-        SCENES.put("S53", new SCENE("ผู้บรรยาย", "Day5", "คำว่า “ชอบ” ถูกพูดชัดเจนครั้งแรก", null, null, null, "S54", null, null, null));
-        SCENES.put("S54", new SCENE("ผู้บรรยาย", "Day5", "แต่ยังไม่มีคำว่าแฟนยังไม่มีคำว่ารัก", null, null, null, "S55", null, null, null));
-        SCENES.put("S55", new SCENE("ผู้บรรยาย", "Day5", "หลังเลิกเรียน — ทางเดินเงียบ", null, null, null, "S56", null, null, null));
-        SCENES.put("S56", new SCENE("ผู้บรรยาย", "Day5", "วันนี้คุณสองคนไม่ได้รีบกลับ เดินช้ากว่าปกติ", null, null, null, "S57", null, null, null));
-        SCENES.put("S57", new SCENE("ผู้บรรยาย", "Day5", "ไม่มีใครพูดอะไรสักพัก แต่บรรยากาศไม่อึดอัด", null, null, null, "S58", null, null, null));
-        SCENES.put("S58", new SCENE("ผู้บรรยาย", "Day5", "มือของคุณแกว่งไปตามจังหวะเดิน แล้วปลายนิ้วชนกันอีกครั้ง", null, null, null, "S59", null, null, null));
-        SCENES.put("S59", new SCENE("ผู้บรรยาย", "Day5", "คราวนี้เขาเป็นฝ่ายจับไว้เอง มืออุ่นมาก แน่น…แต่ไม่บังคับ", null, null, null, "S60", null, null, null));
-        SCENES.put("S60", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…อย่าเปิดโอกาสให้ใครก่อนฉันได้ไหม”", null, null, null, "S61", null, null, null));
-        SCENES.put("S61", new SCENE("ผู้บรรยาย", "Day5", "เสียงเบา แต่จริงจังที่สุดตั้งแต่เคยได้ยินมา", null, null, null, "Q4", null, null, null));
+        SCENES.put("S52",
+                new SCENE("ผู้บรรยาย", "Day5", "“…เพราะฉันก็ชอบเธอ”", null, null, null, "S53", null, null, null));
+        SCENES.put("S53", new SCENE("ผู้บรรยาย", "Day5", "คำว่า “ชอบ” ถูกพูดชัดเจนครั้งแรก", null, null, null, "S54",
+                null, null, null));
+        SCENES.put("S54", new SCENE("ผู้บรรยาย", "Day5", "แต่ยังไม่มีคำว่าแฟนยังไม่มีคำว่ารัก", null, null, null, "S55",
+                null, null, null));
+        SCENES.put("S55", new SCENE("ผู้บรรยาย", "Day5", "หลังเลิกเรียน — ทางเดินเงียบ", null, null, null, "S56", null,
+                null, null));
+        SCENES.put("S56", new SCENE("ผู้บรรยาย", "Day5", "วันนี้คุณสองคนไม่ได้รีบกลับ เดินช้ากว่าปกติ", null, null,
+                null, "S57", null, null, null));
+        SCENES.put("S57", new SCENE("ผู้บรรยาย", "Day5", "ไม่มีใครพูดอะไรสักพัก แต่บรรยากาศไม่อึดอัด", null, null, null,
+                "S58", null, null, null));
+        SCENES.put("S58", new SCENE("ผู้บรรยาย", "Day5", "มือของคุณแกว่งไปตามจังหวะเดิน แล้วปลายนิ้วชนกันอีกครั้ง",
+                null, null, null, "S59", null, null, null));
+        SCENES.put("S59", new SCENE("ผู้บรรยาย", "Day5", "คราวนี้เขาเป็นฝ่ายจับไว้เอง มืออุ่นมาก แน่น…แต่ไม่บังคับ",
+                null, null, null, "S60", null, null, null));
+        SCENES.put("S60", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…อย่าเปิดโอกาสให้ใครก่อนฉันได้ไหม”", null,
+                null, null, "S61", null, null, null));
+        SCENES.put("S61", new SCENE("ผู้บรรยาย", "Day5", "เสียงเบา แต่จริงจังที่สุดตั้งแต่เคยได้ยินมา", null, null,
+                null, "Q4", null, null, null));
 
         SCENES.put("Q4", new SCENE("คุณ", "Day5", "คำถามที่ 4 — คุณตอบยังไง?",
                 "A) “ไม่มีใครสำคัญกว่าเธอ”",
@@ -328,117 +381,146 @@ public class Day5 {
         SCENES.put("Q4_B", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +4 ", null, null, null, "END", null, null, null));
         SCENES.put("Q4_C", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +2 ", null, null, null, "END", null, null, null));
 
-        SCENES.put("S62", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายหยุดเดินหันมามองคุณใกล้มาก", null, null, null, "S63", null, null, null));
-        SCENES.put("S63", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…งั้นรอฉันอีกนิด”", null, null, null, "S64", null, null, null));
-        SCENES.put("S64", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…พรุ่งนี้ ฉันจะไม่ให้เธอรอแล้ว”", null, null, null, "END", null, null, null));
+        SCENES.put("S62", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายหยุดเดินหันมามองคุณใกล้มาก", null, null, null, "S63",
+                null, null, null));
+        SCENES.put("S63", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…งั้นรอฉันอีกนิด”", null, null, null, "S64",
+                null, null, null));
+        SCENES.put("S64", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day5", "“…พรุ่งนี้ ฉันจะไม่ให้เธอรอแล้ว”", null, null,
+                null, "END", null, null, null));
 
         SCENES.put("END", new SCENE("ผู้บรรยาย", "Day5", "จบ Day 5", null, null, null, null, null, null, null));
     }
 
     private void SHOW_SCENE(String ID) {
-    CURRENT_ID = ID;
-    SCENE S = SCENES.get(ID);
-    if (S == null) return;
+        CURRENT_ID = ID;
+        SCENE S = SCENES.get(ID);
+        if (S == null)
+            return;
 
-    // 🔥 ดึงเลขฉากออกมา
-    int sceneNumber = -1;
-    if (ID.startsWith("S")) {
-        try {
-            sceneNumber = Integer.parseInt(ID.substring(1));
-        } catch (Exception ignored) {}
+        // 🔥 ดึงเลขฉากออกมา
+        int sceneNumber = -1;
+        if (ID.startsWith("S")) {
+            try {
+                sceneNumber = Integer.parseInt(ID.substring(1));
+            } catch (Exception ignored) {
+            }
+        }
+
+        // ห้องนอน (S1 - S10)
+        if (sceneNumber >= 1 && sceneNumber <= 10) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องนอน.jpg");
+        }
+
+        // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
+        else if ((sceneNumber >= 11 && sceneNumber <= 22) || ID.startsWith("Q1")) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/หน้าโรงเรียน.png");
+        }
+
+        // ห้องเรียน (S21 - S30)
+        else if ((sceneNumber >= 23 && sceneNumber <= 43) || ID.startsWith("Q2")) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
+        }
+        // พักกลางวัน (S39 - S50)
+        else if ((sceneNumber >= 44 && sceneNumber <= 54) || ID.startsWith("Q3")) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงอาหาร.jpg");
+        }
+        // ทางเดิน/เย็น (S45 - S50)
+        else if ((sceneNumber >= 55 && sceneNumber <= 64) || ID.startsWith("Q4")) {
+            BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงเรียนตอนเย็น.jpg");
+        }
+
+        DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
+        DIALOG.repaint();
+
+        boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
+        CHOICE_PANEL.setVisible(HAS_CHOICES);
+        BTN_CHOICE1.setVisible(HAS_CHOICES);
+        BTN_CHOICE2.setVisible(HAS_CHOICES);
+        BTN_CHOICE3.setVisible(HAS_CHOICES);
+
+        if (HAS_CHOICES) {
+            BTN_CHOICE1.setText(S.C1);
+            BTN_CHOICE2.setText(S.C2);
+            BTN_CHOICE3.setText(S.C3);
+        }
     }
-
-    // ห้องนอน (S1 - S10)
-    if (sceneNumber >= 1 && sceneNumber <= 10) {
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องนอน.jpg");
-    }
-
-    // หน้าโรงเรียนเช้า (S11 - S20 + Q1)
-    else if ((sceneNumber >= 11 && sceneNumber <= 22) || ID.startsWith("Q1")) {
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/หน้าโรงเรียน.png");
-    }
-
-    // ห้องเรียน (S21 - S30)
-    else if ((sceneNumber >= 23 && sceneNumber <= 43) || ID.startsWith("Q2")){
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ห้องเรียน.jpg");
-    }
-    // พักกลางวัน (S39 - S50)
-    else if ((sceneNumber >= 44 && sceneNumber <= 54) || ID.startsWith("Q3")){
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงอาหาร.jpg");
-    }
-    // ทางเดิน/เย็น (S45 - S50)
-    else if ((sceneNumber >= 55 && sceneNumber <= 64) || ID.startsWith("Q4")){
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงเรียนตอนเย็น.jpg");
-    }
-
-    DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
-    DIALOG.repaint();
-
-    boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
-    CHOICE_PANEL.setVisible(HAS_CHOICES);
-    BTN_CHOICE1.setVisible(HAS_CHOICES);
-    BTN_CHOICE2.setVisible(HAS_CHOICES);
-    BTN_CHOICE3.setVisible(HAS_CHOICES);    
-
-
-    if (HAS_CHOICES) {
-        BTN_CHOICE1.setText(S.C1);
-        BTN_CHOICE2.setText(S.C2);
-        BTN_CHOICE3.setText(S.C3);
-    }
-}
 
     private void GOTO_NEXT_BY_CLICK() {
         SCENE S = SCENES.get(CURRENT_ID);
-        if (S == null) return;
+        if (S == null)
+            return;
         boolean HAS_CHOICES = S.C1 != null && S.C2 != null && S.C3 != null;
-        if (HAS_CHOICES) return;
-        if (S.NEXT != null) SHOW_SCENE(S.NEXT);
+        if (HAS_CHOICES)
+            return;
+
+        if (CURRENT_ID.equals("END")) {
+            new Day6().CREATEANDSHOWGUI(FRAME);
+            return;
+        }
+
+        if (S.NEXT != null)
+            SHOW_SCENE(S.NEXT);
     }
 
-   private void PICK(int INDEX) {
-    SCENE S = SCENES.get(CURRENT_ID);
-    if (S == null) return;
+    private void PICK(int INDEX) {
+        SCENE S = SCENES.get(CURRENT_ID);
+        if (S == null)
+            return;
 
-    AffectionManager affection = AffectionManager.getInstance();
+        AffectionManager affection = AffectionManager.getInstance();
 
-    // Q1
-    if (CURRENT_ID.equals("Q1")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+        // Q1
+        if (CURRENT_ID.equals("Q1")) {
+            if (INDEX == 1)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+        }
+
+        // Q2
+        if (CURRENT_ID.equals("Q2")) {
+            if (INDEX == 1)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 7);
+        }
+
+        // Q3
+        if (CURRENT_ID.equals("Q3")) {
+            if (INDEX == 1)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
+        }
+
+        // Q4
+        if (CURRENT_ID.equals("Q4")) {
+            if (INDEX == 1)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+        }
+
+        // รีเฟรชแถบ
+        if (affectionBar != null) {
+            affectionBar.refresh();
+        }
+
+        if (INDEX == 1 && S.NEXT1 != null)
+            SHOW_SCENE(S.NEXT1);
+        if (INDEX == 2 && S.NEXT2 != null)
+            SHOW_SCENE(S.NEXT2);
+        if (INDEX == 3 && S.NEXT3 != null)
+            SHOW_SCENE(S.NEXT3);
     }
-
-    // Q2
-    if (CURRENT_ID.equals("Q2")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 7);
-    }
-
-    // Q3
-    if (CURRENT_ID.equals("Q3")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
-    }
-
-    // Q4
-    if (CURRENT_ID.equals("Q4")) {
-        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
-        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
-        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
-    }
-
-    // รีเฟรชแถบ
-    if (affectionBar != null) {
-        affectionBar.refresh();
-    }
-
-    if (INDEX == 1 && S.NEXT1 != null) SHOW_SCENE(S.NEXT1);
-    if (INDEX == 2 && S.NEXT2 != null) SHOW_SCENE(S.NEXT2);
-    if (INDEX == 3 && S.NEXT3 != null) SHOW_SCENE(S.NEXT3);
-}
 
     public static void main(String[] ARGS) {
         SwingUtilities.invokeLater(() -> new Day5().CREATEANDSHOWGUI());
@@ -456,7 +538,8 @@ public class Day5 {
         String NEXT2;
         String NEXT3;
 
-        SCENE(String NAME, String DAY, String TEXT, String C1, String C2, String C3, String NEXT, String NEXT1, String NEXT2, String NEXT3) {
+        SCENE(String NAME, String DAY, String TEXT, String C1, String C2, String C3, String NEXT, String NEXT1,
+                String NEXT2, String NEXT3) {
             this.NAME = NAME;
             this.DAY = DAY;
             this.TEXT = TEXT;
@@ -471,26 +554,26 @@ public class Day5 {
     }
 
     static class BGVIEW extends JPanel {
-    private Image ORIG;
+        private Image ORIG;
 
-    BGVIEW(String PATH) {
-        SET_BG(PATH);
-    }
+        BGVIEW(String PATH) {
+            SET_BG(PATH);
+        }
 
-    void SET_BG(String PATH) {
-        ORIG = new ImageIcon(PATH).getImage();
-        repaint();   // เรียกครั้งเดียวพอ
-    }
+        void SET_BG(String PATH) {
+            ORIG = new ImageIcon(PATH).getImage();
+            repaint(); // เรียกครั้งเดียวพอ
+        }
 
-    @Override
-    protected void paintComponent(Graphics G) {
-        super.paintComponent(G);
+        @Override
+        protected void paintComponent(Graphics G) {
+            super.paintComponent(G);
 
-        if (ORIG != null) {
-            G.drawImage(ORIG, 0, 0, getWidth(), getHeight(), this);
+            if (ORIG != null) {
+                G.drawImage(ORIG, 0, 0, getWidth(), getHeight(), this);
+            }
         }
     }
-}
 
     static class DIALOGPANEL extends JPanel {
         private String NAME;
@@ -592,7 +675,8 @@ public class Day5 {
                     LINE.append(W);
                 }
             }
-            if (LINE.length() > 0) OUT.add(LINE.toString());
+            if (LINE.length() > 0)
+                OUT.add(LINE.toString());
             return OUT.toArray(new String[0]);
         }
     }
@@ -608,7 +692,8 @@ public class Day5 {
             int H = B.getHeight();
 
             String STATE = (String) B.getClientProperty("BTN_STATE");
-            if (STATE == null) STATE = "NORMAL";
+            if (STATE == null)
+                STATE = "NORMAL";
 
             Color BG = (Color) B.getClientProperty("BTN_BG");
             Color BR = (Color) B.getClientProperty("BTN_BORDER");
@@ -616,8 +701,10 @@ public class Day5 {
             Color PRESS = (Color) B.getClientProperty("BTN_PRESS");
 
             Color USE_BG = BG;
-            if ("HOVER".equals(STATE)) USE_BG = HOVER;
-            if ("PRESS".equals(STATE)) USE_BG = PRESS;
+            if ("HOVER".equals(STATE))
+                USE_BG = HOVER;
+            if ("PRESS".equals(STATE))
+                USE_BG = PRESS;
 
             int ARC = 26;
 
