@@ -22,8 +22,6 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
     private JButton btnTalk; // ใช้เป็นปุ่มเริ่มเกม
     private JButton btnGift; // ใช้เป็นปุ่มออกจากห้อง
 
-    private final Map<String, JLabel> scoreLabels = new LinkedHashMap<>();
-
     // ======================================================
     // Constructor (รับ 3 พารามิเตอร์เพื่อให้หายแดงใน GameController)
     // ======================================================
