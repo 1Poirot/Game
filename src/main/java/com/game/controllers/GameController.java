@@ -108,10 +108,6 @@ public class GameController {
         showChangescene();
     }
 
-    public void showShop() {
-        changeScreen(new ShopScreen(this));
-    }
-
     public void showSettings() {
         if (!mainFrame.isVisible()) {
             lastScene = "CHANGESCENE";

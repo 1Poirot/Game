@@ -89,7 +89,7 @@ public class SaveScreen extends JPanel {
                         controller.getPlayer().setName(data.get("Name"));
                         controller.getPlayer().setMoney(Integer.parseInt(data.get("Money")));
                         JOptionPane.showMessageDialog(this, "โหลดข้อมูลสำเร็จ!");
-                        controller.showShop(); // กลับเข้าเกม
+                        controller.showSaveScreen(); // กลับเข้าเกม //TODO: แก้นะให้หน้าหมี
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "ไม่มีข้อมูลในช่องนี้");
