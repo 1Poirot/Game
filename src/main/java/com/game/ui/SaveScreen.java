@@ -2,149 +2,153 @@ package com.game.ui;
 
 import com.game.controllers.GameController;
 import com.game.systems.save.SaveSystem;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class SaveScreen extends JPanel {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private final GameController CONTROLLER;
+    private final Runnable ON_BACK;
+    private final JLabel[] SLOT_TITLE = new JLabel[5];
+    private final JLabel[] SLOT_SUB = new JLabel[5];
 
-    public SaveScreen(GameController controller, Runnable onBack) {
+    public SaveScreen(GameController CONTROLLER, Runnable ON_BACK) {
+        this.CONTROLLER = CONTROLLER;
+        this.ON_BACK = ON_BACK;
+
         setLayout(new BorderLayout());
         setBackground(new Color(255, 209, 220));
+        setBorder(new EmptyBorder(24, 28, 24, 28));
 
-        // --- Header ---
-        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        header.setOpaque(false);
-        header.setBorder(new EmptyBorder(30, 50, 0, 0));
+        // Top Bar
+        JPanel TOP = new JPanel(new BorderLayout(18, 0));
+        TOP.setOpaque(false);
+        JButton BACK = MAKE_BUTTON("< ย้อนกลับ", Color.WHITE, new Color(30, 30, 30), 200, 56, 22, 26);
+        BACK.addActionListener(e -> this.ON_BACK.run());
+        TOP.add(BACK, BorderLayout.WEST);
+        add(TOP, BorderLayout.NORTH);
 
-        JButton backBtn = createRoundedButton("< ย้อนกลับ", 200, 70, Color.WHITE, Color.BLACK);
-        backBtn.addActionListener(e -> onBack.run());
-        header.add(backBtn);
-        add(header, BorderLayout.NORTH);
+        JPanel LIST = new JPanel(new GridLayout(5, 1, 0, 14));
+        LIST.setOpaque(false);
 
-        // --- Center Panel (ขนาดใหญ่ 1500x850) ---
-        JPanel centerWrapper = new JPanel(new GridBagLayout());
-        centerWrapper.setOpaque(false);
+        for (int i = 0; i < 5; i++) {
+            int SLOT = i + 1;
+            JPanel CARD = MAKE_SLOT_CARD();
+            SLOT_TITLE[i] = new JLabel();
+            SLOT_TITLE[i].setFont(new Font("Tahoma", Font.BOLD, 22));
+            SLOT_SUB[i] = new JLabel();
+            SLOT_SUB[i].setFont(new Font("Tahoma", Font.PLAIN, 16));
 
-        JPanel saveBox = new JPanel(new GridBagLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(4));
-                g2.drawRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 50, 50);
-                g2.dispose();
-            }
-        };
-        saveBox.setOpaque(false);
+            JPanel TEXT = new JPanel(new GridLayout(2, 1, 0, 2));
+            TEXT.setOpaque(false);
+            TEXT.add(SLOT_TITLE[i]);
+            TEXT.add(SLOT_SUB[i]);
 
-        // ให้ saveBox ขยายเต็มพื้นที่แทนขนาดคงที่
-        GridBagConstraints outerGbc = new GridBagConstraints();
-        outerGbc.fill = GridBagConstraints.BOTH;
-        outerGbc.weightx = 1.0;
-        outerGbc.weighty = 1.0;
-        outerGbc.insets = new Insets(20, 40, 30, 40);
+            JButton LOAD = MAKE_BUTTON("โหลด", new Color(92, 145, 235), Color.WHITE, 150, 50, 18, 22);
+            JButton SAVE = MAKE_BUTTON("บันทึกทับ", new Color(255, 105, 180), Color.WHITE, 150, 50, 18, 22);
+            JButton DELETE = MAKE_BUTTON("ลบเซฟ", new Color(180, 180, 180), Color.WHITE, 150, 50, 18, 22);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 15, 20);
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+            // Logic ปุ่มโหลด
+            LOAD.addActionListener(e -> {
+                Map<String, String> DATA = SaveSystem.loadFromLocal(SLOT);
+                if (DATA == null) { JOptionPane.showMessageDialog(this, "สล็อตนี้ว่างอยู่"); return; }
+                int CONFIRM = JOptionPane.showConfirmDialog(this, "โหลด Slot " + SLOT + "?", "ยืนยัน", JOptionPane.YES_NO_OPTION);
+                if (CONFIRM != JOptionPane.YES_OPTION) return;
 
-        JLabel titleLabel = new JLabel("ระบบจัดการข้อมูลเกม (Save & Load)");
-        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 32));
-        gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 30, 0);
-        saveBox.add(titleLabel, gbc);
+                this.CONTROLLER.getPlayer().setName(DATA.getOrDefault("Name", "Hero"));
+                this.CONTROLLER.getPlayer().setMoney(Integer.parseInt(DATA.getOrDefault("Money", "0")));
+                int savedIdx = Integer.parseInt(DATA.getOrDefault("DialogueIndex", "0"));
+                this.CONTROLLER.loadGameAt(savedIdx); // วาร์ปไปหน้าเนื้อเรื่อง
+                JOptionPane.showMessageDialog(this, "โหลดข้อมูลสำเร็จ!");
+            });
 
-        // --- สร้าง 5 Slots ---
-        for (int i = 1; i <= 5; i++) {
-            final int slot = i;
-            Map<String, String> data = SaveSystem.loadFromLocal(slot); // ดึงข้อมูลจาก SaveSystem
-            boolean hasData = (data != null);
+            // Logic ปุ่มเซฟ
+            SAVE.addActionListener(e -> {
+                int CONFIRM = JOptionPane.showConfirmDialog(this, "บันทึกทับ Slot " + SLOT + "?", "ยืนยัน", JOptionPane.YES_NO_OPTION);
+                if (CONFIRM != JOptionPane.YES_OPTION) return;
 
-            String info = !hasData ? "--- ช่องว่าง (Empty Slot) ---"
-                    : "ผู้เล่น: " + data.get("Name") + " | เงิน: " + data.get("Money") + " (" + data.get("Date") + ")";
+                int currentIdx = this.CONTROLLER.getCurrentDialogueIndex();
+                SaveSystem.saveToFile(SLOT, this.CONTROLLER.getPlayer().getName(), this.CONTROLLER.getPlayer().getMoney(), DATE_FORMAT.format(new Date()), currentIdx);
+                REFRESH_SLOTS();
+                JOptionPane.showMessageDialog(this, "บันทึกเรียบร้อย!");
+            });
 
-            // แผงปุ่มสำหรับแต่ละ Slot (รวมทั้งปุ่ม Save และ Load)
-            JPanel slotRow = new JPanel(new BorderLayout(15, 0));
-            slotRow.setOpaque(false);
-
-            // 1. ปุ่มแสดงข้อมูลและกดเพื่อ LOAD
-            JButton loadBtn = createRoundedButton("LOAD " + slot + " | " + info, 1050, 90,
-                    hasData ? new Color(100, 149, 237) : Color.LIGHT_GRAY, Color.WHITE);
-            loadBtn.addActionListener(e -> {
-                if (hasData) {
-                    int confirm = JOptionPane.showConfirmDialog(this,
-                            "ต้องการโหลดข้อมูลจาก Slot " + slot + " ใช่หรือไม่?", "ยืนยันการโหลด",
-                            JOptionPane.YES_NO_OPTION);
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        controller.getPlayer().setName(data.get("Name"));
-                        controller.getPlayer().setMoney(Integer.parseInt(data.get("Money")));
-                        JOptionPane.showMessageDialog(this, "โหลดข้อมูลสำเร็จ!");
-                        controller.showShop(); // กลับเข้าเกม
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "ไม่มีข้อมูลในช่องนี้");
+            // Logic ปุ่มลบ
+            DELETE.addActionListener(e -> {
+                int CONFIRM = JOptionPane.showConfirmDialog(this, "ลบ Slot " + SLOT + "?", "ยืนยันการลบ", JOptionPane.YES_NO_OPTION);
+                if (CONFIRM == JOptionPane.YES_OPTION) {
+                    SaveSystem.deleteSave(SLOT);
+                    REFRESH_SLOTS();
+                    JOptionPane.showMessageDialog(this, "ลบข้อมูลสำเร็จ!");
                 }
             });
 
-            // 2. ปุ่มสำหรับ SAVE ทับช่องนี้
-            JButton saveBtn = createRoundedButton("บันทึกทับ", 200, 90, new Color(255, 105, 180), Color.WHITE);
-            saveBtn.addActionListener(e -> {
-                int confirm = JOptionPane.showConfirmDialog(this, "ต้องการบันทึกข้อมูลปัจจุบันลงใน Slot " + slot + "?",
-                        "ยืนยันการเซฟ", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    SaveSystem.saveToFile(slot, controller.getPlayer().getName(), controller.getPlayer().getMoney(),
-                            dateFormat.format(new Date()));
-                    JOptionPane.showMessageDialog(this, "บันทึกลงเครื่องเรียบร้อย!");
-                    controller.showSaveScreen(onBack); // รีเฟรชหน้าจอทันทีเพื่อโชว์ข้อมูลใหม่
-                }
-            });
+            JPanel ACTIONS = new JPanel(new GridLayout(3, 1, 0, 5)); // ปรับเป็น 3 แถว
+            ACTIONS.setOpaque(false);
+            ACTIONS.add(LOAD); ACTIONS.add(SAVE); ACTIONS.add(DELETE);
 
-            slotRow.add(loadBtn, BorderLayout.CENTER);
-            slotRow.add(saveBtn, BorderLayout.EAST);
-
-            gbc.gridy = i;
-            saveBox.add(slotRow, gbc);
+            CARD.add(TEXT, BorderLayout.CENTER);
+            CARD.add(ACTIONS, BorderLayout.EAST);
+            LIST.add(CARD);
         }
-
-        centerWrapper.add(saveBox, outerGbc);
-        add(centerWrapper, BorderLayout.CENTER);
+        add(LIST, BorderLayout.CENTER);
+        REFRESH_SLOTS();
     }
 
-    private JButton createRoundedButton(String text, int w, int h, Color bg, Color fg) {
-        JButton btn = new JButton(text) {
+    private void REFRESH_SLOTS() {
+        for (int i = 0; i < 5; i++) {
+            Map<String, String> DATA = SaveSystem.loadFromLocal(i + 1);
+            if (DATA == null) {
+                SLOT_TITLE[i].setText("SLOT " + (i + 1) + " | ว่าง");
+                SLOT_SUB[i].setText("ยังไม่มีข้อมูล");
+            } else {
+                SLOT_TITLE[i].setText("SLOT " + (i + 1) + " | " + DATA.get("Name") + " | ฿" + DATA.get("Money"));
+                SLOT_SUB[i].setText("วันที่: " + DATA.get("Date"));
+            }
+        }
+    }
+
+    private JPanel MAKE_SLOT_CARD() {
+        JPanel P = new JPanel(new BorderLayout(18, 0)) {
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(3));
-                g2.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 40, 40);
-                FontMetrics fm = g2.getFontMetrics();
-                g2.setColor(getForeground());
-                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
-                        (getHeight() + fm.getAscent()) / 2 - 5);
-                g2.dispose();
+                Graphics2D G2 = (Graphics2D) g.create();
+                G2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                G2.setColor(Color.WHITE);
+                G2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
+                G2.dispose();
             }
         };
-        btn.setFont(new Font("Tahoma", Font.BOLD, 22));
-        btn.setBackground(bg);
-        btn.setForeground(fg);
-        btn.setPreferredSize(new Dimension(w, h));
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
+        P.setOpaque(false);
+        P.setBorder(new EmptyBorder(10, 16, 10, 16));
+        return P;
+    }
+
+    private JButton MAKE_BUTTON(String TEXT, Color BG, Color FG, int W, int H, int FONT_SIZE, int ARC) {
+        JButton BTN = new JButton(TEXT) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D G2 = (Graphics2D) g.create();
+                G2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                G2.setColor(getBackground());
+                G2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
+                G2.setColor(getForeground());
+                FontMetrics FM = G2.getFontMetrics();
+                G2.drawString(getText(), (getWidth() - FM.stringWidth(getText())) / 2, (getHeight() + FM.getAscent()) / 2 - 4);
+                G2.dispose();
+            }
+        };
+        BTN.setFont(new Font("Tahoma", Font.BOLD, FONT_SIZE)); // ใช้ Tahoma เพื่อภาษาไทย
+        BTN.setBackground(BG);
+        BTN.setForeground(FG);
+        BTN.setPreferredSize(new Dimension(W, H));
+        BTN.setContentAreaFilled(false);
+        BTN.setBorderPainted(false);
+        BTN.setFocusPainted(false);
+        return BTN;
     }
 }
