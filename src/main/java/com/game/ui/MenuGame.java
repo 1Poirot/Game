@@ -53,11 +53,12 @@ public class MenuGame extends JPanel {
         // ===== Characters =====
         int maleW = (int) (screenW * 0.27);
         int maleH = (int) (screenH * 0.80);
+        int downOffset = (int) (screenH * 0.03); // ปรับ % ได้
         int femaleW = (int) (screenW * 0.23);
         int femaleH = (int) (screenH * 0.72);
 
         int femaleX = (int) (screenW * 0.72);
-        int femaleY = screenH - femaleH;
+        int femaleY = screenH - femaleH + downOffset;
         int maleY = screenH - maleH;
         int overlap = (int) (screenW * 0.05);
 
