@@ -4,7 +4,7 @@ import com.game.controllers.GameController;
 import com.game.multi.dating.MultiDatingScreen;
 import com.game.network.GameClient;
 import java.awt.*; // ✅ เพิ่ม import
-import java.awt.event.*;
+import java.awt.event.*; // ✅ เพิ่ม import สำหรับ MenuGame (ตรวจสอบชื่อและแพ็กเกจให้ตรงกับไฟล์ในโปรเจกต์ของคุณ)
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -134,10 +134,29 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
     // ======================================================
     @Override
     public void onRejected(String reason) {
+        // ✅ 1. สั่งซ่อนหน้า Lobby ทันที (จะไม่มีหน้าขาวค้างอีกต่อไป)
+        this.setVisible(false);
+
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, reason, "ห้องเต็ม", JOptionPane.ERROR_MESSAGE);
-            client.disconnect();
-            dispose();
+            // ✅ 2. แสดงแจ้งเตือนโดยใช้ null เพื่อให้เด้งกลางจอ Desktop
+            JOptionPane.showMessageDialog(null, 
+                "<html><font face='Tahoma'>⚠️ <b>เข้าห้องแข่งไม่ได้</b><br>" + reason + "</font></html>", 
+                "ระบบ", 
+                JOptionPane.ERROR_MESSAGE);
+
+            // ✅ 3. ตัดการเชื่อมต่อและปิดหน้าจอนี้
+            if (client != null) client.disconnect();
+            this.dispose();
+
+            // ✅ 4. ใช้ตัวแปร controller ที่คุณมีอยู่แล้วในการสลับหน้าจอ (หายแดงแน่นอน!)
+            if (controller != null) {
+                controller.showMainMenu(); 
+            } else {
+                // กรณีฉุกเฉินจริงๆ ถ้าไม่มี controller ให้ใช้วิธีเรียก Class ตรงๆ
+                // ลองเช็คดูว่าไฟล์ชื่อ MenuGame.java หรือ GameMenu.java กันแน่
+                com.game.ui.MenuGame menu = new com.game.ui.MenuGame(controller); 
+                menu.setVisible(true);
+            }
         });
     }
 
@@ -167,18 +186,27 @@ public class MultiplayerScreen extends JFrame implements GameClient.MessageListe
     public void onPlayerListUpdate(java.util.List<String> players) {
         SwingUtilities.invokeLater(() -> {
             scoreboardPanel.removeAll();
-            JLabel title = new JLabel("รายชื่อผู้เล่น");
-            title.setFont(new Font("Tahoma", Font.BOLD, 16));
-            title.setForeground(new Color(255, 200, 220));
-            scoreboardPanel.add(title);
+            
+            // ✅ ปรับ UI หัวข้อรายชื่อ
+            JLabel titleLabel = new JLabel("รายชื่อผู้เล่น");
+            titleLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+            titleLabel.setForeground(new Color(255, 200, 220));
+            titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            scoreboardPanel.add(titleLabel);
+            scoreboardPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
             this.expectedPlayers = players.size();
 
             for (String name : players) {
+                // ✅ แสดงชื่อผู้เล่นพร้อมไอคอน และเน้นสีเหลืองถ้าเป็นชื่อเราเอง
                 JLabel lbl = new JLabel("👤 " + name);
                 lbl.setFont(new Font("Tahoma", Font.PLAIN, 14));
                 lbl.setForeground(name.equals(client.getPlayerName()) ? Color.YELLOW : Color.WHITE);
+                lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
                 scoreboardPanel.add(lbl);
+                scoreboardPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             }
+            
             scoreboardPanel.revalidate();
             scoreboardPanel.repaint();
         });
