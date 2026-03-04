@@ -64,7 +64,7 @@ public class AudioSettingsScreen extends JPanel {
         whiteBox.add(speakerIcon, gbc);
 
         // ดึงระดับเสียงปัจจุบัน
-        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.8f;
+        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.2f;
         JSlider volumeSlider = new JSlider(0, 100, (int) (currentVol * 100));
         volumeSlider.setBackground(Color.WHITE);
         volumeSlider.setOpaque(true); // มั่นใจว่าเห็นตัว Slider ชัดเจน

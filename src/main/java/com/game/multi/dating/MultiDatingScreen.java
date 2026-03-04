@@ -13,7 +13,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-public class MultiDatingScreen extends JFrame {
+public class MultiDatingScreen extends JFrame implements GameClient.MessageListener {
     private final MultiDatingEventManager manager = new MultiDatingEventManager();
     private final MultiDatingSound sound = MultiDatingSound.getInstance();
 
@@ -179,72 +179,92 @@ public class MultiDatingScreen extends JFrame {
 
     private void showSettingsDialog() {
         JDialog settings = new JDialog(this, "Settings", true);
-
-        // ✅ 1. ล็อกสเปค: ห้ามขยับ ห้ามปรับขนาด และเอาแถบหัวออก
         settings.setUndecorated(true);
         settings.setResizable(false);
-        settings.setSize(420, 520);
-        settings.setLocationRelativeTo(this); // Flex ไว้ตรงกลางเสมอ
+        settings.setSize(450, 550); // ปรับขนาดให้กว้างขวางขึ้นเล็กน้อย
+        settings.setLocationRelativeTo(this);
+        settings.setBackground(new Color(0, 0, 0, 0)); // ทำให้พื้นหลัง Dialog โปร่งใสเพื่อขอบมนที่แท้จริง
 
-        // ✅ 2. ดักจับกากบาท (JFrame หลัก) ให้หน้าต่างนี้ยังคงอยู่
-        settings.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(new Color(255, 250, 252));
-        content.setBorder(BorderFactory.createLineBorder(new Color(255, 105, 180), 4, true));
+        // แผงเนื้อหาหลักพร้อมการวาด Gradient และขอบมน
+        JPanel content = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // พื้นหลังไล่เฉดสีขาวนวลไปชมพูอ่อน
+                GradientPaint gp = new GradientPaint(0, 0, Color.WHITE, 0, getHeight(), new Color(255, 240, 245));
+                g2d.setPaint(gp);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+                
+                // เส้นขอบสีชมพูเข้มแบบหนาพรีเมียม
+                g2d.setColor(new Color(255, 105, 180));
+                g2d.setStroke(new BasicStroke(5));
+                g2d.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 50, 50);
+                g2d.dispose();
+            }
+        };
+        content.setOpaque(false);
         settings.setContentPane(content);
 
-        // --- ส่วนหัว ---
+        // --- ส่วนหัว (Title) ---
         JLabel lbTitle = new JLabel("SETTINGS", SwingConstants.CENTER);
-        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
+        lbTitle.setFont(new Font("Tahoma", Font.BOLD, 32));
         lbTitle.setForeground(new Color(255, 20, 147));
-        lbTitle.setBorder(new EmptyBorder(30, 0, 10, 0));
+        lbTitle.setBorder(new EmptyBorder(40, 0, 20, 0));
         content.add(lbTitle, BorderLayout.NORTH);
 
-        // --- ส่วนกลาง (Slider + Buttons) ---
+        // --- ส่วนกลาง (Controls) ---
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setOpaque(false);
-        mainPanel.setBorder(new EmptyBorder(10, 50, 30, 50));
+        mainPanel.setBorder(new EmptyBorder(10, 50, 40, 50));
 
-        // ✅ ส่วนควบคุมเสียงแบบ Slider
-        JLabel lbVolume = new JLabel("ระดับเสียงเพลง");
-        lbVolume.setFont(new Font("Tahoma", Font.BOLD, 16));
+        // หัวข้อเสียง
+        JLabel lbVolume = new JLabel("Music Volume");
+        lbVolume.setFont(new Font("Tahoma", Font.BOLD, 18));
+        lbVolume.setForeground(new Color(150, 50, 80));
         lbVolume.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // ปรับแต่ง Slider
         JSlider volSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (sound.getVolume() * 100));
         volSlider.setOpaque(false);
-        volSlider.setMajorTickSpacing(25);
-        volSlider.setPaintTicks(false);
+        volSlider.setPreferredSize(new Dimension(300, 50));
         volSlider.addChangeListener(e -> {
             float volume = volSlider.getValue() / 100f;
             sound.setVolume(volume);
-            lbVolume.setText(volume == 0 ? "ปิดเสียง" : "ระดับเสียง: " + volSlider.getValue() + "%");
+            lbVolume.setText(volume == 0 ? "Muted 🔇" : "Music Volume: " + volSlider.getValue() + "%");
         });
 
-        // ปุ่มรายการ
-        Font btnFont = new Font("Tahoma", Font.BOLD, 17);
-        JButton btnResume = createStyledMenuBtn("กลับไปเล่นต่อ", new Color(255, 182, 193), btnFont);
+        // ข้อความแสดงสถานะเสียงปัจจุบัน
+        lbVolume.setText(sound.getVolume() == 0 ? "Muted 🔇" : "Music Volume: " + (int)(sound.getVolume()*100) + "%");
+
+        // ปุ่มคำสั่ง
+        Font btnFont = new Font("Tahoma", Font.BOLD, 18);
+        
+        JButton btnResume = createStyledMenuBtn("กลับเข้าสู่เกม", new Color(255, 182, 193), btnFont);
+        btnResume.setForeground(new Color(150, 20, 80));
         btnResume.addActionListener(e -> settings.dispose());
 
-        JButton btnLeave = createStyledMenuBtn("ออกจากห้องแข่ง", new Color(255, 99, 71), btnFont);
+        JButton btnLeave = createStyledMenuBtn("ออกจากเกม", new Color(255, 99, 71), btnFont);
         btnLeave.setForeground(Color.WHITE);
         btnLeave.addActionListener(e -> {
-            int res = JOptionPane.showConfirmDialog(settings, "คุณแน่ใจนะว่าจะทิ้งเกมนี้ไป?", "ยืนยัน",
-                    JOptionPane.YES_NO_OPTION);
+            int res = JOptionPane.showConfirmDialog(settings, 
+                "คุณแน่ใจนะว่าจะออก ?", "Confirm Exit",
+                JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION) {
                 settings.dispose();
                 exitAndGoToMain();
             }
         });
 
-        // เพิ่มคอมโพเนนต์ลงแผง
+        // ประกอบร่าง
         mainPanel.add(lbVolume);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainPanel.add(volSlider);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        mainPanel.add(btnResume);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(volSlider);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        mainPanel.add(btnResume);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(btnLeave);
 
         content.add(mainPanel, BorderLayout.CENTER);
@@ -288,6 +308,48 @@ public class MultiDatingScreen extends JFrame {
                 controller.showMainMenu();
         });
     }
+
+    // ======================================================
+    // ✅ GameClient.MessageListener Implementation
+    // ======================================================
+    @Override
+    public void onRejected(String reason) {
+        SwingUtilities.invokeLater(() -> {
+            // 1. หยุดเสียงและไทม์เมอร์
+            sound.stopBGM();
+            if (timer != null) timer.stop();
+
+            // 2. แสดงแจ้งเตือน
+            JOptionPane.showMessageDialog(null, 
+                "<html><font face='Tahoma'>⚠️ <b>การเชื่อมต่อสิ้นสุด</b><br>" + reason + "</font></html>", 
+                "แจ้งเตือนจากเซิร์ฟเวอร์", 
+                JOptionPane.ERROR_MESSAGE);
+
+            // 3. ตัดการเชื่อมต่อและล้างหน้าจอ
+            if (client != null) client.disconnect();
+            
+            // ปิดหน้า Lobby เดิม (ถ้ามี)
+            if (parentScreen != null) parentScreen.dispose();
+            
+            // ปิดหน้าจอการเล่นปัจจุบัน
+            this.dispose();
+
+            // 4. กลับหน้าเมนูผ่าน Controller
+            if (controller != null) {
+                controller.showMainMenu();
+            }
+        });
+    }
+
+    // เมธอดเหล่านี้ต้องใส่ไว้ให้ครบตาม Interface แม้ไม่ได้ใช้งานในหน้านี้
+    @Override public void onPlayerListUpdate(java.util.List<String> players) {}
+    @Override public void onGameStart() {}
+    @Override public void onSystemMessage(String message) {}
+    @Override public void onConnectionFailed(String ip) {}
+    @Override public void onScoreUpdate(String message) {}
+    @Override public void onWinner(String winnerName) {}
+    @Override public void onFinalScore() {}
+    @Override public void onFinalScoreItem(String playerName, int score) {}
 
     // ✅ แก้ไข: ลอจิกจบเกม (แยกขาดระหว่างเล่นคนเดียว กับ เล่นหลายคน)
     // ✅ แก้ไข: ลอจิกจบเกม (เล่นคนเดียวจบเลย / เล่นหลายคน "ต้อง" ค้างหน้ารอ Server
