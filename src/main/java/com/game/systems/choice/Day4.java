@@ -342,7 +342,7 @@ public class Day4 {
         SCENES.put("Q3_B", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +1", null, null, null, "S46", null, null, null));
         SCENES.put("Q3_C", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +3", null, null, null, "S46", null, null, null));
 
-        SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day4", "อีกฝ่ายนิ่งไปทันที ก่อนมองคุณตรง ๆ", null, null, null, "Q2",
+        SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day4", "อีกฝ่ายนิ่งไปทันที ก่อนมองคุณตรง ๆ", null, null, null, "S42",
                 null, null, null));
         SCENES.put("S42",
                 new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day4", "“…ดี”", null, null, null, "S43", null, null, null));
