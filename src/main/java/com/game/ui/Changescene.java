@@ -1,6 +1,7 @@
 package com.game.ui;
 
 import com.game.controllers.GameController;
+import com.game.systems.choice.Day1;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -218,7 +219,7 @@ public class Changescene extends JFrame {
     // ========================== DIALOG SCENE 1 ==========================
     private JPanel createDialogUI1(int w, int h) {
         return createDialogBase(w, h, new String[] {
-                "เช้าวันเปิดเทอม ลมเช้าเย็นกว่าที่คาด",
+                "เช้าวันเปิดเทอรม ลมเช้าเย็นกว่าที่คาด",
                 "คุณยืนอยู่หน้าประตูโรงเรียนในชุดนักเรียนใหม่เอี่ยม",
                 "เสียงนักเรียนรอบตัวเต็มไปด้วยบทสนทนาและเสียงหัวเราะ",
                 "แต่ไม่มีเสียงไหนเรียกชื่อคุณ",
@@ -233,7 +234,7 @@ public class Changescene extends JFrame {
                 "วินาทีนั้นเอง คุณยังไม่รู้เลยว่า",
                 "การชนกันเพียงครั้งเดียว",
                 "จะเปลี่ยน 7 วันแรกของคุณไปตลอดกาล"
-        }, true);
+        }, true, null);
     }
 
     // ========================== DIALOG SCENE 2 ==========================
@@ -248,11 +249,14 @@ public class Changescene extends JFrame {
                 "อีกฝ่ายเหลือบมองคุณนิดเดียว",
                 "\u201cบังเอิญอีกแล้ว\u201d",
                 "คุณหัวเราะ"
-        }, false);
+        }, false, () -> {
+            dispose();
+            SwingUtilities.invokeLater(() -> new Day1().CREATEANDSHOWGUI());
+        });
     }
 
     // ========================== DIALOG BASE ==========================
-    private JPanel createDialogBase(int screenW, int screenH, String[] dialogs, boolean changeScene) {
+    private JPanel createDialogBase(int screenW, int screenH, String[] dialogs, boolean changeScene, Runnable onEnd) {
 
         int dialogWidth = screenW - (int) (screenW * 0.08);
         int dialogHeight = (int) (screenH * 0.28);
@@ -320,6 +324,8 @@ public class Changescene extends JFrame {
                 index[0]++;
                 if (index[0] < dialogs.length) {
                     text.setText(dialogs[index[0]]);
+                } else if (onEnd != null) {
+                    onEnd.run();
                 } else if (changeScene) {
                     cardLayout.show(mainPanel, "next");
                 }

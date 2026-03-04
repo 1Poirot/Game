@@ -5,6 +5,7 @@ import com.game.multi.dating.MultiDatingSound; // ✅ สำหรับจั�
 import com.game.network.GameClient;
 import com.game.systems.audio.AudioSystem;
 import com.game.systems.shop.ShopSystem;
+import com.game.systems.choice.Day1;
 import com.game.ui.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -94,13 +95,12 @@ public class GameController {
     }
 
     public void showChangescene() {
-        // ✅ หยุดเสียงทุกระบบก่อนเริ่มฉากใหม่
         MultiDatingSound.getInstance().stopBGM();
         if (audioSystem != null)
             audioSystem.stopBGM();
 
         mainFrame.setVisible(false);
-        new Changescene(this);
+        SwingUtilities.invokeLater(() -> new Day1().CREATEANDSHOWGUI());
     }
 
     public void showGameScene() {
