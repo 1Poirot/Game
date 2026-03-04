@@ -1,12 +1,18 @@
 package com.game.systems.choice;
 
+import com.game.systems.affection.AffectionManager;
+import com.game.systems.affection.CharacterRoute;
+import com.game.ui.AffectionBar;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 
+
 public class Day6 {
+
+    private AffectionBar affectionBar;
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
     private static final Font NAME_FONT = new Font("Leelawadee UI", Font.BOLD, 20);
     private static final Font DAY_FONT = new Font("Leelawadee UI", Font.PLAIN, 16);
@@ -45,6 +51,9 @@ public class Day6 {
         BG_VIEW.add(LABEL_CHARACTER);
 
         CHAR_ORIG = LOAD_IMAGE_SAFE("char.png");
+
+        affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
+        BG_VIEW.add(affectionBar);
 
         CHOICE_PANEL = new JPanel(null);
         CHOICE_PANEL.setOpaque(false);
@@ -91,6 +100,11 @@ public class Day6 {
         SHOW_SCENE(CURRENT_ID);
         LAYOUT_UI();
         
+       if (affectionBar != null) {
+    int barW = 320;   // ขนาดกำลังดี
+    int barH = 85;    // เตี้ยลง
+    affectionBar.setBounds(40, 25, barW, barH);
+}
     }
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
@@ -160,6 +174,8 @@ public class Day6 {
         BG_VIEW.setComponentZOrder(DIALOG, 0);
         BG_VIEW.setComponentZOrder(LABEL_CHARACTER, 2);
 
+        BG_VIEW.setComponentZOrder(affectionBar, 0);
+
         BG_VIEW.revalidate();
         BG_VIEW.repaint();
     }
@@ -204,7 +220,7 @@ public class Day6 {
         });
     }
 
-    private void BUILD_STORY() {
+      private void BUILD_STORY() {
         SCENES.clear();
 
         SCENES.put("S1", new SCENE("Narrator", "Day6", "DAY 6 — วันที่เหมือนเดท แต่ยังไม่เรียกว่าเดท", null, null, null, "S2", null, null, null));
@@ -331,7 +347,6 @@ public class Day6 {
         SCENES.put("S65", new SCENE("Narrator", "Day6", "คืนนี้คุณนอนพร้อมรอยยิ้ม และคำถามในหัว", null, null, null, "S66", null, null, null));
         SCENES.put("S66", new SCENE("Narrator", "Day6", "พรุ่งนี้… ความสัมพันธ์นี้จะกลายเป็นอะไร", null, null, null, "END", null, null, null));
 
-        SCENES.put("END", new SCENE("Narrator", "Day6", "จบตอน", null, null, null, null, null, null, null));
     }
 
 
@@ -362,12 +377,15 @@ public class Day6 {
         BG_VIEW.SET_BG("src/main/resources/images/backgrounds/สวนสนุก.jpg");
     }
     // พักกลางวัน (S27 - S44)
-    else if (sceneNumber >= 27 && sceneNumber <= 44) {
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงอาหาร.jpg");
+    else if (sceneNumber >= 27 && sceneNumber <= 37) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/บนชิงช้า.png");
     }
     // ทางเดิน/เย็น (S45 - S50)
-    else if (sceneNumber >= 45 && sceneNumber <= 50) {
-        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/โรงเรียนตอนเย็น.jpg");
+    else if (sceneNumber >= 38 && sceneNumber <= 49) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ตอนเย็น.png");
+    }
+    else if (sceneNumber >= 50 && sceneNumber <= 64) {
+        BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ทางเดินตอนกลางคืน.jpg");
     }
 
     DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
@@ -377,6 +395,7 @@ public class Day6 {
     CHOICE_PANEL.setVisible(HAS_CHOICES);
     BTN_CHOICE1.setVisible(HAS_CHOICES);
     BTN_CHOICE2.setVisible(HAS_CHOICES);
+    BTN_CHOICE3.setVisible(HAS_CHOICES);    
 
 
     if (HAS_CHOICES) {
@@ -394,13 +413,54 @@ public class Day6 {
         if (S.NEXT != null) SHOW_SCENE(S.NEXT);
     }
 
-    private void PICK(int INDEX) {
-        SCENE S = SCENES.get(CURRENT_ID);
-        if (S == null) return;
-        if (INDEX == 1 && S.NEXT1 != null) SHOW_SCENE(S.NEXT1);
-        if (INDEX == 2 && S.NEXT2 != null) SHOW_SCENE(S.NEXT2);
-        if (INDEX == 3 && S.NEXT3 != null) SHOW_SCENE(S.NEXT3);
+   private void PICK(int INDEX) {
+    SCENE S = SCENES.get(CURRENT_ID);
+    if (S == null) return;
+
+    AffectionManager affection = AffectionManager.getInstance();
+
+    // Q1
+    if (CURRENT_ID.equals("Q1")) {
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 7);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
     }
+
+    // Q2
+    if (CURRENT_ID.equals("Q2")) {
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
+    }
+
+    // Q3
+    if (CURRENT_ID.equals("Q3")) {
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 9);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+    }
+
+    // Q4
+    if (CURRENT_ID.equals("Q4")) {
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
+    }
+    // Q5
+    if (CURRENT_ID.equals("Q5")) {
+        if (INDEX == 1) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+        if (INDEX == 2) affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+        if (INDEX == 3) affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
+    }
+    // รีเฟรชแถบ
+    if (affectionBar != null) {
+        affectionBar.refresh();
+    }
+
+    if (INDEX == 1 && S.NEXT1 != null) SHOW_SCENE(S.NEXT1);
+    if (INDEX == 2 && S.NEXT2 != null) SHOW_SCENE(S.NEXT2);
+    if (INDEX == 3 && S.NEXT3 != null) SHOW_SCENE(S.NEXT3);
+}
 
     public static void main(String[] ARGS) {
         SwingUtilities.invokeLater(() -> new Day6().CREATEANDSHOWGUI());
