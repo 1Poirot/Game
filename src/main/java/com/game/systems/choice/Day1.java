@@ -9,8 +9,9 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 
-public class Day1 {
+public class Day1 extends BaseDay {
 
+        
     private AffectionBar affectionBar;
     private static final Font THAI_FONT = new Font("Leelawadee UI", Font.PLAIN, 20);
     private static final Font NAME_FONT = new Font("Leelawadee UI", Font.BOLD, 20);
@@ -18,7 +19,6 @@ public class Day1 {
     private static final Font BTN_FONT = new Font("Leelawadee UI", Font.PLAIN, 18);
     private static final int FOOT_GAP = 0;
 
-    private JFrame FRAME;
     private BGVIEW BG_VIEW;
 
     private Image CHAR_ORIG;
@@ -51,6 +51,8 @@ public class Day1 {
         BG_VIEW = new BGVIEW("bg.png");
         BG_VIEW.setLayout(null);
         FRAME.setContentPane(BG_VIEW);
+
+        initBaseUI(FRAME, BG_VIEW, controller); // ✅ ส่ง controller เป็น null สำหรับ Day1
 
         DIALOG = new DIALOGPANEL("", "", "");
         BG_VIEW.add(DIALOG);
@@ -587,9 +589,6 @@ public class Day1 {
             SHOW_SCENE(S.NEXT3);
     }
 
-    public static void main(String[] ARGS) {
-        SwingUtilities.invokeLater(() -> new Day1().CREATEANDSHOWGUI());
-    }
 
     static class SCENE {
         String NAME;
