@@ -529,19 +529,19 @@ public class Day6 {
         // Q1
         if (CURRENT_ID.equals("Q1")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 7);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
         }
 
         // Q2
         if (CURRENT_ID.equals("Q2")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
         }
@@ -549,7 +549,7 @@ public class Day6 {
         // Q3
         if (CURRENT_ID.equals("Q3")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 9);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
@@ -559,18 +559,18 @@ public class Day6 {
         // Q4
         if (CURRENT_ID.equals("Q4")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 6);
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
         }
         // Q5
         if (CURRENT_ID.equals("Q5")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
         }
