@@ -588,7 +588,7 @@ public class Day4 {
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -4);
         }
 
         // Q3
@@ -596,7 +596,7 @@ public class Day4 {
             if (INDEX == 1)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
             if (INDEX == 3)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
         }
@@ -608,7 +608,7 @@ public class Day4 {
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -1);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -4);
         }
 
         // Q5
@@ -618,7 +618,7 @@ public class Day4 {
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -5);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -7);
         }
 
         // รีเฟรชแถบ
