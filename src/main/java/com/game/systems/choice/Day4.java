@@ -16,12 +16,14 @@ public class Day4 {
     private static final Font NAME_FONT = new Font("Leelawadee UI", Font.BOLD, 20);
     private static final Font DAY_FONT = new Font("Leelawadee UI", Font.PLAIN, 16);
     private static final Font BTN_FONT = new Font("Leelawadee UI", Font.PLAIN, 18);
-
+    private static final int FOOT_GAP = 0;
     private JFrame FRAME;
     private BGVIEW BG_VIEW;
 
     private Image CHAR_ORIG;
+    private Image CHAR_ORIG2;
     private JLabel LABEL_CHARACTER;
+    private JLabel LABEL_CHARACTER2;
 
     private DIALOGPANEL DIALOG;
 
@@ -58,7 +60,12 @@ public class Day4 {
         LABEL_CHARACTER.setOpaque(false);
         BG_VIEW.add(LABEL_CHARACTER);
 
-        CHAR_ORIG = LOAD_IMAGE_SAFE("char.png");
+        LABEL_CHARACTER2 = new JLabel();
+        LABEL_CHARACTER2.setOpaque(false);
+        BG_VIEW.add(LABEL_CHARACTER2);
+
+        CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
+        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png");
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
@@ -180,10 +187,25 @@ public class Day4 {
             LABEL_CHARACTER.setBounds(CHAR_X, CHAR_Y, CHAR_W, CHAR_H);
         }
 
+        if (CHAR_ORIG2 != null && LABEL_CHARACTER2 != null) {
+            Image CHAR_SCALED2 = CHAR_ORIG2.getScaledInstance(-1, CHAR_TARGET_H, Image.SCALE_SMOOTH);
+            ImageIcon CHAR_ICON2 = new ImageIcon(CHAR_SCALED2);
+            LABEL_CHARACTER2.setIcon(CHAR_ICON2);
+
+            int CHAR_W2 = CHAR_ICON2.getIconWidth();
+            int CHAR_H2 = CHAR_ICON2.getIconHeight();
+
+            int CHAR_X2 = (W - CHAR_W2) / 2;
+            int CHAR_Y2 = (DIALOG_Y - CHAR_H2) + FOOT_GAP;
+            CHAR_Y2 = Math.max(10, CHAR_Y2);
+
+            LABEL_CHARACTER2.setBounds(CHAR_X2, CHAR_Y2, CHAR_W2, CHAR_H2);
+        }
+
         BG_VIEW.setComponentZOrder(CHOICE_PANEL, 0);
         BG_VIEW.setComponentZOrder(DIALOG, 0);
         BG_VIEW.setComponentZOrder(LABEL_CHARACTER, 2);
-
+        BG_VIEW.setComponentZOrder(LABEL_CHARACTER2, 1);
         BG_VIEW.setComponentZOrder(affectionBar, 0);
 
         BG_VIEW.revalidate();
