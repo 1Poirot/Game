@@ -132,7 +132,7 @@ public class Day7 {
                     return img;
                 }
             }
-            
+
             // ถ้า ClassLoader ล้มเหลว ลองใช้เส้นทางสัมพัทธ์
             ImageIcon fallback = new ImageIcon(PATH);
             if (fallback.getIconWidth() > 0 && fallback.getIconHeight() > 0) {
@@ -142,7 +142,7 @@ public class Day7 {
                 tracker.waitForID(0);
                 return img;
             }
-            
+
             System.err.println("ไม่สามารถโหลดรูปภาพ: " + PATH);
             return MAKE_EMPTY_IMAGE();
         } catch (Exception EX) {
@@ -409,8 +409,8 @@ public class Day7 {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ฉากตอบจบ.png");
         }
 
-        LABEL_CHARACTER2.setVisible(sceneNumber >= 10 && sceneNumber <= 16 &&   CHAR_ORIG2 != null);
-        
+        LABEL_CHARACTER2.setVisible(sceneNumber >= 10 && sceneNumber <= 16 && CHAR_ORIG2 != null);
+
         LABEL_CHARACTER.setVisible(sceneNumber >= 17 && sceneNumber <= 64 && CHAR_ORIG != null);
 
         DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
@@ -440,6 +440,16 @@ public class Day7 {
         boolean HAS_CHOICES = S.C1 != null && S.C2 != null;
         if (HAS_CHOICES)
             return;
+
+        if (CURRENT_ID.equals("END")) {
+            FRAME.dispose();
+            SwingUtilities.invokeLater(() -> {
+                com.game.controllers.GameController controller = new com.game.controllers.GameController();
+                controller.start();
+            });
+            return;
+        }
+
         if (S.NEXT != null)
             SHOW_SCENE(S.NEXT);
     }
