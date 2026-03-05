@@ -23,11 +23,6 @@ public class Day1 extends BaseDay {
 
     private Image CHAR_ORIG;
     private Image CHAR_ORIG2;
-    private Image CHAR_ORIG3;
-    private Image CHAR_ORIG4;
-
-
-
 
 
     private JLabel LABEL_CHARACTER;
@@ -66,9 +61,7 @@ public class Day1 extends BaseDay {
         BG_VIEW.add(LABEL_CHARACTER2);
 
         CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png");
-        CHAR_ORIG3 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ยิ้ม.png");
         CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-        CHAR_ORIG4 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ยิ้ม.png");
 
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
@@ -128,13 +121,34 @@ public class Day1 extends BaseDay {
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
         try {
-            Image IMG = new ImageIcon(PATH).getImage();
-            if (IMG == null)
-                return MAKE_EMPTY_IMAGE();
-            if (IMG.getWidth(null) <= 0 || IMG.getHeight(null) <= 0)
-                return MAKE_EMPTY_IMAGE();
-            return IMG;
+            // ลองใช้ ClassLoader โหลดทรัพยากรก่อน (ที่เชื่อถือได้ที่สุด)
+            java.net.URL url = getClass().getClassLoader().getResource(PATH.replace("src/main/resources/", ""));
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
+                Image img = icon.getImage();
+                // ใช้ MediaTracker เพื่อให้แน่ใจว่ารูปภาพโหลดสมบูรณ์
+                MediaTracker tracker = new MediaTracker(new JPanel());
+                tracker.addImage(img, 0);
+                tracker.waitForID(0);
+                if (img.getWidth(null) > 0 && img.getHeight(null) > 0) {
+                    return img;
+                }
+            }
+            
+            // ถ้า ClassLoader ล้มเหลว ลองใช้เส้นทางสัมพัทธ์
+            ImageIcon fallback = new ImageIcon(PATH);
+            if (fallback.getIconWidth() > 0 && fallback.getIconHeight() > 0) {
+                Image img = fallback.getImage();
+                MediaTracker tracker = new MediaTracker(new JPanel());
+                tracker.addImage(img, 0);
+                tracker.waitForID(0);
+                return img;
+            }
+            
+            System.err.println("ไม่สามารถโหลดรูปภาพ: " + PATH);
+            return MAKE_EMPTY_IMAGE();
         } catch (Exception EX) {
+            System.err.println("เกิดข้อผิดพลาดขณะโหลดรูปภาพ: " + PATH + " - " + EX.getMessage());
             return MAKE_EMPTY_IMAGE();
         }
     }
@@ -419,10 +433,10 @@ public class Day1 extends BaseDay {
                 "C) “ไม่ค่อยดีเท่าไหร่”",
                 null, "Q5_A", "Q5_B", "Q5_C"));
 
-        SCENES.put("Q5_A", new SCENE("คุณ", "Day6", "ความสัมพันธ์ +6", null, null, null, "S116", null, null, null));
-        SCENES.put("Q5_B", new SCENE("คุณ", "Day6", "ความสัมพันธ์ +2", null, null, null, "S106", null, null, null));
-        SCENES.put("Q5_C", new SCENE("คุณ", "Day6", "ความสัมพันธ์ +1", null, null, null, "S106", null, null, null));
-        SCENES.put("S116",new SCENE("คุณ", "Day6", " อีกฝ่ายจะยิ้มชัดเจนครั้งแรก", null, null, null, "S106", null, null, null));
+        SCENES.put("Q5_A", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +6", null, null, null, "S116", null, null, null));
+        SCENES.put("Q5_B", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +2", null, null, null, "S106", null, null, null));
+        SCENES.put("Q5_C", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +1", null, null, null, "S106", null, null, null));
+        SCENES.put("S116",new SCENE("คุณ", "Day1", " อีกฝ่ายจะยิ้มชัดเจนครั้งแรก", null, null, null, "S106", null, null, null));
 
         SCENES.put("S106", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day1", "“ถ้ามีอะไรไม่เข้าใจ… มาถามฉันได้”", null, null,null, "S107", null, null, null));
         SCENES.put("S107", new SCENE("ผู้บรรยาย", "Day1", "คุณกระพริบตา", null, null, null, "S108", null, null, null));
@@ -480,7 +494,7 @@ public class Day1 extends BaseDay {
         }
 
         // แสดงตัวละครตั้งแต่ฉาก S27 เป็นต้นไป (ถ้ามีรูป)
-        LABEL_CHARACTER.setVisible(sceneNumber >= 4 && sceneNumber <= 115 && sceneNumber != 8 && CHAR_ORIG != null);
+        LABEL_CHARACTER.setVisible(sceneNumber >= 4 && sceneNumber <= 26 && sceneNumber != 8 && sceneNumber != 9 && CHAR_ORIG != null);
         // แสดงตัวละครอื่นในฉากห้องเรียน (S69-S77) (ปรับเงื่อนไขได้)
         
         LABEL_CHARACTER2.setVisible(sceneNumber >= 32 && sceneNumber <= 115 && CHAR_ORIG2 != null);

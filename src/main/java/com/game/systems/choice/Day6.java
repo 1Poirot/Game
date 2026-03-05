@@ -64,8 +64,8 @@ public class Day6 {
         LABEL_CHARACTER2.setOpaque(false);
         BG_VIEW.add(LABEL_CHARACTER2);
 
-        CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png");
+        CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ชุดไปเที่ยว.png");
+        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ชุดไปเที่ยว.png");
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
@@ -255,21 +255,14 @@ public class Day6 {
     private void BUILD_STORY() {
         SCENES.clear();
 
-        SCENES.put("S1", new SCENE("ผู้บรรยาย", "Day6", "DAY 6 — วันที่เหมือนเดท แต่ยังไม่เรียกว่าเดท", null, null,
-                null, "S2", null, null, null));
-        SCENES.put("S2", new SCENE("ผู้บรรยาย", "Day6", "เช้าวันนี้อากาศสดใสกว่าทุกวัน", null, null, null, "S3", null,
-                null, null));
-        SCENES.put("S3", new SCENE("ผู้บรรยาย", "Day6", "แสงแดดอ่อน ๆ ลอดผ่านผ้าม่านเข้ามา", null, null, null, "S4",
-                null, null, null));
-        SCENES.put("S4",
-                new SCENE("ผู้บรรยาย", "Day6", "โทรศัพท์ของคุณสั่น", null, null, null, "S5", null, null, null));
+        SCENES.put("S1", new SCENE("ผู้บรรยาย", "Day6", "DAY 6 — วันที่เหมือนเดท แต่ยังไม่เรียกว่าเดท", null, null,null, "S2", null, null, null));
+        SCENES.put("S2", new SCENE("ผู้บรรยาย", "Day6", "เช้าวันนี้อากาศสดใสกว่าทุกวัน", null, null, null, "S3", null,null, null));
+        SCENES.put("S3", new SCENE("ผู้บรรยาย", "Day6", "แสงแดดอ่อน ๆ ลอดผ่านผ้าม่านเข้ามา", null, null, null, "S4",null, null, null));
+        SCENES.put("S4",new SCENE("ผู้บรรยาย", "Day6", "โทรศัพท์ของคุณสั่น", null, null, null, "S5", null, null, null));
         SCENES.put("S5", new SCENE("ผู้บรรยาย", "Day6", "ข้อความจากเขา", null, null, null, "S6", null, null, null));
-        SCENES.put("S6",
-                new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“ตื่นยัง”", null, null, null, "S7", null, null, null));
-        SCENES.put("S7", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“วันนี้ว่างไหม…”", null, null, null, "S8", null,
-                null, null));
-        SCENES.put("S8", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“อยากชวนไปเที่ยวด้วยกันหน่อย”", null, null, null,
-                "S9", null, null, null));
+        SCENES.put("S6",new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“ตื่นยัง”", null, null, null, "S7", null, null, null));
+        SCENES.put("S7", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“วันนี้ว่างไหม…”", null, null, null, "S8", null,null, null));
+        SCENES.put("S8", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day6", "“อยากชวนไปเที่ยวด้วยกันหน่อย”", null, null, null,"S9", null, null, null));
         SCENES.put("S9", new SCENE("ผู้บรรยาย", "Day6", "คุณอ่านวนซ้ำสองรอบ ใจเต้นเร็วขึ้นโดยไม่รู้ตัว", null, null,
                 null, "S10", null, null, null));
         SCENES.put("S10", new SCENE("ผู้บรรยาย", "Day6", "คำว่า “ไปเที่ยวด้วยกัน” มันไม่ใช่แค่คำธรรมดา", null, null,
@@ -490,6 +483,10 @@ public class Day6 {
         } else if (sceneNumber >= 50 && sceneNumber <= 64) {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ทางเดินตอนกลางคืน.jpg");
         }
+
+        LABEL_CHARACTER2.setVisible(sceneNumber >= 14 && sceneNumber <= 15 &&   CHAR_ORIG2 != null);
+        
+        LABEL_CHARACTER.setVisible(sceneNumber >= 16 && sceneNumber <= 64 && CHAR_ORIG != null);
 
         DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
         DIALOG.repaint();

@@ -65,7 +65,7 @@ public class Day3 {
         BG_VIEW.add(LABEL_CHARACTER2);
 
         CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้ชาย ตัวเอก.png");
-        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ตัวเอก.png");
+        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง เขิน.png");
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
@@ -124,13 +124,34 @@ public class Day3 {
 
     private Image LOAD_IMAGE_SAFE(String PATH) {
         try {
-            Image IMG = new ImageIcon(PATH).getImage();
-            if (IMG == null)
-                return MAKE_EMPTY_IMAGE();
-            if (IMG.getWidth(null) <= 0 || IMG.getHeight(null) <= 0)
-                return MAKE_EMPTY_IMAGE();
-            return IMG;
+            // ลองใช้ ClassLoader โหลดทรัพยากรก่อน (ที่เชื่อถือได้ที่สุด)
+            java.net.URL url = getClass().getClassLoader().getResource(PATH.replace("src/main/resources/", ""));
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
+                Image img = icon.getImage();
+                // ใช้ MediaTracker เพื่อให้แน่ใจว่ารูปภาพโหลดสมบูรณ์
+                MediaTracker tracker = new MediaTracker(new JPanel());
+                tracker.addImage(img, 0);
+                tracker.waitForID(0);
+                if (img.getWidth(null) > 0 && img.getHeight(null) > 0) {
+                    return img;
+                }
+            }
+            
+            // ถ้า ClassLoader ล้มเหลว ลองใช้เส้นทางสัมพัทธ์
+            ImageIcon fallback = new ImageIcon(PATH);
+            if (fallback.getIconWidth() > 0 && fallback.getIconHeight() > 0) {
+                Image img = fallback.getImage();
+                MediaTracker tracker = new MediaTracker(new JPanel());
+                tracker.addImage(img, 0);
+                tracker.waitForID(0);
+                return img;
+            }
+            
+            System.err.println("ไม่สามารถโหลดรูปภาพ: " + PATH);
+            return MAKE_EMPTY_IMAGE();
         } catch (Exception EX) {
+            System.err.println("เกิดข้อผิดพลาดขณะโหลดรูปภาพ: " + PATH + " - " + EX.getMessage());
             return MAKE_EMPTY_IMAGE();
         }
     }
@@ -504,6 +525,9 @@ public class Day3 {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ทางเดินตอนเย็น.png");
         }
 
+        LABEL_CHARACTER2.setVisible(sceneNumber >= 6 && sceneNumber <= 20 &&   CHAR_ORIG2 != null);
+        
+        LABEL_CHARACTER.setVisible(sceneNumber >= 21 && sceneNumber <= 86 && CHAR_ORIG != null);
         DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
         DIALOG.repaint();
 
