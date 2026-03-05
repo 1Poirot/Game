@@ -1,50 +1,60 @@
-# เกมจีบสาว (Dating Simulation Game)
+# เกมจีบสาว — Love Game (Dating Simulation)
 
-เกม Dating Simulation แบบเทิร์นเบส สร้างด้วยภาษา Java
+เกม Dating Simulation แบบเทิร์นเบส สร้างด้วยภาษา Java Swing  
+รองรับโหมดเดี่ยว, 3 ผู้เล่น (Local), และโหมดออนไลน์ผ่าน TCP Socket
 
-## ภาพรวม
+---
 
-เกมจีบสาวที่ผู้เล่นจะได้สร้างความสัมพันธ์กับตัวละครต่างๆ ผ่านการเลือกคำตอบในบทสนทนา เพื่อไปสู่ตอนจบที่แตกต่างกันตามคะแนนความสัมพันธ์
+## 🚀 วิธีรันโปรเจกต์
 
-## ระบบหลัก
-
-- **ระบบบทสนทนา** (Dialogue System) - แสดงบทสนทนาและรูปตัวละคร
-- **ระบบเลือกคำตอบ** (Choice System) - เลือกตอบโต้ที่ส่งผลต่อเนื้อเรื่อง
-- **ระบบคะแนนความสัมพันธ์** (Affection Points) - ติดตามความสัมพันธ์กับตัวละคร
-- **ระบบหลายตอนจบ** (Multiple Ending) - ตอนจบหลายแบบตามการเล่น
-- **ระบบ Save/Load** - บันทึกและโหลดความคืบหน้า
-
-## โครงสร้างโปรเจกต์
-
-ดูรายละเอียดใน [docs/STRUCTURE.md](docs/STRUCTURE.md)
-
-## การรันโปรเจกต์
+### โหมดเดี่ยว
 
 ```bash
-# Compile
 javac -d out src/main/java/com/game/**/*.java
-
-# Run
 java -cp out com.game.Main
 ```
 
-## สถานะปัจจุบัน
+### โหมดออนไลน์ (เปิด Server ก่อน)
 
-✅ โครงสร้างพื้นฐานเสร็จสมบูรณ์  
-🔄 ยังไม่มี UI (Console-based ในตอนนี้)  
-📝 ต้องสร้างเนื้อหาบทสนทนาและตัวละคร
+```bash
+# Host รันก่อน
+javac -d out src/main/java/com/game/network/GameServer.java
+java -cp out com.game.network.GameServer
 
-## TODO
+# แล้วทุกคนรันเกมแล้วกด "เล่นออนไลน์"
+```
 
-- [ ] สร้าง UI (Swing/JavaFX)
-- [ ] เพิ่มเนื้อหาบทสนทนา
-- [ ] สร้าง character sprites
-- [ ] เพิ่ม BGM และ sound effects
-- [ ] เขียน unit tests
+> 💡 ใน VS Code กด ▶ Run บนไฟล์ได้เลย ไม่ต้อง compile เอง
+
+---
+
+## 📋 ระบบหลัก
+
+| ระบบ                                  | สถานะ                     |
+| ------------------------------------- | ------------------------- |
+| บทสนทนา (DialogueSystem)              | ✅ สมบูรณ์                |
+| ร้านค้า (ShopSystem)                  | ✅ สมบูรณ์                |
+| บันทึกเกม (SaveSystem)                | ✅ สมบูรณ์                |
+| ระบบเสียง (AudioSystem)               | ✅ สมบูรณ์                |
+| Multiplayer (GameServer + GameClient) | ✅ สมบูรณ์                |
+| คะแนนความสัมพันธ์ (AffectionSystem)   | 🔴 TODO                   |
+| ระบบตอนจบ (EndingSystem)              | 🔴 TODO                   |
+| ตัวเลือก (ChoiceSystem)               | 🟡 UI มีแล้ว ยังไม่เชื่อม |
+
+---
+
+## 📚 เอกสารรายละเอียด
+
+- [DEV_DOCS.md](DEV_DOCS.md) — คู่มือนักพัฒนาฉบับเต็ม (ภาษาไทย)
+- [STRUCTURE.md](STRUCTURE.md) — โครงสร้างโปรเจกต์
+- [DEVELOPMENT.md](DEVELOPMENT.md) — แนวทางการพัฒนา
+
+---
 
 ## Requirements
 
-- Java 8 หรือสูงกว่า
+- Java 11 หรือสูงกว่า
+- ไม่มี dependency ภายนอก (ใช้ Java Standard Library ล้วน)
 
 ## License
 

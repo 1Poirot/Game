@@ -309,8 +309,4 @@ public class ChoiceSystem extends JFrame {
             if (SCALED != null) G.drawImage(SCALED, 0, 0, getWidth(), getHeight(), this);
         }
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ChoiceSystem().setVisible(true));
-    }
 }

@@ -23,7 +23,7 @@ public class MenuGame extends JPanel {
         add(layeredPane, BorderLayout.CENTER);
 
         if (controller.getAudioSystem() != null) {
-            controller.getAudioSystem().playBGM("audiotest.wav");
+            controller.getAudioSystem().playBGM("backgroundhome.wav");
         }
 
         layeredPane.addComponentListener(new ComponentAdapter() {
@@ -34,7 +34,6 @@ public class MenuGame extends JPanel {
         });
     }
 
-    // ================== Responsive Layout ==================
     private void layoutComponents() {
         int screenW = layeredPane.getWidth();
         int screenH = layeredPane.getHeight();
@@ -54,11 +53,12 @@ public class MenuGame extends JPanel {
         // ===== Characters =====
         int maleW = (int) (screenW * 0.27);
         int maleH = (int) (screenH * 0.80);
+        int downOffset = (int) (screenH * 0.03); // ปรับ % ได้
         int femaleW = (int) (screenW * 0.23);
         int femaleH = (int) (screenH * 0.72);
 
         int femaleX = (int) (screenW * 0.72);
-        int femaleY = screenH - femaleH;
+        int femaleY = screenH - femaleH + downOffset;
         int maleY = screenH - maleH;
         int overlap = (int) (screenW * 0.05);
 
@@ -80,40 +80,43 @@ public class MenuGame extends JPanel {
         layeredPane.add(sakura, Integer.valueOf(3));
 
         // ===== Title =====
-        JLabel title = new JLabel("เกมจีบสาว", SwingConstants.CENTER);
-        title.setFont(new Font("Tahoma", Font.BOLD, screenW / 35));
-        title.setOpaque(true);
-        title.setBackground(new Color(255, 255, 255, 220));
-        title.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        title.setBounds((screenW - (screenW / 3)) / 2,
-                screenH / 15,
-                screenW / 3,
-                screenH / 9);
+        JLabel title = new JLabel("Seven Days, With You", SwingConstants.CENTER);
+        title.setFont(new Font("Serif", Font.BOLD, screenW / 24));
+        title.setForeground(new Color(180, 60, 140));
+        title.setBounds((screenW - (screenW / 2)) / 2,
+                screenH / 18,
+                screenW / 2,
+                screenH / 10);
         layeredPane.add(title, Integer.valueOf(4));
 
-        // ===== Menu Buttons (เพิ่ม "เล่นออนไลน์") =====
+        // ===== Menu Buttons =====
         String[] menuText = { "เริ่มเกม", "โหลดเซฟ", "เล่นออนไลน์", "ตั้งค่า", "ออกเกม" };
-        int btnW = screenW / 8;
-        int btnH = screenH / 14;
-        int startY = (int) (screenH * 0.33);
+
+        int btnW = screenW / 6;
+        int btnH = screenH / 12;
+        int startY = (int) (screenH * 0.35);
+        int leftX = screenW / 12;
 
         for (int i = 0; i < menuText.length; i++) {
+
             String text = menuText[i];
 
-            // ปุ่ม "เล่นออนไลน์" ใช้สีพิเศษ
-            RoundedButton btn = text.equals("เล่นออนไลน์")
-                    ? new RoundedButton(text, new Color(130, 80, 220), Color.WHITE)
-                    : new RoundedButton(text, new Color(255, 215, 230), Color.BLACK);
+            boolean isPurple = text.equals("เล่นออนไลน์");
 
-            btn.setFont(new Font("Tahoma", Font.BOLD, screenW / 60));
-            btn.setBounds(screenW / 10,
-                    startY + (i * (btnH + 16)),
-                    btnW, btnH);
+            RoundedButton btn = new RoundedButton(text, isPurple, Color.WHITE);
+            btn.setFont(new Font("Tahoma", Font.BOLD, screenW / 65));
+
+            btn.setBounds(leftX,
+                    startY + (i * (btnH + 22)),
+                    btnW,
+                    btnH);
 
             btn.addActionListener(e -> {
+
                 if (controller.getAudioSystem() != null) {
                     controller.getAudioSystem().playSFX("click.wav");
                 }
+
                 switch (text) {
                     case "เริ่มเกม" -> controller.showChangescene();
                     case "โหลดเซฟ" -> controller.showSaveScreen();
@@ -158,36 +161,91 @@ public class MenuGame extends JPanel {
     // ================== Rounded Button ==================
     class RoundedButton extends JButton {
 
-        private final Color bgColor;
-        private final Color fgColor;
+        private final Color textColor;
+        private final boolean isOnlineButton;
 
-        public RoundedButton(String label, Color bgColor, Color fgColor) {
-            super(label);
-            this.bgColor = bgColor;
-            this.fgColor = fgColor;
+        public RoundedButton(String text, boolean isOnline, Color fg) {
+            super(text);
+            this.isOnlineButton = isOnline;
+            this.textColor = fg;
+
             setContentAreaFilled(false);
             setFocusPainted(false);
             setBorderPainted(false);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setOpaque(false);
         }
 
         @Override
         protected void paintComponent(Graphics g) {
+
             Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
 
-            Color fill = getModel().isPressed() ? bgColor.darker()
-                    : getModel().isRollover() ? bgColor.brighter() : bgColor;
+            int arc = 28;
 
-            g2.setColor(fill);
-            g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 45, 45));
+            Color top;
+            Color bottom;
 
-            g2.setColor(fgColor);
-            FontMetrics fm = g2.getFontMetrics(getFont());
+            if (isOnlineButton) {
+                // 💜 ม่วง (เล่นออนไลน์)
+                top = new Color(190, 150, 255);
+                bottom = new Color(140, 95, 230);
+
+                if (getModel().isRollover()) {
+                    top = new Color(205, 165, 255);
+                    bottom = new Color(160, 115, 240);
+                }
+
+                if (getModel().isPressed()) {
+                    top = new Color(170, 130, 240);
+                    bottom = new Color(120, 80, 210);
+                }
+
+            } else {
+                // 🌸 ชมพูพอดี ไม่อ่อนเกิน ไม่เข้มเกิน
+
+                top = new Color(255, 185, 220); // ชมพูพาสเทลชัด
+                bottom = new Color(255, 125, 175); // ชมพูสดพอดี
+
+                if (getModel().isRollover()) {
+                    top = new Color(255, 200, 230);
+                    bottom = new Color(255, 140, 185);
+                }
+
+                if (getModel().isPressed()) {
+                    top = new Color(240, 165, 200);
+                    bottom = new Color(235, 105, 155);
+                }
+
+            }
+
+            // เงา
+            g2.setColor(new Color(0, 0, 0, 18));
+            g2.fillRoundRect(3, 6, getWidth() - 3, getHeight() - 3, arc, arc);
+
+            // Gradient 2 สี
+            GradientPaint gp = new GradientPaint(
+                    0, 0, top,
+                    0, getHeight(), bottom);
+
+            g2.setPaint(gp);
+            g2.fillRoundRect(0, 0, getWidth() - 3, getHeight() - 6, arc, arc);
+
+            // ขอบบาง
+            g2.setColor(new Color(255, 255, 255, 110));
+            g2.drawRoundRect(0, 0, getWidth() - 3, getHeight() - 6, arc, arc);
+
+            // ข้อความ
             g2.setFont(getFont());
-            g2.drawString(getText(),
-                    (getWidth() - fm.stringWidth(getText())) / 2,
-                    (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+            FontMetrics fm = g2.getFontMetrics();
+            g2.setColor(textColor);
+
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+
+            g2.drawString(getText(), x, y);
 
             g2.dispose();
         }
@@ -213,7 +271,8 @@ public class MenuGame extends JPanel {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(new Color(255, 182, 193, 160));
             for (SakuraParticle p : particles)
                 g2.fill(p.getShape());

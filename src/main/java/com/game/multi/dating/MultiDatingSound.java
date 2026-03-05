@@ -6,10 +6,14 @@ import javax.sound.sampled.*;
 
 public class MultiDatingSound {
     private static MultiDatingSound instance;
-    private static Clip bgmClip; 
+    private static Clip bgmClip;
     private boolean isMuted = false;
 
-    private MultiDatingSound() {}
+    // ✅ ปรับค่าเริ่มต้นเป็น 0.5f (ประมาณ 50% ของความดังที่หูรับรู้)
+    private float currentVolume = 0.2f;
+
+    private MultiDatingSound() {
+    }
 
     public static MultiDatingSound getInstance() {
         if (instance == null) {
@@ -19,7 +23,7 @@ public class MultiDatingSound {
     }
 
     public void playBGM(String fileName) {
-        stopBGM(); 
+        stopBGM();
         try {
             String path = "/audio/bgm/" + fileName;
             URL soundURL = getClass().getResource(path);
@@ -29,16 +33,26 @@ public class MultiDatingSound {
                 audioStream = AudioSystem.getAudioInputStream(soundURL);
             } else {
                 File fallback = new File("src/main/resources/audio/bgm/" + fileName);
-                if (!fallback.exists()) return;
+                if (!fallback.exists())
+                    return;
                 audioStream = AudioSystem.getAudioInputStream(fallback);
             }
 
             bgmClip = AudioSystem.getClip();
             bgmClip.open(audioStream);
-            if (isMuted) setGain(-80.0f);
+
+            // ✅ บังคับใช้ระดับเสียงปัจจุบันทันทีที่เปิดไฟล์ (ก่อนเริ่มเล่น)
+            applyCurrentVolume();
+
+            if (isMuted) {
+                setGain(-80.0f);
+            }
+
             bgmClip.loop(Clip.LOOP_CONTINUOUSLY);
             bgmClip.start();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopBGM() {
@@ -52,15 +66,53 @@ public class MultiDatingSound {
 
     public void toggleMute() {
         isMuted = !isMuted;
-        setGain(isMuted ? -80.0f : 0.0f);
+        if (isMuted) {
+            setGain(-80.0f);
+        } else {
+            applyCurrentVolume(); // กลับไปใช้ระดับเสียงล่าสุด
+        }
     }
 
-    public boolean isMuted() { return isMuted; }
+    public boolean isMuted() {
+        return isMuted;
+    }
 
+    // Helper ภายในสำหรับปรับ Gain ตรงๆ
     private void setGain(float value) {
         if (bgmClip != null && bgmClip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
             FloatControl gainControl = (FloatControl) bgmClip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(value);
+            // ป้องกันค่าเกินขอบเขตของระบบ
+            float min = gainControl.getMinimum();
+            float max = gainControl.getMaximum();
+            gainControl.setValue(Math.max(min, Math.min(max, value)));
+        }
+    }
+
+    // ✅ เมธอดสำหรับดึงค่าระดับเสียง
+    public float getVolume() {
+        return currentVolume;
+    }
+
+    // ✅ เมธอดสำหรับตั้งค่าระดับเสียง
+    public void setVolume(float volume) {
+        this.currentVolume = volume;
+        applyCurrentVolume();
+    }
+
+    // ✅ ฟังก์ชันหัวใจหลักในการคำนวณเสียงให้เป็น Background นุ่มๆ
+    private void applyCurrentVolume() {
+        if (bgmClip != null && bgmClip.isOpen()) {
+            if (bgmClip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                FloatControl gainControl = (FloatControl) bgmClip.getControl(FloatControl.Type.MASTER_GAIN);
+
+                // ใช้สูตร Logarithmic เพื่อให้การปรับเสียงดูเป็นธรรมชาติเหมือนหูมนุษย์ได้ยิน
+                // 0.0 -> -80dB (เงียบสนิท), 1.0 -> 0dB (ดังปกติของไฟล์)
+                float dB = (float) (Math.log10(Math.max(0.0001, currentVolume)) * 20.0);
+
+                float min = gainControl.getMinimum();
+                float max = gainControl.getMaximum();
+                gainControl.setValue(Math.max(min, Math.min(max, dB)));
+            }
         }
     }
 }

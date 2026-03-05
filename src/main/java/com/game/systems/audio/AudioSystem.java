@@ -6,15 +6,17 @@ import javax.sound.sampled.*;
 
 public class AudioSystem {
     private Clip bgmClip;
-    private String currentBGMPath = ""; 
+    private String currentBGMPath = "";
     private String lastFileName = ""; // ✅ แทรก: เก็บชื่อไฟล์ล่าสุดที่ส่งเข้ามา (เช่น "audiotest.wav")
-    private float currentVolume = 0.8f; 
+    private float currentVolume = 0.2f;
 
     // ================== ระบบปรับระดับเสียง ==================
-    
+
     public void setVolume(float volume) {
-        if (volume < 0f) volume = 0f;
-        if (volume > 1f) volume = 1f;
+        if (volume < 0f)
+            volume = 0f;
+        if (volume > 1f)
+            volume = 1f;
         this.currentVolume = volume;
 
         if (bgmClip != null) {
@@ -40,44 +42,52 @@ public class AudioSystem {
     // ================== ระบบเล่นเพลง ==================
 
     public void playBGM(String fileName) {
-        // ✅ แทรก: บันทึกชื่อไฟล์ไว้ก่อนแปรรูป Path
-        this.lastFileName = fileName; 
+        this.lastFileName = fileName;
 
+        // ✅ ตรวจสอบ Path ให้ฉลาดขึ้น
         String fullPath = fileName.startsWith("audio/") ? fileName : "audio/bgm/" + fileName;
 
+        // ✅ ป้องกันการเล่นซ้ำถ้าเพลงเดิมกำลังเล่นอยู่
         if (fullPath.equals(currentBGMPath) && bgmClip != null && bgmClip.isRunning()) {
-            return; 
+            return;
         }
 
-        stopBGM(); 
-        
+        stopBGM();
+
         try {
             URL url = getClass().getClassLoader().getResource(fullPath);
-            if (url == null) url = getClass().getResource("/" + fullPath);
+            if (url == null)
+                url = getClass().getResource("/" + fullPath);
+
+            AudioInputStream audioInput;
 
             if (url != null) {
-                AudioInputStream audioInput = javax.sound.sampled.AudioSystem.getAudioInputStream(url);
-                bgmClip = javax.sound.sampled.AudioSystem.getClip();
-                bgmClip.open(audioInput);
-                setVolume(currentVolume);
-                bgmClip.loop(Clip.LOOP_CONTINUOUSLY);
-                bgmClip.start();
-                currentBGMPath = fullPath;
-                System.out.println("AudioSystem: Playing BGM -> " + fullPath + " (Vol: " + currentVolume + ")");
+                audioInput = javax.sound.sampled.AudioSystem.getAudioInputStream(url);
             } else {
                 File file = new File("src/main/resources/" + fullPath);
                 if (file.exists()) {
-                    AudioInputStream audioInput = javax.sound.sampled.AudioSystem.getAudioInputStream(file);
-                    bgmClip = javax.sound.sampled.AudioSystem.getClip();
-                    bgmClip.open(audioInput);
-                    setVolume(currentVolume);
-                    bgmClip.loop(Clip.LOOP_CONTINUOUSLY);
-                    bgmClip.start();
-                    currentBGMPath = fullPath;
+                    audioInput = javax.sound.sampled.AudioSystem.getAudioInputStream(file);
                 } else {
                     System.err.println("AudioSystem Error: หาไฟล์ไม่เจอที่ -> " + fullPath);
+                    return;
                 }
             }
+
+            // ✅ ตรวจสอบนามสกุลไฟล์ ถ้าเป็น mp3 ให้แจ้งเตือนทันที
+            if (fullPath.toLowerCase().endsWith(".mp3")) {
+                System.err.println("❌ AudioSystem Error: Java มาตรฐานไม่รองรับ .mp3 โปรดแปลงเป็น .wav");
+                return;
+            }
+
+            bgmClip = javax.sound.sampled.AudioSystem.getClip();
+            bgmClip.open(audioInput);
+            setVolume(currentVolume);
+            bgmClip.loop(Clip.LOOP_CONTINUOUSLY);
+            bgmClip.start();
+            currentBGMPath = fullPath;
+
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("❌ Error: นามสกุลไฟล์ไม่รองรับ (โปรดใช้ .wav) -> " + fullPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,7 +97,8 @@ public class AudioSystem {
         try {
             String fullPath = fileName.startsWith("audio/") ? fileName : "audio/sfx/" + fileName;
             URL url = getClass().getClassLoader().getResource(fullPath);
-            if (url == null) url = getClass().getResource("/" + fullPath);
+            if (url == null)
+                url = getClass().getResource("/" + fullPath);
 
             if (url != null) {
                 AudioInputStream audioInput = javax.sound.sampled.AudioSystem.getAudioInputStream(url);
@@ -102,11 +113,13 @@ public class AudioSystem {
 
     public void stopBGM() {
         if (bgmClip != null) {
-            if (bgmClip.isRunning()) bgmClip.stop();
+            if (bgmClip.isRunning())
+                bgmClip.stop();
             bgmClip.close();
             bgmClip = null;
             currentBGMPath = "";
-            // lastFileName = ""; // ไม่ต้องล้างค่า เพื่อให้หน้าตั้งค่าดึงไปใช้ต่อได้แม้เพลงหยุด
+            // lastFileName = ""; // ไม่ต้องล้างค่า
+            // เพื่อให้หน้าตั้งค่าดึงไปใช้ต่อได้แม้เพลงหยุด
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.game.ui;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * LobbyDialog — Dialog สำหรับให้ผู้เล่นกรอก IP และชื่อก่อนเข้าเกม Multiplayer
@@ -54,7 +54,7 @@ public class LobbyDialog extends JDialog {
         setContentPane(root);
 
         // ===== Title =====
-        JLabel title = new JLabel("🎮 เล่นออนไลน์กับเพื่อน");
+        JLabel title = new JLabel("เล่นออนไลน์กับเพื่อน");
         title.setFont(new Font("Tahoma", Font.BOLD, 20));
         title.setForeground(new Color(120, 40, 100));
         title.setBounds(60, 20, 340, 36);
@@ -95,7 +95,7 @@ public class LobbyDialog extends JDialog {
         root.add(nameField);
 
         // ===== Buttons =====
-        JButton joinBtn = makeButton("เข้าเกม ▶", new Color(255, 100, 140), Color.WHITE);
+        JButton joinBtn = makeButton("เข้าเกม", new Color(255, 100, 140), Color.WHITE);
         joinBtn.setBounds(60, 220, 150, 42);
         joinBtn.addActionListener(e -> onJoin());
         root.add(joinBtn);

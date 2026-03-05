@@ -6,161 +6,291 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class AudioSettingsScreen extends JPanel {
-    private GameController controller;
+
     private boolean isMuted = false;
-    private float lastVolume = 0.8f;
+    private float lastVolume = 0.3f;
+
+    private final Color PINK_ACCENT = new Color(255, 105, 180);
 
     public AudioSettingsScreen(GameController controller) {
-        this.controller = controller;
-        setLayout(new BorderLayout());
-        setBackground(new Color(255, 209, 220));
 
-        // 1. Header
+        setLayout(new BorderLayout());
+        setOpaque(false);
+
+        // ================= HEADER =================
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
         header.setOpaque(false);
-        header.setBorder(new EmptyBorder(30, 30, 0, 0));
+        header.setBorder(new EmptyBorder(30, 40, 10, 0));
 
-        JButton backTitleBtn = createRoundedButton("< ตั้งค่า", 160, 60, Color.WHITE, Color.BLACK, 20);
-        backTitleBtn.addActionListener(e -> controller.showSettings());
-        header.add(backTitleBtn);
+        JLabel title = new JLabel("🎵 Settings Audio");
+        title.setFont(new Font("\"Segoe UI Emoji", Font.BOLD, 32));
+        title.setForeground(new Color(150, 70, 110));
+
+        JButton backBtn = createModernButton("← ย้อนกลับ", 170, 45, Color.WHITE, Color.BLACK, 16);
+        backBtn.addActionListener(e -> controller.showSettings());
+
+        header.add(backBtn);
+        header.add(Box.createHorizontalStrut(30));
+        header.add(title);
+
         add(header, BorderLayout.NORTH);
 
-        // 2. Center Panel
+        // ================= CENTER =================
         JPanel centerWrapper = new JPanel(new GridBagLayout());
         centerWrapper.setOpaque(false);
 
-        // กล่องสีขาวหลัก
-        JPanel whiteBox = new JPanel(new GridBagLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(3));
-                g2.drawRoundRect(1, 1, getWidth()-2, getHeight()-2, 30, 30);
-                g2.dispose();
-                super.paintComponent(g); // วาดคอมโพเนนต์ลูกทับลงบนพื้นหลังที่วาดเสร็จแล้ว
-            }
-        };
-        whiteBox.setPreferredSize(new Dimension(800, 420));
-        whiteBox.setOpaque(false);
-        whiteBox.setBorder(new EmptyBorder(30, 40, 30, 40));
+        JPanel whiteBox = new RoundedPanel(35);
+        whiteBox.setPreferredSize(new Dimension(750, 380));
+        whiteBox.setLayout(new GridBagLayout());
+        whiteBox.setBorder(new EmptyBorder(40, 50, 40, 50));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 15, 10, 15);
+        gbc.insets = new Insets(15, 20, 15, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // --- แถวบน: ไอคอนลำโพง + Slider + On/Off ---
-        
+        // ===== ICON =====
         JLabel speakerIcon = new JLabel("🔊", SwingConstants.CENTER);
-        speakerIcon.setFont(new Font("Tahoma", Font.BOLD, 30));
-        speakerIcon.setPreferredSize(new Dimension(70, 70));
-        speakerIcon.setOpaque(true);
-        speakerIcon.setBackground(Color.BLACK);
-        speakerIcon.setForeground(Color.WHITE);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        speakerIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 36));
+        speakerIcon.setPreferredSize(new Dimension(80, 80));
+        speakerIcon.setOpaque(false);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
         whiteBox.add(speakerIcon, gbc);
 
         // ดึงระดับเสียงปัจจุบัน
-        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.8f;
-        JSlider volumeSlider = new JSlider(0, 100, (int)(currentVol * 100));
-        volumeSlider.setBackground(Color.WHITE);
-        volumeSlider.setOpaque(true); // มั่นใจว่าเห็นตัว Slider ชัดเจน
-        volumeSlider.setForeground(new Color(255, 105, 180));
+        float currentVol = (controller.getAudioSystem() != null) ? controller.getAudioSystem().getVolume() : 0.2f;
+        JSlider volumeSlider = new JSlider(0, 100, (int) (currentVol * 100));
+        volumeSlider.setOpaque(false);
+        volumeSlider.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        volumeSlider.setUI(new ModernSliderUI(volumeSlider));
 
-        // ปุ่ม On/Off (สร้างก่อนเพื่อให้ Slider เรียกใช้ได้)
-        JButton onOffBtn = createRoundedButton(currentVol > 0 ? "On" : "Off", 120, 50, 
-                currentVol > 0 ? new Color(255, 105, 180) : Color.LIGHT_GRAY, Color.WHITE, 16);
-        
-        // ====== ปรับเสียงแบบ Real-time (ดังตามมือ) ======
-        volumeSlider.addChangeListener(e -> {
-            float vol = volumeSlider.getValue() / 100f;
-            if (controller.getAudioSystem() != null) {
-                controller.getAudioSystem().setVolume(vol);
-                
-                // ปรับสถานะปุ่ม On/Off ตามการลาก
-                if (vol > 0) {
-                    onOffBtn.setText("On");
-                    onOffBtn.setBackground(new Color(255, 105, 180));
-                    isMuted = false;
-                } else {
-                    onOffBtn.setText("Off");
-                    onOffBtn.setBackground(Color.LIGHT_GRAY);
-                    isMuted = true;
-                }
-            }
-        });
-
-        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1.0;
+        gbc.gridx = 1;
+        gbc.weightx = 1;
         whiteBox.add(volumeSlider, gbc);
 
-        // Action สำหรับปุ่ม On/Off
-        onOffBtn.addActionListener(e -> {
-            if (controller.getAudioSystem() == null) return;
-            if (!isMuted) {
-                lastVolume = controller.getAudioSystem().getVolume();
-                if(lastVolume == 0) lastVolume = 0.5f; // กันบั๊กถ้า mute ตอนเป็น 0
-                volumeSlider.setValue(0); // ChangeListener จะทำงานอัตโนมัติ
-            } else {
-                volumeSlider.setValue((int)(lastVolume * 100));
-            }
-        });
-        
-        gbc.gridx = 2; gbc.gridy = 0; gbc.weightx = 0;
-        whiteBox.add(onOffBtn, gbc);
+        // ===== TOGGLE BUTTON =====
+        JToggleButton toggleBtn = new JToggleButton(currentVol > 0 ? "เปิด" : "ปิด") {
 
-        // --- แถวล่าง: ปุ่มกลับ + ยืนยัน ---
-        JPanel footer = new JPanel(new GridLayout(1, 2, 100, 0));
-        footer.setOpaque(false);
-        
-        JButton btnBack = createRoundedButton("กลับ", 180, 65, Color.WHITE, Color.BLACK, 22);
-        btnBack.addActionListener(e -> controller.showSettings());
-        
-        JButton btnConfirm = createRoundedButton("ยืนยัน", 180, 65, Color.WHITE, Color.BLACK, 22);
-        btnConfirm.addActionListener(e -> {
-            if (controller.getAudioSystem() != null) controller.getAudioSystem().playSFX("click.wav");
-            controller.showSettings();
-        });
-
-        footer.add(btnBack);
-        footer.add(btnConfirm);
-
-        gbc.gridx = 0; gbc.gridy = 1; 
-        gbc.gridwidth = 3; 
-        gbc.insets = new Insets(80, 0, 0, 0); 
-        whiteBox.add(footer, gbc);
-
-        centerWrapper.add(whiteBox);
-        add(centerWrapper, BorderLayout.CENTER);
-    }
-
-    private JButton createRoundedButton(String text, int w, int h, Color bg, Color fg, int fontSize) {
-        JButton btn = new JButton(text) {
-            @Override
             protected void paintComponent(Graphics g) {
+
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+
+                Color top;
+                Color bottom;
+
+                if (isSelected()) {
+                    top = new Color(255, 170, 210);
+                    bottom = new Color(255, 105, 180);
+                } else {
+                    top = new Color(230, 230, 230);
+                    bottom = new Color(200, 200, 200);
+                }
+
+                GradientPaint gp = new GradientPaint(
+                        0, 0, top,
+                        0, getHeight(), bottom);
+
+                g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(2));
-                g2.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 40, 40);
+
+                g2.setColor(isSelected() ? Color.WHITE : new Color(80, 80, 80));
+                g2.setFont(new Font("Tahoma", Font.BOLD, 14));
+
                 FontMetrics fm = g2.getFontMetrics();
-                g2.setColor(getForeground());
-                g2.drawString(getText(), (getWidth()-fm.stringWidth(getText()))/2, (getHeight()+fm.getAscent())/2 - 5);
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = (getHeight() + fm.getAscent()) / 2 - 4;
+
+                g2.drawString(getText(), x, y);
+
                 g2.dispose();
             }
         };
+
+        toggleBtn.setPreferredSize(new Dimension(110, 45));
+        toggleBtn.setContentAreaFilled(false);
+        toggleBtn.setBorderPainted(false);
+        toggleBtn.setFocusPainted(false);
+        toggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        toggleBtn.setSelected(currentVol > 0);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+        whiteBox.add(toggleBtn, gbc);
+
+        // ===== REALTIME VOLUME =====
+        volumeSlider.addChangeListener(e -> {
+
+            float vol = volumeSlider.getValue() / 100f;
+
+            if (controller.getAudioSystem() != null) {
+                controller.getAudioSystem().setVolume(vol);
+            }
+
+            if (vol > 0) {
+                toggleBtn.setText("เปิด");
+                toggleBtn.setSelected(true);
+                isMuted = false;
+            } else {
+                toggleBtn.setText("ปิด");
+                toggleBtn.setSelected(false);
+                isMuted = true;
+            }
+        });
+
+        toggleBtn.addActionListener(e -> {
+
+            if (controller.getAudioSystem() == null)
+                return;
+
+            if (toggleBtn.isSelected()) {
+                volumeSlider.setValue((int) (lastVolume * 100));
+            } else {
+                lastVolume = controller.getAudioSystem().getVolume();
+                volumeSlider.setValue(0);
+            }
+        });
+
+        // ===== FOOTER =====
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
+        footer.setOpaque(false);
+
+        JButton btnCancel = createRedGradientButton("ยกเลิก", 160, 55);
+        JButton btnConfirm = createGreenGradientButton("บันทึก", 160, 55);
+
+        btnCancel.addActionListener(e -> controller.showSettings());
+
+        btnConfirm.addActionListener(e -> {
+            if (controller.getAudioSystem() != null)
+                controller.getAudioSystem().playSFX("click.wav");
+            controller.showSettings();
+        });
+
+        footer.add(btnCancel);
+        footer.add(btnConfirm);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        gbc.insets = new Insets(60, 0, 0, 0);
+
+        whiteBox.add(footer, gbc);
+
+        centerWrapper.add(whiteBox);
+
+        add(centerWrapper, BorderLayout.CENTER);
+    }
+
+    // ================= พื้นหลัง =================
+    protected void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        int w = getWidth();
+        int h = getHeight();
+
+        GradientPaint gp = new GradientPaint(
+                0, 0, new Color(255, 200, 220),
+                0, h, new Color(255, 240, 245));
+
+        g2.setPaint(gp);
+        g2.fillRect(0, 0, w, h);
+
+        g2.dispose();
+    }
+
+    // ================= ปุ่มปกติ =================
+    private JButton createModernButton(String text, int w, int h, Color bg, Color fg, int fontSize) {
+
+        JButton btn = new JButton(text);
+
+        btn.setPreferredSize(new Dimension(w, h));
         btn.setFont(new Font("Tahoma", Font.BOLD, fontSize));
         btn.setBackground(bg);
         btn.setForeground(fg);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder());
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        return btn;
+    }
+
+    // ================= ปุ่มเขียว =================
+    private JButton createGreenGradientButton(String text, int w, int h) {
+
+        JButton btn = new JButton(text) {
+
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                GradientPaint gp = new GradientPaint(
+                        0, 0, new Color(170, 240, 190),
+                        0, getHeight(), new Color(60, 170, 110));
+
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Tahoma", Font.BOLD, 18));
+
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = (getHeight() + fm.getAscent()) / 2 - 4;
+
+                g2.drawString(getText(), x, y);
+
+                g2.dispose();
+            }
+        };
+
         btn.setPreferredSize(new Dimension(w, h));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        return btn;
+    }
+
+    // ================= ปุ่มแดง =================
+    private JButton createRedGradientButton(String text, int w, int h) {
+
+        JButton btn = new JButton(text) {
+
+            protected void paintComponent(Graphics g) {
+
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                GradientPaint gp = new GradientPaint(
+                        0, 0, new Color(255, 120, 120),
+                        0, getHeight(), new Color(200, 40, 40));
+
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40);
+
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Tahoma", Font.BOLD, 18));
+
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = (getHeight() + fm.getAscent()) / 2 - 4;
+
+                g2.drawString(getText(), x, y);
+
+                g2.dispose();
+            }
+        };
+
+        btn.setPreferredSize(new Dimension(w, h));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+
         return btn;
     }
 }

@@ -1,9 +1,11 @@
 package com.game.controllers;
 
+
 import com.game.models.Player;
+import com.game.multi.dating.MultiDatingSound;
 import com.game.network.GameClient;
-import com.game.systems.audio.AudioSystem;
-import com.game.systems.dialogue.DialogueSystemAndChoice;
+import com.game.systems.audio.AudioSystem; // ✅ สำหรับจัดการเสียงระบบใหม่
+import com.game.systems.choice.Day1;
 import com.game.systems.shop.ShopSystem;
 import com.game.ui.*;
 import java.awt.*;
@@ -11,32 +13,35 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
+
 public class GameController {
 
-    // เปลี่ยนจาก Player คนเดียว เป็น List เพื่อรองรับ 3 คน
     private List<Player> players;
-    private int currentPlayerIndex = 0; // เก็บว่าตอนนี้ตาใคร (0, 1, 2)
+    private int currentPlayerIndex = 0;
+    private Player player;
 
     private ShopSystem shopSystem;
-    private DialogueSystemAndChoice dialogueSystem;
     private AudioSystem audioSystem;
     private String lastScene = "MAIN_MENU";
 
     private JFrame mainFrame;
 
+    // ✅ ป้องกันการเปิดหน้าจอ Multiplayer ซ้อนกัน
+    private boolean isConnecting = false;
+
     public GameController() {
-        // ===== สร้างข้อมูลผู้เล่น 3 คน แข่งจีบคนเดียวกัน =====
+        this.player = new Player("Hero", 100);
         this.players = new ArrayList<>();
-        this.players.add(new Player("Player 1", 100));
+        this.players.add(this.player);
         this.players.add(new Player("Player 2", 100));
         this.players.add(new Player("Player 3", 100));
 
         this.shopSystem = new ShopSystem();
-        this.dialogueSystem = new DialogueSystemAndChoice();
         this.audioSystem = new AudioSystem();
 
-        // ===== สร้างหน้าต่างหลักหน้าต่างเดียว (Single Frame) =====
-        mainFrame = new JFrame("Love Game - 3 Players Rivalry");
+        applyThaiFontGlobal();
+
+        mainFrame = new JFrame("Love Game - Multiplayer Rivalry");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1280, 720);
         mainFrame.setResizable(true);
@@ -45,34 +50,36 @@ public class GameController {
     }
 
     // ================== ระบบจัดการ Turn ==================
-    // ดึงข้อมูลผู้เล่นที่กำลังเล่นอยู่ตอนนี้
     public Player getCurrentPlayer() {
+        if (players == null || players.isEmpty())
+            return player;
         return players.get(currentPlayerIndex);
     }
 
-    // สลับไปตาผู้เล่นคนถัดไป
     public void nextTurn() {
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.size()) {
-            currentPlayerIndex = 0; // วนกลับมาคนที่ 1
+            currentPlayerIndex = 0;
         }
         System.out.println("ตอนนี้ตาของ: " + getCurrentPlayer().getName());
     }
 
     // ================== เริ่มเกม ==================
-
     public void start() {
         showMainMenu();
         mainFrame.setVisible(true);
-
-        SwingUtilities.invokeLater(() -> {
-            if (audioSystem != null) {
-                audioSystem.playBGM("audiotest.wav");
-            }
-        });
     }
 
-    // ================== เปลี่ยนหน้าจอ (รับเฉพาะ JPanel) ==================
+    private void applyThaiFontGlobal() {
+        UIManager.put("OptionPane.messageFont", new Font("Tahoma", Font.PLAIN, 14));
+        UIManager.put("OptionPane.buttonFont", new Font("Tahoma", Font.PLAIN, 12));
+        Font thaiPlain = new Font("Segoe UI", Font.PLAIN, 16);
+        Font thaiBold = new Font("Segoe UI", Font.BOLD, 18);
+        UIManager.put("Label.font", thaiPlain);
+        UIManager.put("Button.font", thaiBold);
+        UIManager.put("TextField.font", thaiPlain);
+        UIManager.put("TextArea.font", thaiPlain);
+    }
 
     private void changeScreen(JPanel panel) {
         panel.setPreferredSize(null);
@@ -85,23 +92,22 @@ public class GameController {
     // ================== หน้าต่างต่าง ๆ ==================
     public void showMainMenu() {
         lastScene = "MAIN_MENU";
+        mainFrame.setVisible(true);
         changeScreen(new MenuGame(this));
     }
 
     public void showChangescene() {
+        MultiDatingSound.getInstance().stopBGM();
         if (audioSystem != null)
             audioSystem.stopBGM();
+
         mainFrame.setVisible(false);
-        new Changescene(this);
+        SwingUtilities.invokeLater(() -> new Day1().CREATEANDSHOWGUI());
     }
 
     public void showGameScene() {
         lastScene = "GAME_SCENE";
         showChangescene();
-    }
-
-    public void showShop() {
-        changeScreen(new ShopScreen(this));
     }
 
     public void showSettings() {
@@ -116,12 +122,8 @@ public class GameController {
 
     public void showAudioSettings() {
         changeScreen(new AudioSettingsScreen(this));
-        if (audioSystem != null && audioSystem.getCurrentBgmName() != null) {
-            audioSystem.playBGM(audioSystem.getCurrentBgmName());
-        }
     }
 
-    // เมธอดสำหรับปุ่มย้อนกลับ
     public void backToPreviousScreen() {
         if (lastScene.equals("CHANGESCENE") || lastScene.equals("GAME_SCENE")) {
             showChangescene();
@@ -138,27 +140,42 @@ public class GameController {
         changeScreen(new SaveScreen(this, onBack));
     }
 
-    // ================== Multiplayer ==================
-    /**
-     * เปิดหน้า Lobby Dialog ให้กรอก IP + ชื่อ แล้วเชื่อมต่อ GameServer
-     * เรียกจาก MenuGame เมื่อกดปุ่ม "เล่นออนไลน์"
-     */
+    // ================== Multiplayer (แก้ไขเพื่อส่งไม้ต่อ) ==================
     public void showMultiplayer() {
+        if (isConnecting)
+            return; // ป้องกันการกดซ้ำ
+
         LobbyDialog.LobbyResult lobbyResult = LobbyDialog.show(mainFrame);
         if (lobbyResult == null)
-            return; // ผู้ใช้กด Cancel
-
-        GameClient client = new GameClient(lobbyResult.ip, 9090, lobbyResult.playerName);
-        boolean ok = client.connect();
-        if (!ok) {
-            JOptionPane.showMessageDialog(mainFrame,
-                    "เชื่อมต่อ IP: " + lobbyResult.ip + " ไม่สำเร็จ!\nโปรดเช็คว่า Host เปิด GameServer แล้ว",
-                    "เชื่อมต่อไม่สำเร็จ", JOptionPane.ERROR_MESSAGE);
             return;
-        }
 
-        // เปิดหน้าต่าง Multiplayer (เป็น JFrame แยกต่างหาก)
-        new MultiplayerScreen(client);
+        isConnecting = true;
+
+        new Thread(() -> {
+            GameClient client = new GameClient(lobbyResult.ip, 9090, lobbyResult.playerName);
+            boolean ok = client.connect();
+
+            SwingUtilities.invokeLater(() -> {
+                isConnecting = false;
+                if (!ok) {
+                    JOptionPane.showMessageDialog(mainFrame, "เชื่อมต่อไม่สำเร็จ!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // ✅ หยุดเสียงเมนูก่อนเข้า Lobby
+                if (audioSystem != null)
+                    audioSystem.stopBGM();
+                MultiDatingSound.getInstance().stopBGM();
+
+                // ✅ ซ่อนหน้าหลัก
+                mainFrame.setVisible(false);
+
+                // ✅ เปิดหน้า Lobby โดยส่ง 'this' (Controller) ไปด้วยเพื่อหายแดง
+                MultiplayerScreen lobby = new MultiplayerScreen(client, true, this);
+                lobby.setVisible(true);
+                lobby.toFront();
+            });
+        }).start();
     }
 
     public void exitGame() {
@@ -166,7 +183,6 @@ public class GameController {
     }
 
     // ================== Getters ==================
-    // ให้ getPlayer() คืนค่าผู้เล่นคนปัจจุบันเสมอ เพื่อให้หน้า Save/Shop ทำงานถูกคน
     public Player getPlayer() {
         return getCurrentPlayer();
     }
@@ -186,4 +202,48 @@ public class GameController {
     public JFrame getMainFrame() {
         return mainFrame;
     }
+    
+
+// ================== ระบบ Save/Load (เวอร์ชันทำงานจริง) ==================
+// เพิ่มไว้ใต้พวก private Player player; หรือ private JFrame mainFrame;
+private int currentDialogueIndex = 0;
+
+    /**
+     * ดึงตำแหน่งบทสนทนาปัจจุบันที่บันทึกไว้ในตัวแปรออกมาเพื่อเขียนลงไฟล์
+     */
+    
+    public int getCurrentDialogueIndex() {
+        return this.currentDialogueIndex; // คืนค่าตัวแปรที่เราสร้างไว้ด้านบน แทนเลข 0
+    }
+
+    /**
+     * ใช้สำหรับอัปเดตเลขหน้า (สำคัญ: ต้องเรียกใช้ในหน้าเนื้อเรื่องเวลาบทสนทนาเปลี่ยน)
+     */
+    public void setCurrentDialogueIndex(int index) {
+        this.currentDialogueIndex = index;
+    }
+
+    /**
+     * เมื่อกดโหลด ระบบจะส่งเลขหน้าจากไฟล์มาให้
+     * เราต้องจดค่าลงตัวแปร แล้วสั่งเปิดหน้าเนื้อเรื่องทันที
+     */
+    public void loadGameAt(int index) {
+        this.currentDialogueIndex = index; // จดเลขหน้าที่โหลดมาได้ลงในระบบ
+        
+        showGameScene(); // เปลี่ยนหน้าจอไปที่หน้าเล่นเกม (Changescene)
+        
+        System.out.println("ระบบ: โหลดสำเร็จ! กำลังวาร์ปไปบทสนทนาหน้า: " + index);
+    }
+
+    // ส่วนเชื่อมต่อเพื่อให้ SaveScreen.java หายตัวแดง
+    public GameController getDialogueManager() { return this; }
+    public int getCurrentIndex() { return getCurrentDialogueIndex(); }
+
+    public void showShop() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'showShop'");
+    }
+
+    
 }
+

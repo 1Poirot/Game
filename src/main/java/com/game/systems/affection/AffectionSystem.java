@@ -9,9 +9,8 @@ import com.game.models.Character;
 public class AffectionSystem {
 
     public void updateAffection(Character character, int points) {
-        character.addAffectionPoints(points);
-        checkAffectionLevel(character);
-    }
+    character.addAffectionPoints(points);
+}
 
     private void checkAffectionLevel(Character character) {
         int points = character.getAffectionPoints();
