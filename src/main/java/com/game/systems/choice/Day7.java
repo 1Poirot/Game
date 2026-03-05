@@ -65,7 +65,7 @@ public class Day7 {
         BG_VIEW.add(LABEL_CHARACTER2);
 
         CHAR_ORIG = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ตัวละครตอนจบ.png");
-        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ผู้หญิง ชุดไปเที่ยว.png");
+        CHAR_ORIG2 = LOAD_IMAGE_SAFE("src/main/resources/images/Characters/ตัวละครหน้าเศร้าตอบจบ.png");
 
         affectionBar = new AffectionBar(CharacterRoute.KIM_JAEHYUN);
         BG_VIEW.add(affectionBar);
@@ -132,7 +132,7 @@ public class Day7 {
                     return img;
                 }
             }
-            
+
             // ถ้า ClassLoader ล้มเหลว ลองใช้เส้นทางสัมพัทธ์
             ImageIcon fallback = new ImageIcon(PATH);
             if (fallback.getIconWidth() > 0 && fallback.getIconHeight() > 0) {
@@ -142,7 +142,7 @@ public class Day7 {
                 tracker.waitForID(0);
                 return img;
             }
-            
+
             System.err.println("ไม่สามารถโหลดรูปภาพ: " + PATH);
             return MAKE_EMPTY_IMAGE();
         } catch (Exception EX) {
@@ -316,67 +316,45 @@ public class Day7 {
         SCENES.put("Q1", new SCENE("คุณ", "Day7", "คุณจะตอบเขายังไงดี?",
                 "A) “เราก็ชอบเธอ… มากกว่าเพื่อนเหมือนกัน”",
                 "B) “เรารู้สึกดีนะ… แต่เรายังไม่พร้อมเป็นแฟน”",
-                null, "A1", "B1"));
+                null, "S31", "S48"));
 
-        SCENES.put("A1",
-                new SCENE("คุณ", "Day7", "ฉากจบที่ 1 — Happy Ending (เป็นแฟนกัน)", null, null, "A2", null, null));
-        SCENES.put("A2", new SCENE("คุณ", "Day7", "“เราชอบเธอ”", null, null, "A3", null, null));
-        SCENES.put("A3", new SCENE("ผู้บรรยาย", "Day7", "เขานิ่งไปหนึ่งวินาที ก่อนรอยยิ้มจะค่อย ๆ ปรากฏ", null, null,
-                "A4", null, null));
-        SCENES.put("A4", new SCENE("ผู้บรรยาย", "Day7", "รอยยิ้มแบบที่เก็บไว้ไม่อยู่", null, null, "A5", null, null));
-        SCENES.put("A5", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“จริงนะ…”", null, null, "A6", null, null));
-        SCENES.put("A6", new SCENE("ผู้บรรยาย", "Day7", "เขาหัวเราะเบา ๆ อย่างโล่งใจ", null, null, "A7", null, null));
-        SCENES.put("A7", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7",
-                "“เรากลัวมากเลยนะกลัวว่าเธอจะไม่รู้สึกแบบเดียวกัน”", null, null, "A8", null, null));
-        SCENES.put("A8", new SCENE("ผู้บรรยาย", "Day7", "มือเขาค่อย ๆ เอื้อมมาหยุดอยู่ใกล้มือคุณ", null, null, "A9",
-                null, null));
-        SCENES.put("A9", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“งั้น…เราขอเป็นแฟนเธอได้ไหม”", null, null, "A10",
-                null, null));
-        SCENES.put("A10", new SCENE("คุณ", "Day7", "“ได้สิ”", null, null, "A11", null, null));
-        SCENES.put("A11", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“จากนี้ไป เราไม่ต้องเป็นแค่เพื่อนกันแล้วนะ”",
-                null, null, "A12", null, null));
-        SCENES.put("A12", new SCENE("ผู้บรรยาย", "Day7", "คุณหัวเราะเบา ๆ", null, null, "A13", null, null));
-        SCENES.put("A13", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“ขอกอดได้ไหม”", null, null, "A14", null, null));
-        SCENES.put("A14", new SCENE("ผู้บรรยาย", "Day7", "คุณพยักหน้า", null, null, "A15", null, null));
-        SCENES.put("A15", new SCENE("ผู้บรรยาย", "Day7", "อ้อมกอดนั้นอบอุ่นมาก ๆ", null, null, "A16", null, null));
-        SCENES.put("A16",
-                new SCENE("ผู้บรรยาย", "Day7", "ค่ำวันนั้นคุณกลับบ้านพร้อมสถานะใหม่", null, null, "A17", null, null));
-        SCENES.put("A17", new SCENE("ผู้บรรยาย", "Day7", " สถานะ: แฟน", null, null, "A18", null, null));
-        SCENES.put("A18", new SCENE("ผู้บรรยาย", "Day7", " และนี่ไม่ใช่จุดจบแต่มันคือจุดเริ่มต้น", null, null, "END",
-                null, null));
+        SCENES.put("S30",new SCENE("คุณ", "Day7", "ฉากจบที่ 1 — Happy Ending (เป็นแฟนกัน)", null, null, "S31", null, null));
+        SCENES.put("S31", new SCENE("คุณ", "Day7", "“เราชอบเธอ”", null, null, "S32", null, null));
+        SCENES.put("S32", new SCENE("ผู้บรรยาย", "Day7", "เขานิ่งไปหนึ่งวินาที ก่อนรอยยิ้มจะค่อย ๆ ปรากฏ", null, null,"S33", null, null));
+        SCENES.put("S33", new SCENE("ผู้บรรยาย", "Day7", "รอยยิ้มแบบที่เก็บไว้ไม่อยู่", null, null, "S34", null, null));
+        SCENES.put("S34", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“จริงนะ…”", null, null, "S35", null, null));
+        SCENES.put("S35", new SCENE("ผู้บรรยาย", "Day7", "เขาหัวเราะเบา ๆ อย่างโล่งใจ", null, null, "S36", null, null));
+        SCENES.put("S36", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7","“เรากลัวมากเลยนะกลัวว่าเธอจะไม่รู้สึกแบบเดียวกัน”", null, null, "S37", null, null));
+        SCENES.put("S37", new SCENE("ผู้บรรยาย", "Day7", "มือเขาค่อย ๆ เอื้อมมาหยุดอยู่ใกล้มือคุณ", null, null, "S38",null, null));
+        SCENES.put("S38", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“งั้น…เราขอเป็นแฟนเธอได้ไหม”", null, null, "S39",null, null));
+        SCENES.put("S39", new SCENE("คุณ", "Day7", "“ได้สิ”", null, null, "S40", null, null));
+        SCENES.put("S40", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“จากนี้ไป เราไม่ต้องเป็นแค่เพื่อนกันแล้วนะ”",null, null, "S41", null, null));
+        SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day7", "คุณหัวเราะเบา ๆ", null, null, "S42", null, null));
+        SCENES.put("S42", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“ขอกอดได้ไหม”", null, null, "S43", null, null));
+        SCENES.put("S43", new SCENE("ผู้บรรยาย", "Day7", "คุณพยักหน้า", null, null, "S44", null, null));
+        SCENES.put("S44", new SCENE("ผู้บรรยาย", "Day7", "อ้อมกอดนั้นอบอุ่นมาก ๆ", null, null, "S45", null, null));
+        SCENES.put("S45",new SCENE("ผู้บรรยาย", "Day7", "ค่ำวันนั้นคุณกลับบ้านพร้อมสถานะใหม่", null, null, "S46", null, null));
+        SCENES.put("S46",new SCENE("ผู้บรรยาย", "Day7", "สถานะ: แฟน", null, null, "S47", null, null));
+        SCENES.put("S47", new SCENE("ผู้บรรยาย", "Day7", " และนี่ไม่ใช่จุดจบแต่มันคือจุดเริ่มต้น", null, null, "END",null, null));
 
-        SCENES.put("B1", new SCENE("ผู้บรรยาย", "Day7", "ฉากจบที่ 2 — Friend Ending (คนสำคัญที่ไม่ใช่แฟน)", null, null,
-                "B2", null, null));
-        SCENES.put("B2", new SCENE("คุณ", "Day7", "“เรารู้สึกดีมากนะแต่เรายังไม่พร้อมเป็นแฟนใครตอนนี้”", null, null,
-                "B3", null, null));
-        SCENES.put("B3",
-                new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“อ๋อ…แบบนั้นเหรอ”", null, null, "B4", null, null));
-        SCENES.put("B4", new SCENE("คุณ", "Day7", "“มันไม่ใช่ว่าเราไม่ชอบนะแค่เรายังอยากใช้เวลากับตัวเองมากกว่านี้”",
-                null, null, "B5", null, null));
-        SCENES.put("B5", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7",
-                "“ขอบคุณนะที่พูดตรง ๆอย่างน้อยเราก็ไม่ได้เสียเธอไป”", null, null, "B6", null, null));
-        SCENES.put("B6", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“เรายังเป็นคนสำคัญต่อกันได้ใช่ไหม”", null, null,
-                "B7", null, null));
-        SCENES.put("B7", new SCENE("คุณ", "Day7", "คุณพยักหน้า", null, null, "B8", null, null));
-        SCENES.put("B8", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“งั้น…ให้เราได้อยู่ข้าง ๆ แบบนี้ไปก่อนก็พอ”",
-                null, null, "B9", null, null));
-        SCENES.put("B9", new SCENE("ผู้บรรยาย", "Day7", "ไม่มีการจับมือ  ไม่มีอ้อมกอด แต่มีความเข้าใจ", null, null,
-                "B10", null, null));
-        SCENES.put("B10", new SCENE("ผู้บรรยาย", "Day7", "พระอาทิตย์ลับขอบฟ้า", null, null, "B11", null, null));
-        SCENES.put("B11", new SCENE("ผู้บรรยาย", "Day7", "เหมือนกับความหวังบางอย่างที่ค่อย ๆ จางลง", null, null, "B12",
-                null, null));
-        SCENES.put("B12", new SCENE("ผู้บรรยาย", "Day7", "แต่ความสัมพันธ์ไม่ได้หายไป มันเปลี่ยนรูปแบบ", null, null,
-                "B13", null, null));
-        SCENES.put("B13", new SCENE("ผู้บรรยาย", "Day7", "สถานะ: คนสำคัญ", null, null, "B14", null, null));
-        SCENES.put("B14",
-                new SCENE("ผู้บรรยาย", "Day7", "คุณเดินกลับด้วยกันระยะห่างพอเหมาะ", null, null, "B15", null, null));
-        SCENES.put("B15", new SCENE("ผู้บรรยาย", "Day7", "ไม่มีคำว่าแฟน", null, null, "B16", null, null));
-        SCENES.put("B16", new SCENE("ผู้บรรยาย", "Day7", "แต่ก็ไม่ใช่คนแปลกหน้า", null, null, "END", null, null));
+        SCENES.put("S48", new SCENE("ผู้บรรยาย", "Day7", "ฉากจบที่ 2 — Friend Ending (คนสำคัญที่ไม่ใช่แฟน)", null, null,"S49", null, null));
+        SCENES.put("S49", new SCENE("คุณ", "Day7", "“เรารู้สึกดีมากนะแต่เรายังไม่พร้อมเป็นแฟนใครตอนนี้”", null, null,"S50", null, null));
+        SCENES.put("S50",new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“อ๋อ…แบบนั้นเหรอ”", null, null, "S51", null, null));
+        SCENES.put("S51", new SCENE("คุณ", "Day7", "“มันไม่ใช่ว่าเราไม่ชอบนะแค่เรายังอยากใช้เวลากับตัวเองมากกว่านี้”",null, null, "S52", null, null));
+        SCENES.put("S52", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7","“ขอบคุณนะที่พูดตรง ๆอย่างน้อยเราก็ไม่ได้เสียเธอไป”", null, null, "S53", null, null));
+        SCENES.put("S53", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“เรายังเป็นคนสำคัญต่อกันได้ใช่ไหม”", null, null,"S54", null, null));
+        SCENES.put("S54", new SCENE("คุณ", "Day7", "คุณพยักหน้า", null, null, "S55", null, null));
+        SCENES.put("S55", new SCENE("คิมแจฮยอน (Kim Jaehyun)", "Day7", "“งั้น…ให้เราได้อยู่ข้าง ๆ แบบนี้ไปก่อนก็พอ”",null, null, "S56", null, null));
+        SCENES.put("S56", new SCENE("ผู้บรรยาย", "Day7", "ไม่มีการจับมือ  ไม่มีอ้อมกอด แต่มีความเข้าใจ", null, null,"S57", null, null));
+        SCENES.put("S57", new SCENE("ผู้บรรยาย", "Day7", "พระอาทิตย์ลับขอบฟ้า", null, null, "S58", null, null));
+        SCENES.put("S58", new SCENE("ผู้บรรยาย", "Day7", "เหมือนกับความหวังบางอย่างที่ค่อย ๆ จางลง", null, null, "S59",null, null));
+        SCENES.put("S59", new SCENE("ผู้บรรยาย", "Day7", "แต่ความสัมพันธ์ไม่ได้หายไป มันเปลี่ยนรูปแบบ", null, null,"S60", null, null));
+        SCENES.put("S60", new SCENE("ผู้บรรยาย", "Day7", "สถานะ: คนสำคัญ", null, null, "S61", null, null));
+        SCENES.put("S61",new SCENE("ผู้บรรยาย", "Day7", "คุณเดินกลับด้วยกันระยะห่างพอเหมาะ", null, null, "S62", null, null));
+        SCENES.put("S62", new SCENE("ผู้บรรยาย", "Day7", "ไม่มีคำว่าแฟน", null, null, "S63", null, null));
+        SCENES.put("S63", new SCENE("ผู้บรรยาย", "Day7", "แต่ก็ไม่ใช่คนแปลกหน้า", null, null, "END", null, null));
 
-        SCENES.put("END",
-                new SCENE("ผู้บรรยาย", "Day7",
-                        "จบ Day 7 ขอบคุณที่เล่นเกมนี้จนจบขอบคุณมากๆเลยครับ / ค่ะวังว่าเกมนี้จะทำให้คุณสนุกไม่มากก็น้อย",
-                        null, null, null, null, null));
+        SCENES.put("END",new SCENE("ผู้บรรยาย", "Day7","จบ Day 7 ขอบคุณที่เล่นเกมนี้จนจบขอบคุณมากๆเลยครับ / ค่ะวังว่าเกมนี้จะทำให้คุณสนุกไม่มากก็น้อย",null, null, null, null, null));
     }
 
     private void SHOW_SCENE(String ID) {
@@ -409,9 +387,9 @@ public class Day7 {
             BG_VIEW.SET_BG("src/main/resources/images/backgrounds/ฉากตอบจบ.png");
         }
 
-        LABEL_CHARACTER2.setVisible(sceneNumber >= 10 && sceneNumber <= 16 &&   CHAR_ORIG2 != null);
-        
-        LABEL_CHARACTER.setVisible(sceneNumber >= 17 && sceneNumber <= 64 && CHAR_ORIG != null);
+        LABEL_CHARACTER.setVisible(sceneNumber >= 10 && sceneNumber <= 47 && CHAR_ORIG != null);
+
+        LABEL_CHARACTER2.setVisible(sceneNumber >= 48 && sceneNumber <= 63 && CHAR_ORIG2 != null);
 
         DIALOG.SETDATA(S.NAME, S.DAY, S.TEXT);
         DIALOG.repaint();
@@ -440,6 +418,16 @@ public class Day7 {
         boolean HAS_CHOICES = S.C1 != null && S.C2 != null;
         if (HAS_CHOICES)
             return;
+
+        if (CURRENT_ID.equals("END")) {
+            FRAME.dispose();
+            SwingUtilities.invokeLater(() -> {
+                com.game.controllers.GameController controller = new com.game.controllers.GameController();
+                controller.start();
+            });
+            return;
+        }
+
         if (S.NEXT != null)
             SHOW_SCENE(S.NEXT);
     }
