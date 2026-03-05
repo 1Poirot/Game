@@ -303,9 +303,9 @@ public class Day5 {
                 "C) “เอ่อ… ขอบคุณที่ช่วยเก็บนะ”",
                 null, "Q1_A", "Q1_B", "Q1_C"));
 
-        SCENES.put("Q1_A", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +10", null, null, null, "S21", null, null, null));
-        SCENES.put("Q1_B", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +5", null, null, null, "S23", null, null, null));
-        SCENES.put("Q1_C", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +8", null, null, null, "S23", null, null, null));
+        SCENES.put("Q1_A", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +8", null, null, null, "S21", null, null, null));
+        SCENES.put("Q1_B", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +3", null, null, null, "S23", null, null, null));
+        SCENES.put("Q1_C", new SCENE("คุณ", "Day1", "ความสัมพันธ์ +4", null, null, null, "S23", null, null, null));
 
         SCENES.put("S21", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายชะงักก่อนหลบสายตาเล็กน้อย", null, null, null, "S22",null, null, null));
         SCENES.put("S22", new SCENE("ผู้บรรยาย", "Day5", "“…เหมือนกัน”", null, null, null, "S23", null, null, null));
@@ -354,8 +354,8 @@ public class Day5 {
                 "C) “ไม่รู้สิ”",
                 null, "Q3_A", "Q3_B", "Q3_C"));
 
-        SCENES.put("Q3_A", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +10 ", null, null, null, "S50", null, null, null));
-        SCENES.put("Q3_B", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +5 ", null, null, null, "S55", null, null, null));
+        SCENES.put("Q3_A", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +8 ", null, null, null, "S50", null, null, null));
+        SCENES.put("Q3_B", new SCENE("คุณ", "Day5", "ความสัมพันธ์ +4 ", null, null, null, "S55", null, null, null));
         SCENES.put("Q3_C", new SCENE("คุณ", "Day5", "ความสัมพันธ์ -3 ", null, null, null, "S55", null, null, null));
 
         SCENES.put("S50", new SCENE("ผู้บรรยาย", "Day5", "อีกฝ่ายเงียบไปหลายวินาทีก่อนสูดหายใจลึก", null, null, null,
@@ -493,11 +493,11 @@ public class Day5 {
         // Q1
         if (CURRENT_ID.equals("Q1")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
-            if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
-            if (INDEX == 3)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
         }
 
         // Q2
@@ -513,7 +513,7 @@ public class Day5 {
         // Q3
         if (CURRENT_ID.equals("Q3")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 10);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 8);
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 3)

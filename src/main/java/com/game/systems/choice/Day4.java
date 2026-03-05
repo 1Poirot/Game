@@ -381,8 +381,8 @@ public class Day4 {
                 "C) “ก็แค่สงสัยเฉย ๆ”",
                 null, "Q3_A", "Q3_B", "Q3_C"));
 
-        SCENES.put("Q3_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +7", null, null, null, "S41", null, null, null));
-        SCENES.put("Q3_B", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +1", null, null, null, "S46", null, null, null));
+        SCENES.put("Q3_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +5", null, null, null, "S41", null, null, null));
+        SCENES.put("Q3_B", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +2", null, null, null, "S46", null, null, null));
         SCENES.put("Q3_C", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +3", null, null, null, "S46", null, null, null));
 
         SCENES.put("S41", new SCENE("ผู้บรรยาย", "Day4", "อีกฝ่ายนิ่งไปทันที ก่อนมองคุณตรง ๆ", null, null, null, "S42",
@@ -419,7 +419,7 @@ public class Day4 {
                 "C) “ปล่อยก่อน เดี๋ยวคนเห็น”",
                 null, "Q4_A", "Q4_B", "Q4_C"));
 
-        SCENES.put("Q4_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +8 ", null, null, null, "S55", null, null, null));
+        SCENES.put("Q4_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +5 ", null, null, null, "S55", null, null, null));
         SCENES.put("Q4_B", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +1", null, null, null, "S58", null, null, null));
         SCENES.put("Q4_C", new SCENE("คุณ", "Day4", "ความสัมพันธ์ -2", null, null, null, "S58", null, null, null));
 
@@ -464,7 +464,7 @@ public class Day4 {
                 "C) “ไม่รู้สิ”",
                 null, "Q6_A", "Q6_B", "Q6_C"));
 
-        SCENES.put("Q6_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +10", null, null, null, "S68", null, null, null));
+        SCENES.put("Q6_A", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +6", null, null, null, "S68", null, null, null));
         SCENES.put("Q6_B", new SCENE("คุณ", "Day4", "ความสัมพันธ์ +5", null, null, null, "S78", null, null, null));
         SCENES.put("Q6_C", new SCENE("คุณ", "Day4", "ความสัมพันธ์ -3", null, null, null, "S78", null, null, null));
 
@@ -576,49 +576,58 @@ public class Day4 {
             if (INDEX == 1)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
-            if (INDEX == 3)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
         }
 
         // Q2
         if (CURRENT_ID.equals("Q2")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
             if (INDEX == 2)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
         }
 
         // Q3
         if (CURRENT_ID.equals("Q3")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 4);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
         }
 
         // Q4
         if (CURRENT_ID.equals("Q4")) {
             if (INDEX == 1)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 6);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -1);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -2);
         }
 
         // Q5
         if (CURRENT_ID.equals("Q5")) {
             if (INDEX == 1)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+            if (INDEX == 2)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 1);
+            if (INDEX == 3)
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 3);
+        }
+
+        if (CURRENT_ID.equals("Q6")) {
+            if (INDEX == 1)
                 affection.addAffection(CharacterRoute.KIM_JAEHYUN, 6);
             if (INDEX == 2)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 2);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, 5);
             if (INDEX == 3)
-                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -5);
+                affection.addAffection(CharacterRoute.KIM_JAEHYUN, -3);
         }
 
         // รีเฟรชแถบ

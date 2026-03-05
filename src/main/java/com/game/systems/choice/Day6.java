@@ -317,11 +317,9 @@ public class Day6 {
                 "C) “งั้นไปอย่างอื่นแทนไหม”",
                 null, "Q2_A", "Q2_B", "Q2_C"));
 
-        SCENES.put("Q2_A", new SCENE("คุณ", "Day6", "“กลัวนิดหน่อย… แต่ถ้ามีเธออยู่ก็โอเค”", null, null, null, "S27",
-                null, null, null));
+        SCENES.put("Q2_A", new SCENE("คุณ", "Day6", "“กลัวนิดหน่อย… แต่ถ้ามีเธออยู่ก็โอเค”", null, null, null, "S27",null, null, null));
         SCENES.put("Q2_B", new SCENE("คุณ", "Day6", "“ไม่กลัวเลย”", null, null, null, "S27", null, null, null));
-        SCENES.put("Q2_C",
-                new SCENE("คุณ", "Day6", "“งั้นไปอย่างอื่นแทนไหม”", null, null, null, "S27", null, null, null));
+        SCENES.put("Q2_C",new SCENE("คุณ", "Day6", "“งั้นไปอย่างอื่นแทนไหม”", null, null, null, "S27", null, null, null));
 
         SCENES.put("S27", new SCENE("ผู้บรรยาย", "Day6", "บนชิงช้าสวรรค์", null, null, null, "S28", null, null, null));
         SCENES.put("S28", new SCENE("ผู้บรรยาย", "Day6", "กระเช้าค่อย ๆ ลอยสูงขึ้น เมืองทั้งเมืองค่อย ๆ เล็กลง", null,
